@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
@@ -32,8 +32,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logoutMutation = useMutation(api.auth.logout);
 
   useEffect(() => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     if (session !== undefined) setLoading(false);
-  }, [session]);
+  }, [session, token]);
 
   const login = async (email: string, password: string) => {
     const result = await loginMutation({ email, password });

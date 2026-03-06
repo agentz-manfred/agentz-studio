@@ -4,7 +4,6 @@ import { useAuth } from "../lib/auth";
 import { KanbanBoard } from "../components/kanban/KanbanBoard";
 import { Plus, Users, Film, Lightbulb, TrendingUp } from "lucide-react";
 import { useState } from "react";
-import { Id } from "../../convex/_generated/dataModel";
 
 function StatCard({
   icon: Icon,
@@ -38,8 +37,6 @@ export function AdminDashboard() {
   const clients = useQuery(api.clients.list);
   const updateStatus = useMutation(api.ideas.updateStatus);
   const createIdea = useMutation(api.ideas.create);
-  const createClient = useMutation(api.clients.create);
-
   const [showNewIdea, setShowNewIdea] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newDesc, setNewDesc] = useState("");
@@ -53,9 +50,9 @@ export function AdminDashboard() {
   const handleStatusChange = async (ideaId: string, newStatus: string) => {
     if (!user) return;
     await updateStatus({
-      ideaId: ideaId as Id<"ideas">,
+      ideaId: ideaId as any,
       status: newStatus,
-      userId: user.userId as Id<"users">,
+      userId: user.userId as any,
     });
   };
 
@@ -63,10 +60,10 @@ export function AdminDashboard() {
     e.preventDefault();
     if (!user || !selectedClient) return;
     await createIdea({
-      clientId: selectedClient as Id<"clients">,
+      clientId: selectedClient as any,
       title: newTitle,
       description: newDesc || undefined,
-      createdBy: user.userId as Id<"users">,
+      createdBy: user.userId as any,
     });
     setNewTitle("");
     setNewDesc("");

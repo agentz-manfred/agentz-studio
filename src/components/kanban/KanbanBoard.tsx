@@ -17,7 +17,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
 import { STATUS_LABELS, STATUS_ORDER, cn } from "../../lib/utils";
-import { GripVertical, MessageSquare } from "lucide-react";
+import { GripVertical } from "lucide-react";
 
 interface Idea {
   _id: string;

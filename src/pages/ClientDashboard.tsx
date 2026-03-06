@@ -1,9 +1,8 @@
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
-import { Film, Calendar, MessageSquare, CheckCircle2 } from "lucide-react";
+import { Film, Calendar, CheckCircle2 } from "lucide-react";
 import { STATUS_LABELS } from "../lib/utils";
-import { Id } from "../../convex/_generated/dataModel";
 
 function StatusBadge({ status }: { status: string }) {
   const colors: Record<string, string> = {
@@ -29,7 +28,7 @@ export function ClientDashboard() {
   const { user } = useAuth();
   const ideas = useQuery(
     api.ideas.list,
-    user?.clientId ? { clientId: user.clientId as Id<"clients"> } : "skip"
+    user?.clientId ? { clientId: user.clientId as any } : "skip"
   );
 
   const published = (ideas || []).filter((i) => i.status === "veröffentlicht").length;
