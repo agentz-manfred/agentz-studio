@@ -147,6 +147,21 @@ export const getSession = query({
   },
 });
 
+// List all users (admin only, used for client user management)
+export const listUsers = query({
+  handler: async (ctx) => {
+    const users = await ctx.db.query("users").collect();
+    return users.map((u) => ({
+      _id: u._id,
+      email: u.email,
+      name: u.name,
+      role: u.role,
+      clientId: u.clientId,
+      createdAt: u.createdAt,
+    }));
+  },
+});
+
 export const logout = mutation({
   args: { token: v.string() },
   handler: async (ctx, args) => {

@@ -3,7 +3,7 @@ import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
 import { STATUS_LABELS, STATUS_ORDER } from "../lib/utils";
 import { useState } from "react";
-import { ArrowLeft, MessageSquare, Send, Check, ChevronDown } from "lucide-react";
+import { ArrowLeft, MessageSquare, Send, Check, ChevronDown, FileText, Plus, Save, Clock } from "lucide-react";
 import type { Id } from "../../convex/_generated/dataModel";
 
 function StatusBadge({ status }: { status: string }) {
@@ -37,19 +37,123 @@ function StatusSelector({ current, onChange }: { current: string; onChange: (s: 
         <ChevronDown className="w-3.5 h-3.5" />
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-1 w-48 bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border)] shadow-[var(--shadow-md)] z-10 py-1">
-          {STATUS_ORDER.map((s) => (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 top-full mt-1 w-48 bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border)] shadow-[var(--shadow-md)] z-20 py-1">
+            {STATUS_ORDER.map((s) => (
+              <button
+                key={s}
+                onClick={() => { onChange(s); setOpen(false); }}
+                className={`w-full text-left px-3 py-1.5 text-[13px] hover:bg-[var(--color-surface-2)] transition-colors flex items-center gap-2 ${
+                  s === current ? "font-medium text-[var(--color-accent)]" : "text-[var(--color-text-secondary)]"
+                }`}
+              >
+                {s === current && <Check className="w-3 h-3" />}
+                <span className={s === current ? "" : "ml-5"}>{STATUS_LABELS[s]}</span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function ScriptEditor({ ideaId }: { ideaId: string }) {
+  const { user } = useAuth();
+  const scripts = useQuery(api.scripts.listByIdea, { ideaId: ideaId as Id<"ideas"> });
+  const createScript = useMutation(api.scripts.create);
+  const updateScript = useMutation(api.scripts.update);
+  const [editing, setEditing] = useState(false);
+  const [content, setContent] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const latestScript = scripts && scripts.length > 0
+    ? [...scripts].sort((a, b) => b.version - a.version)[0]
+    : null;
+
+  const handleStartEdit = () => {
+    setContent(latestScript?.content || "");
+    setEditing(true);
+  };
+
+  const handleSave = async () => {
+    if (!user || !content.trim()) return;
+    setSaving(true);
+    if (latestScript) {
+      await updateScript({ id: latestScript._id, content: content.trim() });
+    } else {
+      await createScript({
+        ideaId: ideaId as Id<"ideas">,
+        content: content.trim(),
+        createdBy: user.userId as Id<"users">,
+      });
+    }
+    setSaving(false);
+    setEditing(false);
+  };
+
+  return (
+    <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--color-border-subtle)]">
+        <div className="flex items-center gap-2">
+          <FileText className="w-4 h-4 text-[var(--color-text-secondary)]" />
+          <h3 className="text-[14px] font-medium">Skript</h3>
+          {latestScript && (
+            <span className="text-[12px] text-[var(--color-text-tertiary)]">
+              v{latestScript.version}
+            </span>
+          )}
+        </div>
+        {user?.role === "admin" && !editing && (
+          <button
+            onClick={handleStartEdit}
+            className="flex items-center gap-1.5 h-7 px-3 rounded-[var(--radius-sm)] text-[12px] font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] transition-colors"
+          >
+            {latestScript ? "Bearbeiten" : <><Plus className="w-3 h-3" /> Skript erstellen</>}
+          </button>
+        )}
+      </div>
+
+      {editing ? (
+        <div className="p-4">
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="w-full h-64 px-3 py-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] leading-relaxed font-[var(--font-body)] focus:border-[var(--color-accent)] focus:outline-none transition-colors resize-y"
+            placeholder="Skript hier eingeben…&#10;&#10;Szene 1: Intro&#10;[Kamera: Frontal, Halbnah]&#10;Text: ..."
+            autoFocus
+          />
+          <div className="flex justify-end gap-2 mt-3">
             <button
-              key={s}
-              onClick={() => { onChange(s); setOpen(false); }}
-              className={`w-full text-left px-3 py-1.5 text-[13px] hover:bg-[var(--color-surface-2)] transition-colors flex items-center gap-2 ${
-                s === current ? "font-medium text-[var(--color-accent)]" : "text-[var(--color-text-secondary)]"
-              }`}
+              onClick={() => setEditing(false)}
+              className="h-8 px-4 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[13px] font-medium hover:bg-[var(--color-surface-2)] transition-colors"
             >
-              {s === current && <Check className="w-3 h-3" />}
-              <span className={s === current ? "" : "ml-5"}>{STATUS_LABELS[s]}</span>
+              Abbrechen
             </button>
-          ))}
+            <button
+              onClick={handleSave}
+              disabled={saving || !content.trim()}
+              className="flex items-center gap-1.5 h-8 px-4 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[13px] font-medium hover:bg-[var(--color-accent-hover)] disabled:opacity-50 transition-colors"
+            >
+              <Save className="w-3.5 h-3.5" />
+              Speichern
+            </button>
+          </div>
+        </div>
+      ) : latestScript ? (
+        <div className="p-4">
+          <p className="text-[14px] leading-relaxed text-[var(--color-text-secondary)] whitespace-pre-wrap">
+            {latestScript.content}
+          </p>
+          <p className="text-[11px] text-[var(--color-text-tertiary)] mt-3">
+            Zuletzt bearbeitet: {new Date(latestScript.createdAt).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+          </p>
+        </div>
+      ) : (
+        <div className="px-4 py-8 text-center">
+          <FileText className="w-6 h-6 mx-auto mb-2 text-[var(--color-text-tertiary)] opacity-40" />
+          <p className="text-[13px] text-[var(--color-text-tertiary)]">Noch kein Skript vorhanden</p>
         </div>
       )}
     </div>
@@ -87,7 +191,6 @@ function CommentSection({ ideaId }: { ideaId: string }) {
         )}
       </h3>
 
-      {/* Comment list */}
       <div className="space-y-3 mb-4">
         {(comments || []).filter(c => !c.parentId).map((comment) => (
           <div
@@ -118,7 +221,6 @@ function CommentSection({ ideaId }: { ideaId: string }) {
         ))}
       </div>
 
-      {/* New comment */}
       <form onSubmit={handleSubmit} className="flex gap-2">
         <input
           value={newComment}
@@ -142,10 +244,14 @@ export function IdeaDetail({ ideaId, onBack }: { ideaId: string; onBack: () => v
   const { user } = useAuth();
   const ideas = useQuery(api.ideas.list, {});
   const clients = useQuery(api.clients.list);
+  const shootDates = useQuery(api.shootDates.list, {});
   const updateStatus = useMutation(api.ideas.updateStatus);
 
   const idea = (ideas || []).find((i) => i._id === ideaId);
   const client = idea && clients ? clients.find((c) => c._id === idea.clientId) : null;
+  const ideaShootDates = (shootDates || []).filter((s) =>
+    s.ideaIds.includes(ideaId as Id<"ideas">)
+  );
 
   if (!idea) {
     return (
@@ -201,9 +307,9 @@ export function IdeaDetail({ ideaId, onBack }: { ideaId: string; onBack: () => v
         </div>
       )}
 
-      {/* Status change (admin only) */}
+      {/* Status change + meta (admin only) */}
       {user?.role === "admin" && (
-        <div className="animate-in stagger-2 flex items-center gap-3 mb-8">
+        <div className="animate-in stagger-2 flex items-center gap-3 mb-6">
           <StatusSelector current={idea.status} onChange={handleStatusChange} />
           <span className="text-[12px] text-[var(--color-text-tertiary)]">
             Erstellt am {new Date(idea.createdAt).toLocaleDateString("de-DE")}
@@ -211,8 +317,35 @@ export function IdeaDetail({ ideaId, onBack }: { ideaId: string; onBack: () => v
         </div>
       )}
 
+      {/* Shoot dates */}
+      {ideaShootDates.length > 0 && (
+        <div className="animate-in stagger-2 mb-6">
+          <div className="space-y-2">
+            {ideaShootDates.map((sd) => (
+              <div key={sd._id} className="flex items-center gap-3 bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] px-4 py-3">
+                <Clock className="w-4 h-4 text-[var(--color-text-tertiary)]" />
+                <div>
+                  <p className="text-[14px] font-medium">
+                    {new Date(sd.date + "T00:00:00").toLocaleDateString("de-DE", { weekday: "short", day: "2-digit", month: "long", year: "numeric" })}
+                    {sd.time && ` · ${sd.time}`}
+                  </p>
+                  {sd.location && (
+                    <p className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5">{sd.location}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Script Editor */}
+      <div className="animate-in stagger-3 mb-8">
+        <ScriptEditor ideaId={ideaId} />
+      </div>
+
       {/* Comments */}
-      <div className="animate-in stagger-3">
+      <div className="animate-in stagger-4">
         <CommentSection ideaId={ideaId} />
       </div>
     </div>

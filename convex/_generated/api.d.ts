@@ -12,6 +12,8 @@ import type * as auth from "../auth.js";
 import type * as clients from "../clients.js";
 import type * as comments from "../comments.js";
 import type * as ideas from "../ideas.js";
+import type * as scripts from "../scripts.js";
+import type * as shootDates from "../shootDates.js";
 
 import type {
   ApiFromModules,
@@ -24,6 +26,8 @@ declare const fullApi: ApiFromModules<{
   clients: typeof clients;
   comments: typeof comments;
   ideas: typeof ideas;
+  scripts: typeof scripts;
+  shootDates: typeof shootDates;
 }>;
 
 /**

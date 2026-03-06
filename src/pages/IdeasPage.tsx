@@ -1,9 +1,10 @@
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
-import { Lightbulb, ChevronRight, Search } from "lucide-react";
+import { Lightbulb, ChevronRight, Search, Plus, X } from "lucide-react";
 import { useState } from "react";
 import { STATUS_LABELS } from "../lib/utils";
+import type { Id } from "../../convex/_generated/dataModel";
 
 function StatusDot({ status }: { status: string }) {
   const colors: Record<string, string> = {
@@ -20,12 +21,96 @@ function StatusDot({ status }: { status: string }) {
   return <div className={`w-2 h-2 rounded-full ${colors[status] || "bg-neutral-400"}`} />;
 }
 
+function NewIdeaModal({ onClose }: { onClose: () => void }) {
+  const { user } = useAuth();
+  const clients = useQuery(api.clients.list);
+  const createIdea = useMutation(api.ideas.create);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [clientId, setClientId] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !clientId) return;
+    setSubmitting(true);
+    await createIdea({
+      clientId: clientId as Id<"clients">,
+      title,
+      description: description || undefined,
+      createdBy: user.userId as Id<"users">,
+    });
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] w-full max-w-[440px] mx-4">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border-subtle)]">
+          <h3 className="text-[17px] font-semibold">Neue Idee</h3>
+          <button onClick={onClose} className="p-1 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors">
+            <X className="w-4 h-4 text-[var(--color-text-tertiary)]" />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Kunde *</label>
+            <select
+              value={clientId}
+              onChange={(e) => setClientId(e.target.value)}
+              className="w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none transition-colors"
+              required
+            >
+              <option value="">Kunde wählen…</option>
+              {(clients || []).map((c) => (
+                <option key={c._id} value={c._id}>{c.name}{c.company ? ` (${c.company})` : ""}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Titel *</label>
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none transition-colors"
+              placeholder="Video-Idee…"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Beschreibung</label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full h-24 px-3 py-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none transition-colors resize-none"
+              placeholder="Worum geht's?"
+            />
+          </div>
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onClose} className="flex-1 h-10 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[14px] font-medium hover:bg-[var(--color-surface-2)] transition-colors">
+              Abbrechen
+            </button>
+            <button
+              type="submit"
+              disabled={submitting || !clientId || !title}
+              className="flex-1 h-10 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[14px] font-medium hover:bg-[var(--color-accent-hover)] disabled:opacity-50 transition-colors"
+            >
+              Erstellen
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: string) => void }) {
   const { user } = useAuth();
   const ideas = useQuery(api.ideas.list, user?.role === "client" && user.clientId ? { clientId: user.clientId as any } : {});
   const clients = useQuery(api.clients.list);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [showNewIdea, setShowNewIdea] = useState(false);
 
   const clientMap = (clients || []).reduce(
     (acc, c) => ({ ...acc, [c._id]: c }),
@@ -43,10 +128,23 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
   return (
     <div className="max-w-[960px] mx-auto">
       <div className="px-6 lg:px-8 py-6 border-b border-[var(--color-border-subtle)]">
-        <h1 className="text-[22px] font-semibold tracking-[-0.02em]">Ideen</h1>
-        <p className="text-[14px] text-[var(--color-text-tertiary)] mt-0.5">
-          {(ideas || []).length} Ideen insgesamt
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-[22px] font-semibold tracking-[-0.02em]">Ideen</h1>
+            <p className="text-[14px] text-[var(--color-text-tertiary)] mt-0.5">
+              {(ideas || []).length} Ideen insgesamt
+            </p>
+          </div>
+          {user?.role === "admin" && (
+            <button
+              onClick={() => setShowNewIdea(true)}
+              className="flex items-center gap-2 h-9 px-4 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[14px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">Neue Idee</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Filters */}
@@ -115,6 +213,8 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
           </div>
         )}
       </div>
+
+      {showNewIdea && <NewIdeaModal onClose={() => setShowNewIdea(false)} />}
     </div>
   );
 }
