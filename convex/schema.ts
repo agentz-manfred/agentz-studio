@@ -1,0 +1,95 @@
+import { defineSchema, defineTable } from "convex/server";
+import { v } from "convex/values";
+
+export default defineSchema({
+  users: defineTable({
+    email: v.string(),
+    passwordHash: v.string(),
+    name: v.string(),
+    role: v.union(v.literal("admin"), v.literal("client")),
+    clientId: v.optional(v.id("clients")),
+    createdAt: v.number(),
+  }).index("by_email", ["email"]),
+
+  clients: defineTable({
+    name: v.string(),
+    company: v.optional(v.string()),
+    email: v.string(),
+    phone: v.optional(v.string()),
+    createdAt: v.number(),
+  }),
+
+  ideas: defineTable({
+    clientId: v.id("clients"),
+    title: v.string(),
+    description: v.optional(v.string()),
+    status: v.string(),
+    order: v.number(),
+    createdBy: v.id("users"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_client", ["clientId"])
+    .index("by_status", ["status"]),
+
+  scripts: defineTable({
+    ideaId: v.id("ideas"),
+    content: v.string(),
+    version: v.number(),
+    createdBy: v.id("users"),
+    createdAt: v.number(),
+  }).index("by_idea", ["ideaId"]),
+
+  shootDates: defineTable({
+    clientId: v.id("clients"),
+    ideaIds: v.array(v.id("ideas")),
+    date: v.string(),
+    time: v.optional(v.string()),
+    location: v.optional(v.string()),
+    notes: v.optional(v.string()),
+    createdAt: v.number(),
+  }).index("by_client", ["clientId"]),
+
+  videos: defineTable({
+    ideaId: v.id("ideas"),
+    bunnyVideoId: v.optional(v.string()),
+    bunnyUrl: v.optional(v.string()),
+    thumbnailUrl: v.optional(v.string()),
+    title: v.string(),
+    status: v.string(),
+    uploadedBy: v.id("users"),
+    createdAt: v.number(),
+  }).index("by_idea", ["ideaId"]),
+
+  comments: defineTable({
+    targetType: v.union(
+      v.literal("idea"),
+      v.literal("script"),
+      v.literal("video")
+    ),
+    targetId: v.string(),
+    userId: v.id("users"),
+    content: v.string(),
+    timestamp: v.optional(v.number()),
+    parentId: v.optional(v.id("comments")),
+    resolved: v.optional(v.boolean()),
+    createdAt: v.number(),
+  })
+    .index("by_target", ["targetType", "targetId"])
+    .index("by_parent", ["parentId"]),
+
+  statusUpdates: defineTable({
+    ideaId: v.id("ideas"),
+    fromStatus: v.string(),
+    toStatus: v.string(),
+    userId: v.id("users"),
+    note: v.optional(v.string()),
+    createdAt: v.number(),
+  }).index("by_idea", ["ideaId"]),
+
+  sessions: defineTable({
+    userId: v.id("users"),
+    token: v.string(),
+    expiresAt: v.number(),
+  }).index("by_token", ["token"]),
+});
