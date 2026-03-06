@@ -21,6 +21,7 @@ function generateToken(): string {
   return token;
 }
 
+// Register is admin-only: only existing admins can create new users
 export const register = mutation({
   args: {
     email: v.string(),
@@ -28,8 +29,25 @@ export const register = mutation({
     name: v.string(),
     role: v.union(v.literal("admin"), v.literal("client")),
     clientId: v.optional(v.id("clients")),
+    // The session token of the admin performing the registration
+    adminToken: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    // Check if any users exist. If none, allow first admin creation (bootstrap).
+    const anyUser = await ctx.db.query("users").first();
+
+    if (anyUser) {
+      // Users exist — require admin authentication
+      if (!args.adminToken) throw new Error("Nur Admins können Nutzer anlegen");
+      const session = await ctx.db
+        .query("sessions")
+        .withIndex("by_token", (q) => q.eq("token", args.adminToken!))
+        .first();
+      if (!session || session.expiresAt < Date.now()) throw new Error("Ungültige Session");
+      const admin = await ctx.db.get(session.userId);
+      if (!admin || admin.role !== "admin") throw new Error("Nur Admins können Nutzer anlegen");
+    }
+
     const existing = await ctx.db
       .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.email))
@@ -41,7 +59,7 @@ export const register = mutation({
       email: args.email,
       passwordHash: simpleHash(args.password),
       name: args.name,
-      role: args.role,
+      role: anyUser ? args.role : "admin", // First user is always admin
       clientId: args.clientId,
       createdAt: Date.now(),
     });
@@ -54,6 +72,29 @@ export const register = mutation({
     });
 
     return { userId, token };
+  },
+});
+
+// Seed admin: creates initial admin if no users exist
+export const seedAdmin = mutation({
+  args: {
+    email: v.string(),
+    password: v.string(),
+    name: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const anyUser = await ctx.db.query("users").first();
+    if (anyUser) return { status: "exists", message: "Admin existiert bereits" };
+
+    const userId = await ctx.db.insert("users", {
+      email: args.email,
+      passwordHash: simpleHash(args.password),
+      name: args.name,
+      role: "admin",
+      createdAt: Date.now(),
+    });
+
+    return { status: "created", userId };
   },
 });
 

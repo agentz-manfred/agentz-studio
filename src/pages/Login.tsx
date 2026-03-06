@@ -3,11 +3,9 @@ import { useAuth } from "../lib/auth";
 import { Loader2 } from "lucide-react";
 
 export function LoginPage() {
-  const { login, register } = useAuth();
-  const [isRegister, setIsRegister] = useState(false);
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -16,11 +14,7 @@ export function LoginPage() {
     setError("");
     setSubmitting(true);
     try {
-      if (isRegister) {
-        await register(email, password, name, "admin");
-      } else {
-        await login(email, password);
-      }
+      await login(email, password);
     } catch (err: any) {
       setError(err.message || "Fehler bei der Anmeldung");
     } finally {
@@ -33,6 +27,9 @@ export function LoginPage() {
       <div className="animate-in w-full max-w-[380px] px-6">
         {/* Logo */}
         <div className="text-center mb-12">
+          <div className="w-12 h-12 mx-auto mb-4 bg-[var(--color-accent)] rounded-[var(--radius-md)] flex items-center justify-center">
+            <span className="text-white text-[20px] font-bold">A</span>
+          </div>
           <h1 className="text-[28px] font-semibold tracking-[-0.02em] text-[var(--color-text-primary)]">
             AgentZ Studio
           </h1>
@@ -43,22 +40,6 @@ export function LoginPage() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {isRegister && (
-            <div className="animate-in">
-              <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">
-                Name
-              </label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full h-11 px-3.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-1)] text-[15px] transition-all duration-200 ease-[var(--ease-out)] focus:border-[var(--color-accent)] focus:ring-0 focus:outline-none placeholder:text-[var(--color-text-tertiary)]"
-                placeholder="Dein Name"
-                required
-              />
-            </div>
-          )}
-
           <div>
             <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">
               E-Mail
@@ -70,6 +51,7 @@ export function LoginPage() {
               className="w-full h-11 px-3.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-1)] text-[15px] transition-all duration-200 ease-[var(--ease-out)] focus:border-[var(--color-accent)] focus:ring-0 focus:outline-none placeholder:text-[var(--color-text-tertiary)]"
               placeholder="mail@beispiel.de"
               required
+              autoComplete="email"
             />
           </div>
 
@@ -85,6 +67,7 @@ export function LoginPage() {
               placeholder="••••••••"
               required
               minLength={6}
+              autoComplete="current-password"
             />
           </div>
 
@@ -100,18 +83,13 @@ export function LoginPage() {
             className="w-full h-11 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[15px] font-medium transition-all duration-200 ease-[var(--ease-out)] hover:bg-[var(--color-accent-hover)] disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-            {isRegister ? "Registrieren" : "Anmelden"}
+            Anmelden
           </button>
         </form>
 
-        <div className="mt-6 text-center">
-          <button
-            onClick={() => { setIsRegister(!isRegister); setError(""); }}
-            className="text-[13px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
-          >
-            {isRegister ? "Bereits registriert? Anmelden" : "Noch kein Konto? Registrieren"}
-          </button>
-        </div>
+        <p className="mt-8 text-center text-[12px] text-[var(--color-text-tertiary)]">
+          © {new Date().getFullYear()} AgentZ Media
+        </p>
       </div>
     </div>
   );

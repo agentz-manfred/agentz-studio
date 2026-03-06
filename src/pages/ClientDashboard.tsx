@@ -1,7 +1,7 @@
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
-import { Film, Calendar, CheckCircle2 } from "lucide-react";
+import { Film, Calendar, CheckCircle2, ChevronRight } from "lucide-react";
 import { STATUS_LABELS } from "../lib/utils";
 
 function StatusBadge({ status }: { status: string }) {
@@ -24,7 +24,7 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-export function ClientDashboard() {
+export function ClientDashboard({ onNavigate }: { onNavigate: (page: string, id?: string) => void }) {
   const { user } = useAuth();
   const ideas = useQuery(
     api.ideas.list,
@@ -35,19 +35,15 @@ export function ClientDashboard() {
   const active = (ideas || []).filter((i) => !["veröffentlicht"].includes(i.status)).length;
 
   return (
-    <div className="flex-1 overflow-auto">
+    <div className="max-w-[960px] mx-auto">
       {/* Header */}
-      <div className="px-8 py-6 border-b border-[var(--color-border-subtle)]">
-        <h1 className="text-[22px] font-semibold tracking-[-0.02em]">
-          Meine Videos
-        </h1>
-        <p className="text-[14px] text-[var(--color-text-tertiary)] mt-0.5">
-          Übersicht aller Projekte
-        </p>
+      <div className="px-6 lg:px-8 py-6 border-b border-[var(--color-border-subtle)]">
+        <h1 className="text-[22px] font-semibold tracking-[-0.02em]">Meine Videos</h1>
+        <p className="text-[14px] text-[var(--color-text-tertiary)] mt-0.5">Übersicht aller Projekte</p>
       </div>
 
       {/* Stats */}
-      <div className="px-8 py-6 grid grid-cols-3 gap-4">
+      <div className="px-6 lg:px-8 py-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="animate-in stagger-1 bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] p-5 flex items-center gap-3">
           <div className="w-9 h-9 rounded-[var(--radius-md)] bg-[var(--color-surface-2)] flex items-center justify-center">
             <Film className="w-[18px] h-[18px] text-[var(--color-text-secondary)]" />
@@ -78,29 +74,32 @@ export function ClientDashboard() {
       </div>
 
       {/* Ideas List */}
-      <div className="px-8 pb-8">
-        <h2 className="text-[16px] font-medium mb-4">Projekte</h2>
-        <div className="space-y-2">
+      <div className="px-6 lg:px-8 pb-8">
+        <h2 className="text-[16px] font-medium mb-3">Projekte</h2>
+        <div className="space-y-1.5">
           {(ideas || []).map((idea, i) => (
-            <div
+            <button
               key={idea._id}
-              className={`animate-in stagger-${Math.min(i + 1, 4)} bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-4 flex items-center justify-between hover:shadow-[var(--shadow-xs)] transition-shadow`}
+              onClick={() => onNavigate("idea", idea._id)}
+              className={`animate-in stagger-${Math.min(i + 1, 4)} w-full text-left bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-4 flex items-center justify-between hover:shadow-[var(--shadow-sm)] transition-shadow group`}
             >
-              <div>
+              <div className="min-w-0">
                 <p className="text-[14px] font-medium">{idea.title}</p>
                 {idea.description && (
-                  <p className="text-[13px] text-[var(--color-text-secondary)] mt-0.5 line-clamp-1">
-                    {idea.description}
-                  </p>
+                  <p className="text-[13px] text-[var(--color-text-secondary)] mt-0.5 line-clamp-1">{idea.description}</p>
                 )}
               </div>
-              <StatusBadge status={idea.status} />
-            </div>
+              <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+                <StatusBadge status={idea.status} />
+                <ChevronRight className="w-4 h-4 text-[var(--color-text-tertiary)] opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+            </button>
           ))}
           {(ideas || []).length === 0 && (
             <div className="text-center py-12 text-[var(--color-text-tertiary)]">
               <Film className="w-8 h-8 mx-auto mb-2 opacity-40" />
               <p className="text-[14px]">Noch keine Projekte</p>
+              <p className="text-[13px] mt-1">Ihr Produktionsteam arbeitet daran!</p>
             </div>
           )}
         </div>
