@@ -1,5 +1,10 @@
 # AgentZ Studio — CHANGELOG
 
+## v2.5.0 (07.03.2026)
+- **App-Icon neu** — Dark navy + white Z + blue play accent (8.5/10 premium rating)
+  - All sizes: 512, 192, 180 (apple-touch), 32 (favicon), SVG + PNG
+- **Mediathek Sortierung** — Sort dropdown (A→Z, Neueste, Status)
+
 ## v2.4.0 (07.03.2026)
 - **Kundenfilter (Admin Sidebar)** — Global client filter
   - Dropdown in Sidebar (Admin only) to filter all views by client
