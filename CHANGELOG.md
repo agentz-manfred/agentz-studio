@@ -1,5 +1,15 @@
 # AgentZ Studio — CHANGELOG
 
+## v2.1.0 (07.03.2026)
+- **Kanban Touch-DnD Fix** — Ganze Karte als Drag-Handle, Scroll-Lock während Drag, Long-Press 300ms
+- **KI Ideen-Generierung** — Monat auswählen, Anzahl = Videos/Monat aus Kundenprofil, Kundenkontext/Plattformen/Kategorien mitgegeben
+- **KI Ideen pro Kunde** — "KI-Ideen" Button auf ClientDetail Seite
+- **KI Skript-Generierung** — Kundenkontext, Plattformen und Hauptplattform automatisch mitgegeben
+- **Impressum + Datenschutz** — Vollständige rechtliche Seiten (DSGVO-konform), öffentlich zugänglich
+- **Cookie-Banner** — Minimaler Cookie-Hinweis, nur technisch notwendige Cookies
+- **Footer-Links** — Impressum & Datenschutz Links auf Login-Seite
+- **Hover-States** — Globaler cursor:pointer für alle interaktiven Elemente
+
 ## v2.0.0 (07.03.2026)
 - **KI-Modell-Auswahl** — Suchbares Model-Picker in Einstellungen, OpenRouter API, Preise pro Token
 - **Settings Store** — Key/Value Convex-Tabelle für globale Einstellungen

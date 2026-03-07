@@ -12,7 +12,7 @@ Neue Wünsche werden unten angehängt oder an der richtigen Prio-Stelle eingefü
 - [ ] **Kalender-View verbessern:** Drehtermine + Veröffentlichungsdaten visuell anzeigen
 - [ ] **Kunden-Dashboard verfeinern:** Super einfach für Nicht-Techniker, Tooltips, Hilfetexte, Onboarding
 
-- [ ] **Hover-States Desktop:** Alle klickbaren Elemente müssen klar erkennbar sein (cursor pointer, Farbwechsel, Elevation)
+
 - [ ] **PWA Install prüfen:** Service Worker korrekt registriert? Install-Banner erscheint auf Android? Settings-Seite: "App installieren" Button funktioniert?
 - [ ] **Logo-Entwicklung:** Eigenes AgentZ Studio Logo als SVG oder via Bildgenerierung (Nano Banana kann keine Transparenz, evtl. GPT-Modell nutzen). Favicon, App-Icon, Touch-Icon einheitlich gestalten.
 - [ ] **Generelles Styling-Audit:** Konsistenz überall prüfen, einheitliches Design-System sicherstellen
