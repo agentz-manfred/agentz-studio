@@ -2,7 +2,8 @@ import { useAuth } from "../lib/auth";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useTheme } from "../hooks/useTheme";
-import { Settings, Users, Film, Database, Shield, ExternalLink, Sun, Moon, Monitor, Lock, Check, AlertCircle, BarChart3, Palette } from "lucide-react";
+import { usePWAInstall } from "../hooks/usePWAInstall";
+import { Settings, Users, Film, Database, Shield, ExternalLink, Sun, Moon, Monitor, Lock, Check, AlertCircle, BarChart3, Palette, Download, Smartphone, Share, Plus } from "lucide-react";
 import { useState } from "react";
 
 function InfoRow({ label, value, mono }: { label: string; value: string | number; mono?: boolean }) {
@@ -147,6 +148,89 @@ function ThemeSection() {
   );
 }
 
+function PWAInstallSection() {
+  const { canInstall, isInstalled, isIOS, install } = usePWAInstall();
+  const [installing, setInstalling] = useState(false);
+
+  if (isInstalled) return null;
+
+  if (isIOS) {
+    return (
+      <div className="animate-in stagger-1 bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] overflow-hidden">
+        <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-[var(--color-border-subtle)]">
+          <Smartphone className="w-4 h-4 text-[var(--color-text-tertiary)]" strokeWidth={1.75} />
+          <span className="text-[14px] font-semibold">App installieren</span>
+        </div>
+        <div className="px-5 py-4">
+          <p className="text-[13px] text-[var(--color-text-secondary)] mb-4 leading-relaxed">
+            Installiere AgentZ Studio als App auf deinem Home-Bildschirm:
+          </p>
+          <div className="space-y-3">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-[var(--color-accent-surface)] flex items-center justify-center">
+                <Share className="w-3.5 h-3.5 text-[var(--color-accent)]" />
+              </div>
+              <div>
+                <p className="text-[13px] font-medium">1. Teilen-Button antippen</p>
+                <p className="text-[12px] text-[var(--color-text-tertiary)]">Das Teilen-Symbol in der Safari-Leiste</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-[var(--color-accent-surface)] flex items-center justify-center">
+                <Plus className="w-3.5 h-3.5 text-[var(--color-accent)]" />
+              </div>
+              <div>
+                <p className="text-[13px] font-medium">2. „Zum Home-Bildschirm"</p>
+                <p className="text-[12px] text-[var(--color-text-tertiary)]">Im Menü nach unten scrollen</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-[var(--color-accent-surface)] flex items-center justify-center">
+                <Check className="w-3.5 h-3.5 text-[var(--color-accent)]" />
+              </div>
+              <div>
+                <p className="text-[13px] font-medium">3. „Hinzufügen" bestätigen</p>
+                <p className="text-[12px] text-[var(--color-text-tertiary)]">Die App erscheint auf deinem Home-Bildschirm</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!canInstall) return null;
+
+  const handleInstall = async () => {
+    setInstalling(true);
+    await install();
+    setInstalling(false);
+  };
+
+  return (
+    <div className="animate-in stagger-1 bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] overflow-hidden">
+      <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-[var(--color-border-subtle)]">
+        <Download className="w-4 h-4 text-[var(--color-text-tertiary)]" strokeWidth={1.75} />
+        <span className="text-[14px] font-semibold">App installieren</span>
+      </div>
+      <div className="px-5 py-4">
+        <p className="text-[13px] text-[var(--color-text-secondary)] mb-4 leading-relaxed">
+          Installiere AgentZ Studio als App auf deinem Gerät — schneller Zugriff, Vollbild-Modus, Offline-Support.
+        </p>
+        <button
+          onClick={handleInstall}
+          disabled={installing}
+          className="h-10 px-5 rounded-[var(--radius-md)] text-white text-[13px] font-medium transition-all duration-200 hover:brightness-110 disabled:opacity-50 flex items-center gap-2"
+          style={{ background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)' }}
+        >
+          <Download className="w-4 h-4" />
+          App installieren
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function SettingsPage() {
   const { user } = useAuth();
   const clients = useQuery(api.clients.list);
@@ -167,6 +251,9 @@ export function SettingsPage() {
       </div>
 
       <div className="px-6 lg:px-8 space-y-5">
+        {/* PWA Install */}
+        <PWAInstallSection />
+
         {/* Account */}
         <div className="animate-in stagger-1 bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] overflow-hidden">
           <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-[var(--color-border-subtle)]">
@@ -248,7 +335,7 @@ export function SettingsPage() {
             <span className="text-[14px] font-semibold">System</span>
           </div>
           <div className="px-5 py-1">
-            <InfoRow label="Version" value="1.2.0" />
+            <InfoRow label="Version" value="1.3.0" />
             <InfoRow label="Backend" value="Convex" />
             <InfoRow label="Video CDN" value="Bunny Stream" />
             <InfoRow label="Hosting" value="Vercel" />
