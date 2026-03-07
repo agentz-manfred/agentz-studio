@@ -18,6 +18,7 @@ import {
   List,
   Search,
   Clock,
+  ArrowUpDown,
 } from "lucide-react";
 import { VIDEO_STATUS_LABELS, STATUS_BADGE_STYLES } from "../lib/utils";
 import { useClientFilter } from "../lib/clientFilter";
@@ -28,6 +29,7 @@ interface LibraryPageProps {
 }
 
 type ViewMode = "grid" | "list";
+type SortMode = "name" | "date" | "status";
 
 function FolderCard({
   folder,
@@ -233,6 +235,7 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
   const { user } = useAuth();
   const [currentFolderId, setCurrentFolderId] = useState<Id<"folders"> | undefined>(undefined);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [sortMode, setSortMode] = useState<SortMode>("name");
   const [searchQuery, setSearchQuery] = useState("");
   const [showNewFolder, setShowNewFolder] = useState(false);
   const [renaming, setRenaming] = useState<{ type: "folder" | "video"; id: string; name: string } | null>(null);
@@ -252,12 +255,16 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
   const renameVideo = useMutation(api.videos.rename);
   const moveVideo = useMutation(api.videos.moveToFolder);
 
-  const filteredFolders = (folders || []).filter((f) =>
-    !searchQuery || f.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  const filteredVideos = (videos || []).filter((v) =>
-    !searchQuery || v.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredFolders = (folders || [])
+    .filter((f) => !searchQuery || f.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => sortMode === "date" ? b.createdAt - a.createdAt : a.name.localeCompare(b.name));
+  const filteredVideos = (videos || [])
+    .filter((v) => !searchQuery || v.title.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => {
+      if (sortMode === "date") return b.createdAt - a.createdAt;
+      if (sortMode === "status") return (a.status || "").localeCompare(b.status || "");
+      return a.title.localeCompare(b.title);
+    });
 
   const handleCreateFolder = async (name: string) => {
     if (!user?.userId) return;
@@ -361,6 +368,16 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
             className="w-full h-9 pl-9 pr-3 rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] text-[13px] focus:border-[var(--color-border)] focus:outline-none transition-colors"
           />
         </div>
+        <select
+          value={sortMode}
+          onChange={(e) => setSortMode(e.target.value as SortMode)}
+          className="h-9 px-2 pr-7 rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] text-[12px] appearance-none cursor-pointer"
+          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 6px center" }}
+        >
+          <option value="name">A→Z</option>
+          <option value="date">Neueste</option>
+          <option value="status">Status</option>
+        </select>
         <div className="flex gap-0.5 bg-[var(--color-surface-2)] rounded-[var(--radius-md)] p-0.5">
           <button
             onClick={() => setViewMode("grid")}
