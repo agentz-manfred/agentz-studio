@@ -45,12 +45,15 @@ export function LoginPage() {
         <div className="relative z-10 max-w-[420px] px-12">
           {/* Logo */}
           <div className="flex items-center gap-4 mb-10">
-            <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center border border-white/20 p-2.5">
-              <img src="/agentz-logo.svg" alt="AgentZ" className="w-full h-full object-contain" />
+            <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center border border-white/20 p-2.5 relative">
+              <div className="absolute inset-0 rounded-2xl animate-pulse opacity-20" style={{ background: 'radial-gradient(circle, #60a5fa 0%, transparent 70%)' }} />
+              <img src="/agentz-logo.svg" alt="AgentZ" className="w-full h-full object-contain relative z-10" />
             </div>
             <div>
-              <h1 className="text-[28px] font-bold text-white tracking-[-0.03em]">AgentZ</h1>
-              <p className="text-[14px] text-blue-200 tracking-wide uppercase font-medium">Studio</p>
+              <h1 className="text-[28px] font-bold text-white tracking-[-0.03em]">
+                agent<span className="text-blue-300">Z</span>
+              </h1>
+              <p className="text-[14px] text-blue-200/80 tracking-[0.2em] uppercase font-medium">Studio</p>
             </div>
           </div>
 

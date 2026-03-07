@@ -182,14 +182,18 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
   return (
     <aside className="w-[240px] h-dvh flex flex-col border-r border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] relative overflow-y-auto">
       {/* Brand */}
-      <div className="h-16 flex items-center px-6 border-b border-[var(--color-border-subtle)]">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-[var(--radius-sm)] bg-[var(--color-accent)] flex items-center justify-center p-[3px]">
+      <div className="h-16 flex items-center px-6 border-b border-[var(--color-border-subtle)] relative overflow-hidden">
+        {/* Subtle brand gradient glow */}
+        <div className="absolute inset-0 opacity-[0.04]" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, transparent 60%)' }} />
+        <div className="flex items-center gap-2.5 relative z-10">
+          <div className="w-8 h-8 rounded-[8px] flex items-center justify-center p-[4px]" style={{ background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)' }}>
             <img src="/agentz-logo.svg" alt="AgentZ" className="w-full h-full object-contain" />
           </div>
-          <span className="text-[15px] font-semibold tracking-[-0.02em]">
-            AgentZ Studio
-          </span>
+          <div className="flex items-baseline gap-0">
+            <span className="text-[15px] font-semibold tracking-[-0.02em]">agent</span>
+            <span className="text-[15px] font-bold tracking-[-0.02em] text-[var(--color-accent)]">Z</span>
+            <span className="text-[13px] font-medium text-[var(--color-text-tertiary)] ml-1.5 tracking-wide uppercase">Studio</span>
+          </div>
         </div>
       </div>
 
