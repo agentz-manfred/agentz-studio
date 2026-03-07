@@ -147,4 +147,10 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_user_read", ["userId", "read"]),
+
+  settings: defineTable({
+    key: v.string(),
+    value: v.string(),
+    updatedAt: v.number(),
+  }).index("by_key", ["key"]),
 });

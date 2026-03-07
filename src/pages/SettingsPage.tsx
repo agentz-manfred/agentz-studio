@@ -3,8 +3,8 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useTheme } from "../hooks/useTheme";
 import { usePWAInstall } from "../hooks/usePWAInstall";
-import { Settings, Users, Film, Database, Shield, ExternalLink, Sun, Moon, Monitor, Lock, Check, AlertCircle, BarChart3, Palette, Download, Smartphone, Share, Plus } from "lucide-react";
-import { useState } from "react";
+import { Settings, Users, Film, Database, Shield, ExternalLink, Sun, Moon, Monitor, Lock, Check, AlertCircle, BarChart3, Palette, Download, Smartphone, Share, Plus, Sparkles, Search, Loader2 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 
 function InfoRow({ label, value, mono }: { label: string; value: string | number; mono?: boolean }) {
   return (
@@ -231,6 +231,150 @@ function PWAInstallSection() {
   );
 }
 
+interface OpenRouterModel {
+  id: string;
+  name: string;
+  pricing: { prompt: string; completion: string };
+}
+
+function AiModelSection() {
+  const currentModel = useQuery(api.settings.get, { key: "ai_model" });
+  const setSetting = useMutation(api.settings.set);
+  const [search, setSearch] = useState("");
+  const [models, setModels] = useState<OpenRouterModel[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const displayModel = currentModel || "google/gemini-2.0-flash-001";
+
+  useEffect(() => {
+    // Close dropdown on outside click
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const fetchModels = async () => {
+    if (models.length > 0) { setOpen(true); return; }
+    setLoading(true);
+    try {
+      const res = await fetch("https://openrouter.ai/api/v1/models");
+      const data = await res.json();
+      const sorted = (data.data || [])
+        .filter((m: any) => m.id && m.name)
+        .map((m: any) => ({
+          id: m.id,
+          name: m.name,
+          pricing: {
+            prompt: m.pricing?.prompt || "0",
+            completion: m.pricing?.completion || "0",
+          },
+        }))
+        .sort((a: OpenRouterModel, b: OpenRouterModel) => a.name.localeCompare(b.name));
+      setModels(sorted);
+      setOpen(true);
+    } catch (err) {
+      console.error("Failed to fetch models:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredModels = models.filter(
+    (m) =>
+      m.id.toLowerCase().includes(search.toLowerCase()) ||
+      m.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const selectModel = async (modelId: string) => {
+    await setSetting({ key: "ai_model", value: modelId });
+    setOpen(false);
+    setSearch("");
+  };
+
+  const formatPrice = (price: string) => {
+    const num = parseFloat(price) * 1_000_000;
+    if (num === 0) return "gratis";
+    if (num < 0.01) return "<$0.01/M";
+    return `$${num.toFixed(2)}/M`;
+  };
+
+  return (
+    <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] overflow-hidden">
+      <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-[var(--color-border-subtle)]">
+        <Sparkles className="w-4 h-4 text-[var(--color-text-tertiary)]" strokeWidth={1.75} />
+        <span className="text-[14px] font-semibold">KI-Modell</span>
+      </div>
+      <div className="px-5 py-4" ref={dropdownRef}>
+        <p className="text-[12px] text-[var(--color-text-tertiary)] mb-2">
+          Aktuelles Modell für Skript- und Ideen-Generierung
+        </p>
+        <button
+          onClick={fetchModels}
+          disabled={loading}
+          className="w-full flex items-center justify-between h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[13px] font-mono hover:border-[var(--color-accent)] transition-colors text-left"
+        >
+          <span className="truncate">{displayModel}</span>
+          {loading ? (
+            <Loader2 className="w-4 h-4 animate-spin text-[var(--color-text-tertiary)]" />
+          ) : (
+            <Search className="w-4 h-4 text-[var(--color-text-tertiary)]" />
+          )}
+        </button>
+
+        {open && (
+          <div className="mt-2 border border-[var(--color-border)] rounded-[var(--radius-md)] bg-[var(--color-surface-1)] shadow-[var(--shadow-lg)] overflow-hidden">
+            <div className="p-2 border-b border-[var(--color-border-subtle)]">
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Modell suchen…"
+                className="w-full h-8 px-2 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none"
+                autoFocus
+              />
+            </div>
+            <div className="max-h-[280px] overflow-y-auto">
+              {filteredModels.length === 0 ? (
+                <p className="px-3 py-4 text-center text-[12px] text-[var(--color-text-tertiary)]">
+                  {search ? "Kein Modell gefunden" : "Modelle werden geladen…"}
+                </p>
+              ) : (
+                filteredModels.slice(0, 100).map((m) => (
+                  <button
+                    key={m.id}
+                    onClick={() => selectModel(m.id)}
+                    className={`w-full text-left px-3 py-2 hover:bg-[var(--color-surface-2)] transition-colors flex items-center justify-between gap-2 ${
+                      m.id === displayModel ? "bg-[var(--color-surface-2)]" : ""
+                    }`}
+                  >
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-medium truncate">{m.name}</p>
+                      <p className="text-[11px] text-[var(--color-text-tertiary)] font-mono truncate">{m.id}</p>
+                    </div>
+                    <div className="flex-shrink-0 text-right">
+                      <p className="text-[10px] text-[var(--color-text-tertiary)]">
+                        In: {formatPrice(m.pricing.prompt)}
+                      </p>
+                      <p className="text-[10px] text-[var(--color-text-tertiary)]">
+                        Out: {formatPrice(m.pricing.completion)}
+                      </p>
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function SettingsPage() {
   const { user } = useAuth();
   const clients = useQuery(api.clients.list);
@@ -328,6 +472,9 @@ export function SettingsPage() {
           </div>
         )}
 
+        {/* AI Model */}
+        {user?.role === "admin" && <AiModelSection />}
+
         {/* System */}
         <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] overflow-hidden">
           <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-[var(--color-border-subtle)]">
@@ -335,7 +482,7 @@ export function SettingsPage() {
             <span className="text-[14px] font-semibold">System</span>
           </div>
           <div className="px-5 py-1">
-            <InfoRow label="Version" value="1.7.0" />
+            <InfoRow label="Version" value="2.0.0" />
             <InfoRow label="Backend" value="Convex" />
             <InfoRow label="Video CDN" value="Bunny Stream" />
             <InfoRow label="Hosting" value="Vercel" />

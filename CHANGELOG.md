@@ -1,5 +1,8 @@
 # AgentZ Studio — CHANGELOG
 
+## v1.9.1 (07.03.2026)
+- **Kategorie-Zuweisung bei Ideen-Erstellung** — Pill-Buttons mit Kundenfarben, dynamisch nach Kundenwahl
+
 ## v1.9.0 (07.03.2026)
 - **Fix: Kanban Drag & Drop** — TouchSensor für Mobile, MeasuringStrategy.Always für korrekte Desktop-Positionierung, KeyboardSensor für Accessibility
 - **TipTap WYSIWYG-Editor** — Kundenkontext + Skript-Editor nutzen jetzt TipTap (Headings, Listen, Bold, Code, Zitate, Trennlinien)

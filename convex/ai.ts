@@ -1,5 +1,13 @@
-import { action } from "./_generated/server";
+import { action, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
+
+const DEFAULT_MODEL = "google/gemini-2.0-flash-001";
+
+async function getAiModel(ctx: any): Promise<string> {
+  const setting = await ctx.runQuery(internal.ai.getModelSetting);
+  return setting || DEFAULT_MODEL;
+}
 
 export const generateScript = action({
   args: {
@@ -13,11 +21,12 @@ export const generateScript = action({
     existingScript: v.optional(v.string()),
     mode: v.union(v.literal("generate"), v.literal("improve"), v.literal("shorten")),
   },
-  handler: async (_ctx, args) => {
+  handler: async (ctx, args) => {
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
       throw new Error("OPENROUTER_API_KEY nicht konfiguriert");
     }
+    const model = await getAiModel(ctx);
 
     const systemPrompt = `Du bist ein erfahrener Social-Media-Skriptautor für TikTok und Instagram Reels. 
 Du schreibst Skripte für Unternehmen, die kurze, authentische Videos für Social Media produzieren.
@@ -83,7 +92,7 @@ Gib nur das gekürzte Skript zurück.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.0-flash-001",
+        model,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
@@ -117,11 +126,12 @@ export const suggestIdeas = action({
     existingIdeas: v.array(v.string()),
     categoryNames: v.optional(v.array(v.string())),
   },
-  handler: async (_ctx, args) => {
+  handler: async (ctx, args) => {
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
       throw new Error("OPENROUTER_API_KEY nicht konfiguriert");
     }
+    const model = await getAiModel(ctx);
 
     const contextBlock = args.clientContext ? `\n\nKUNDENKONTEXT (wichtig — Tonalität, Zielgruppe, Do's & Don'ts beachten!):\n${args.clientContext}` : "";
     const platformInfo = args.clientMainPlatform ? `\nHauptplattform: ${args.clientMainPlatform}` : (args.clientPlatforms?.length ? `\nPlattformen: ${args.clientPlatforms.join(", ")}` : "");
@@ -143,7 +153,7 @@ Beispiel: [{"title": "...", "description": "..."${args.categoryNames?.length ? '
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.0-flash-001",
+        model,
         messages: [{ role: "user", content: prompt }],
         max_tokens: 1000,
         temperature: 0.9,
@@ -164,5 +174,16 @@ Beispiel: [{"title": "...", "description": "..."${args.categoryNames?.length ? '
     } catch {
       return [];
     }
+  },
+});
+
+export const getModelSetting = internalQuery({
+  args: {},
+  handler: async (ctx) => {
+    const setting = await ctx.db
+      .query("settings")
+      .withIndex("by_key", (q: any) => q.eq("key", "ai_model"))
+      .first();
+    return setting?.value ?? null;
   },
 });

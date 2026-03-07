@@ -4,7 +4,7 @@ Items werden von oben nach unten abgearbeitet. Erledigtes kommt ins CHANGELOG.md
 Neue Wünsche werden unten angehängt oder an der richtigen Prio-Stelle eingefügt.
 
 ## Features
-- [ ] **Kategorie-Zuweisung bei Ideen-Erstellung:** Beim Erstellen einer Idee Kategorie auswählen können
+
 - [ ] **KI-Modell-Auswahl (Admin Settings):** OpenRouter API (/api/v1/models) abfragen, suchbares Dropdown mit Modellname + Preise pro Token. Seitenübergreifend speichern. Key: scripts/.openrouter_key
 - [ ] **KI Ideen-Generierung:** Button "Ideen generieren" pro Kunde. Monat auswählen, Anzahl = Videos/Monat aus Kundenprofil. Kundenkontext + Plattformen werden mitgegeben. NUR Admin sichtbar!
 - [ ] **KI Skript-Generierung erweitern:** Kundenkontext automatisch mitgeben bei Generierung
