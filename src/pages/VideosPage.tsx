@@ -1,14 +1,12 @@
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Film, Play, Clock } from "lucide-react";
-import { useAuth } from "../lib/auth";
 
 interface VideosPageProps {
   onNavigate: (page: string, id?: string) => void;
 }
 
 export function VideosPage({ onNavigate }: VideosPageProps) {
-  const _auth = useAuth();
   const videos = useQuery(api.videos.list, {});
   const ideas = useQuery(api.ideas.list, {});
   const clients = useQuery(api.clients.list);

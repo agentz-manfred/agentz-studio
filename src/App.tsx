@@ -11,6 +11,7 @@ import { PipelinePage } from "./pages/PipelinePage";
 import { VideosPage } from "./pages/VideosPage";
 import { VideoReview } from "./pages/VideoReview";
 import { SharePage } from "./pages/SharePage";
+import { SettingsPage } from "./pages/SettingsPage";
 import { Sidebar } from "./components/layout/Sidebar";
 import { MobileHeader } from "./components/layout/MobileHeader";
 import { useState, useEffect } from "react";
@@ -26,6 +27,7 @@ function AdminRoutes({ currentPage, onNavigate }: { currentPage: string; onNavig
   if (currentPage === "videos") return <VideosPage onNavigate={onNavigate} />;
   if (currentPage.startsWith("video:")) return <VideoReview videoId={currentPage.split(":")[1]} onBack={() => onNavigate("videos")} />;
   if (currentPage === "calendar") return <CalendarPage />;
+  if (currentPage === "settings") return <SettingsPage />;
   return <AdminDashboard onNavigate={onNavigate} />;
 }
 

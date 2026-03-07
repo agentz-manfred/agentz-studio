@@ -13,6 +13,7 @@ import {
   Bell,
   X,
   Check,
+  Settings,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import type { Id } from "../../../convex/_generated/dataModel";
@@ -29,6 +30,7 @@ const adminNav = [
   { id: "ideas", label: "Ideen", icon: Lightbulb },
   { id: "videos", label: "Videos", icon: Play },
   { id: "calendar", label: "Kalender", icon: Calendar },
+  { id: "settings", label: "Einstellungen", icon: Settings },
 ];
 
 const clientNav = [

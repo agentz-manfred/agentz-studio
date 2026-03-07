@@ -28,3 +28,16 @@ export const STATUS_ORDER = [
   "review",
   "veröffentlicht",
 ];
+
+/** Subtle dot color per pipeline stage */
+export const STATUS_COLORS: Record<string, string> = {
+  idee: "#a3a3a3",
+  skript: "#8b5cf6",
+  freigabe: "#f59e0b",
+  korrektur: "#ef4444",
+  freigegeben: "#3b82f6",
+  gedreht: "#06b6d4",
+  geschnitten: "#8b5cf6",
+  review: "#f97316",
+  "veröffentlicht": "#16a34a",
+};

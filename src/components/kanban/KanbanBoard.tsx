@@ -16,7 +16,7 @@ import { useDroppable } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
-import { STATUS_LABELS, STATUS_ORDER, cn } from "../../lib/utils";
+import { STATUS_LABELS, STATUS_ORDER, STATUS_COLORS, cn } from "../../lib/utils";
 import { GripVertical } from "lucide-react";
 
 interface Idea {
@@ -54,6 +54,10 @@ function KanbanColumn({
     >
       <div className="flex items-center justify-between px-3 py-3">
         <div className="flex items-center gap-2">
+          <div
+            className="w-2 h-2 rounded-full flex-shrink-0"
+            style={{ background: STATUS_COLORS[status] || "#a3a3a3" }}
+          />
           <span className="text-[13px] font-medium text-[var(--color-text-secondary)]">
             {STATUS_LABELS[status] || status}
           </span>
