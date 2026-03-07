@@ -93,3 +93,21 @@ TODO ist leer → Security Review, Funktionalitätstests, visueller Tiefencheck,
 - 1-2 Runs für restliche Backend-Isolation (videos, clients, folders, etc.)
 - 1 Run für Funktionalitätstests + Edge Cases
 - 1 Run für visuellen Feinschliff
+
+**UPDATE (Ende Run 3):**
+Restliche Backend-Isolation AUCH in diesem Run erledigt! Alle Convex-Dateien abgesichert:
+- videos.ts: create, updateStatus, updateBunnyInfo, moveToFolder, rename, linkIdea, update, remove
+- folders.ts: create, rename, update, move, remove
+- clients.ts: create, update + list (client-scoped)
+- shootDates.ts: create, update, remove + list (client-scoped)
+- scripts.ts: create, update
+- categories.ts: create, update, remove
+- comments.ts: create, resolve
+
+Frontend komplett angepasst: VideoUpload, VideoReview, LibraryPage, CalendarPage, ClientDetail, IdeaDetail
+
+Commits:
+- `37103d6` — Auth on ALL remaining endpoints
+
+### Zusammenfassung Run 3:
+**Security-Sprint abgeschlossen.** Alle 10 Convex-Dateien haben jetzt token-basierte Auth. Jede Mutation prüft Berechtigung. Client-User sehen nur eigene Daten. Notifications.create ist intern. Keine offenen Endpoints mehr.
