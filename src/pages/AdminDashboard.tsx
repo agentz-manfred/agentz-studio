@@ -425,24 +425,56 @@ export function AdminDashboard({
         </div>
       </div>
 
-      {/* Two-column layout for larger screens */}
-      <div className="px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-6">
-          <PipelineProgress ideas={ideas || []} />
-          <UpcomingShoots
-            shoots={shoots || []}
-            clients={clients || []}
-            onNavigate={onNavigate}
-          />
+      {/* Content area */}
+      {(ideas || []).length === 0 && (shoots || []).length === 0 ? (
+        /* Empty state / Onboarding */
+        <div className="px-6 lg:px-8 animate-in stagger-3">
+          <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border)] p-8 text-center">
+            <div className="w-14 h-14 mx-auto mb-4 rounded-[var(--radius-lg)] bg-[var(--color-surface-2)] flex items-center justify-center">
+              <Lightbulb className="w-6 h-6 text-[var(--color-text-tertiary)]" strokeWidth={1.5} />
+            </div>
+            <h2 className="text-[18px] font-semibold tracking-[-0.02em] mb-1">Bereit loszulegen</h2>
+            <p className="text-[14px] text-[var(--color-text-tertiary)] max-w-md mx-auto mb-6">
+              Erstelle deinen ersten Kunden und lege die erste Video-Idee an. Von hier aus steuerst du die komplette Production Pipeline.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <button
+                onClick={() => onNavigate("clients")}
+                className="flex items-center gap-2 h-10 px-5 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[14px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors"
+              >
+                <Users className="w-4 h-4" />
+                Ersten Kunden anlegen
+              </button>
+              <button
+                onClick={() => onNavigate("ideas")}
+                className="flex items-center gap-2 h-10 px-5 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[14px] font-medium hover:bg-[var(--color-surface-2)] transition-colors"
+              >
+                <Lightbulb className="w-4 h-4" />
+                Erste Idee erstellen
+              </button>
+            </div>
+          </div>
         </div>
-        <div>
-          <RecentActivity
-            ideas={ideas || []}
-            clients={clients || []}
-            onNavigate={onNavigate}
-          />
+      ) : (
+        /* Two-column layout for larger screens */
+        <div className="px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            <PipelineProgress ideas={ideas || []} />
+            <UpcomingShoots
+              shoots={shoots || []}
+              clients={clients || []}
+              onNavigate={onNavigate}
+            />
+          </div>
+          <div>
+            <RecentActivity
+              ideas={ideas || []}
+              clients={clients || []}
+              onNavigate={onNavigate}
+            />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
