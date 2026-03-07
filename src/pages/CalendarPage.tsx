@@ -435,7 +435,7 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
     if (month === 11) { setMonth(0); setYear(year + 1); } else setMonth(month + 1);
   };
 
-  const today = now.toISOString().split("T")[0];
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 
   const upcoming = allEvents
     .filter((e) => e.date >= today)
