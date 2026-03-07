@@ -1,27 +1,15 @@
+import { useState, useCallback, useRef, useMemo } from "react";
 import {
-  DndContext,
-  DragOverlay,
-  closestCorners,
-  PointerSensor,
-  TouchSensor,
-  KeyboardSensor,
-  MeasuringStrategy,
-  useSensor,
-  useSensors,
-  type DragStartEvent,
-  type DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  sortableKeyboardCoordinates,
-} from "@dnd-kit/sortable";
-import { useDroppable } from "@dnd-kit/core";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { useState, useCallback, useRef } from "react";
+  Kanban,
+  KanbanBoard as KanbanBoardPrimitive,
+  KanbanColumn,
+  KanbanItem,
+  KanbanItemHandle,
+  KanbanOverlay,
+} from "../ui/kanban";
 import { STATUS_LABELS, STATUS_ORDER, STATUS_COLORS, cn } from "../../lib/utils";
-import { GripVertical, Clock } from "lucide-react";
+import { GripVertical } from "lucide-react";
+import type { UniqueIdentifier } from "@dnd-kit/core";
 
 interface Idea {
   _id: string;
@@ -38,71 +26,14 @@ interface KanbanBoardProps {
   onIdeaClick?: (ideaId: string) => void;
 }
 
-function KanbanColumn({
-  status,
-  ideas,
-  children,
-}: {
-  status: string;
-  ideas: Idea[];
-  children: React.ReactNode;
-}) {
-  const { setNodeRef, isOver } = useDroppable({ id: status });
-  const color = STATUS_COLORS[status] || "#a3a3a3";
-  // Convert hex to rgba for alpha support
-  const hexToRgba = (hex: string, alpha: number) => {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r},${g},${b},${alpha})`;
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      className={cn(
-        "flex-shrink-0 w-[280px] flex flex-col rounded-[var(--radius-lg)] transition-all duration-200 border border-transparent",
-        isOver && "border-[var(--color-border)]"
-      )}
-      style={isOver ? { borderColor: color, background: hexToRgba(color, 0.04) } : undefined}
-    >
-      <div className="flex items-center justify-between px-3 py-2.5 rounded-t-[var(--radius-lg)]"
-        style={{ background: hexToRgba(color, 0.06) }}
-      >
-        <div className="flex items-center gap-2">
-          <div
-            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-            style={{ background: color, boxShadow: `0 0 0 2px ${hexToRgba(color, 0.2)}` }}
-          />
-          <span className="text-[13px] font-semibold" style={{ color }}>
-            {STATUS_LABELS[status] || status}
-          </span>
-        </div>
-        <span
-          className="text-[11px] font-bold tabular-nums w-5 h-5 rounded-full flex items-center justify-center"
-          style={{ background: hexToRgba(color, 0.12), color }}
-        >
-          {ideas.length}
-        </span>
-      </div>
-      <div className="flex-1 px-1.5 pb-2 pt-1.5 space-y-1.5 min-h-[120px]">
-        <SortableContext
-          items={ideas.map((i) => i._id)}
-          strategy={verticalListSortingStrategy}
-        >
-          {children}
-          {ideas.length === 0 && (
-            <div className="flex items-center justify-center h-20 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border)] text-[12px] text-[var(--color-text-tertiary)] opacity-40">
-              Hierher ziehen
-            </div>
-          )}
-        </SortableContext>
-      </div>
-    </div>
-  );
+function hexToRgba(hex: string, alpha: number) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
 }
 
-function KanbanCard({
+function CardContent({
   idea,
   clientName,
   isDragging,
@@ -113,83 +44,26 @@ function KanbanCard({
   isDragging?: boolean;
   onClick?: () => void;
 }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging: isSortDragging,
-  } = useSortable({ id: idea._id, data: { status: idea.status } });
-
-  // Track whether drag activated so we suppress the click
-  const didDragRef = useRef(false);
-  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  // Wrap listeners to track drag activation
-  const wrappedListeners = listeners
-    ? Object.fromEntries(
-        Object.entries(listeners).map(([key, handler]) => [
-          key,
-          (e: any) => {
-            if (key === "onPointerDown" || key === "onTouchStart") {
-              didDragRef.current = false;
-              if (e.touches?.[0]) {
-                touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-              }
-            }
-            return (handler as any)(e);
-          },
-        ])
-      )
-    : {};
-
-  const handleClick = useCallback(() => {
-    // Don't navigate if we just finished dragging
-    if (didDragRef.current) {
-      didDragRef.current = false;
-      return;
-    }
-    onClick?.();
-  }, [onClick]);
-
-  if (isSortDragging) {
-    didDragRef.current = true;
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        className="h-[72px] rounded-[var(--radius-md)] border border-dashed border-[var(--color-border)] bg-[var(--color-surface-2)]"
-      />
-    );
-  }
-
   const statusColor = STATUS_COLORS[idea.status] || "#a3a3a3";
 
   return (
     <div
-      ref={setNodeRef}
-      {...attributes}
-      {...wrappedListeners}
-      style={{ ...style, '--kanban-accent': statusColor, touchAction: 'manipulation' } as React.CSSProperties}
       className={cn(
         "group bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-3",
-        "cursor-grab active:cursor-grabbing select-none",
-        !isDragging && "kanban-card-accent",
-        isDragging && "shadow-[var(--shadow-lg)] rotate-[2deg]"
+        "select-none kanban-card-accent",
+        isDragging && "shadow-[var(--shadow-lg)] rotate-[2deg]",
+        onClick && "cursor-pointer",
       )}
-      onClick={handleClick}
+      style={{ '--kanban-accent': statusColor } as React.CSSProperties}
+      onClick={onClick}
       role={onClick ? "button" : undefined}
     >
       <div className="flex items-start gap-2">
-        <div className="mt-0.5 p-0.5 rounded text-[var(--color-text-tertiary)] opacity-30 group-hover:opacity-100 transition-opacity flex-shrink-0">
+        <KanbanItemHandle
+          className="mt-0.5 p-0.5 rounded text-[var(--color-text-tertiary)] opacity-30 group-hover:opacity-100 transition-opacity flex-shrink-0"
+        >
           <GripVertical className="w-3.5 h-3.5" />
-        </div>
+        </KanbanItemHandle>
         <div className="flex-1 min-w-0">
           <p className="text-[14px] font-medium leading-tight truncate group-hover:text-[var(--color-accent)] transition-colors">
             {idea.title}
@@ -217,93 +91,133 @@ function KanbanCard({
   );
 }
 
-const measuringConfig = {
-  droppable: {
-    strategy: MeasuringStrategy.Always,
-  },
-};
-
 export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }: KanbanBoardProps) {
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  // Build column data as Record<status, Idea[]>
+  const columns = useMemo(() => {
+    const result: Record<string, Idea[]> = {};
+    for (const status of STATUS_ORDER) {
+      result[status] = ideas.filter((i) => i.status === status);
+    }
+    return result;
+  }, [ideas]);
+
+  // Track columns locally for DnD live updates
+  const [localColumns, setLocalColumns] = useState<Record<string, Idea[]> | null>(null);
+  const displayColumns = localColumns ?? columns;
+
+  // When ideas change externally, reset local state
+  const prevIdeasRef = useRef(ideas);
+  if (prevIdeasRef.current !== ideas) {
+    prevIdeasRef.current = ideas;
+    if (localColumns) setLocalColumns(null);
+  }
+
+  const handleValueChange = useCallback(
+    (newColumns: Record<UniqueIdentifier, Idea[]>) => {
+      setLocalColumns(newColumns as Record<string, Idea[]>);
+    },
+    [],
   );
 
-  const columns = STATUS_ORDER.map((status) => ({
-    status,
-    ideas: ideas.filter((i) => i.status === status),
-  }));
-
-  const activeIdea = ideas.find((i) => i._id === activeId);
-
-  const handleDragStart = (event: DragStartEvent) => {
-    setActiveId(event.active.id as string);
-    // Prevent body scroll during drag on touch devices
-    document.body.style.overflow = "hidden";
-    document.body.style.touchAction = "none";
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    setActiveId(null);
-    // Restore scrolling
-    document.body.style.overflow = "";
-    document.body.style.touchAction = "";
-
-    if (!over) return;
-
-    const activeIdea = ideas.find((i) => i._id === active.id);
-    if (!activeIdea) return;
-
-    // Dropped on a column
-    const targetStatus = STATUS_ORDER.includes(over.id as string)
-      ? (over.id as string)
-      : ideas.find((i) => i._id === over.id)?.status;
-
-    if (targetStatus && targetStatus !== activeIdea.status) {
-      onStatusChange(activeIdea._id, targetStatus);
+  const handleDragEnd = useCallback(() => {
+    // After drop, check what moved and fire onStatusChange
+    if (!localColumns) return;
+    for (const [status, statusIdeas] of Object.entries(localColumns)) {
+      for (const idea of statusIdeas) {
+        if (idea.status !== status) {
+          onStatusChange(idea._id, status);
+        }
+      }
     }
-  };
+    setLocalColumns(null);
+  }, [localColumns, onStatusChange]);
+
+  const findIdea = useCallback(
+    (id: UniqueIdentifier) => {
+      for (const statusIdeas of Object.values(displayColumns)) {
+        const found = statusIdeas.find((i) => i._id === String(id));
+        if (found) return found;
+      }
+      return null;
+    },
+    [displayColumns],
+  );
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCorners}
-      onDragStart={handleDragStart}
+    <Kanban
+      value={displayColumns}
+      onValueChange={handleValueChange}
+      getItemValue={(item: Idea) => item._id}
       onDragEnd={handleDragEnd}
-      onDragCancel={() => {
-        setActiveId(null);
-        document.body.style.overflow = "";
-        document.body.style.touchAction = "";
-      }}
-      measuring={measuringConfig}
     >
-      <div className="flex gap-3 overflow-x-auto pb-4 px-1">
-        {columns.map(({ status, ideas: columnIdeas }) => (
-          <KanbanColumn key={status} status={status} ideas={columnIdeas}>
-            {columnIdeas.map((idea) => (
-              <KanbanCard
-                key={idea._id}
-                idea={idea}
-                clientName={clientNames?.[idea.clientId]}
-                onClick={onIdeaClick ? () => onIdeaClick(idea._id) : undefined}
-              />
-            ))}
-          </KanbanColumn>
-        ))}
-      </div>
+      <KanbanBoardPrimitive className="flex gap-3 overflow-x-auto pb-4 px-1">
+        {STATUS_ORDER.map((status) => {
+          const color = STATUS_COLORS[status] || "#a3a3a3";
+          const statusIdeas = displayColumns[status] || [];
 
-      <DragOverlay>
-        {activeIdea && (
-          <KanbanCard
-            idea={activeIdea}
-            clientName={clientNames?.[activeIdea.clientId]}
-            isDragging
-          />
-        )}
-      </DragOverlay>
-    </DndContext>
+          return (
+            <KanbanColumn
+              key={status}
+              value={status}
+              className="flex-shrink-0 w-[280px]"
+            >
+              {/* Column Header */}
+              <div
+                className="flex items-center justify-between px-3 py-2.5 rounded-t-[var(--radius-lg)]"
+                style={{ background: hexToRgba(color, 0.06) }}
+              >
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                    style={{ background: color, boxShadow: `0 0 0 2px ${hexToRgba(color, 0.2)}` }}
+                  />
+                  <span className="text-[13px] font-semibold" style={{ color }}>
+                    {STATUS_LABELS[status] || status}
+                  </span>
+                </div>
+                <span
+                  className="text-[11px] font-bold tabular-nums w-5 h-5 rounded-full flex items-center justify-center"
+                  style={{ background: hexToRgba(color, 0.12), color }}
+                >
+                  {statusIdeas.length}
+                </span>
+              </div>
+
+              {/* Cards */}
+              <div className="flex-1 px-1.5 pb-2 pt-1.5 space-y-1.5 min-h-[120px]">
+                {statusIdeas.map((idea) => (
+                  <KanbanItem key={idea._id} value={idea._id}>
+                    <CardContent
+                      idea={idea}
+                      clientName={clientNames?.[idea.clientId]}
+                      onClick={onIdeaClick ? () => onIdeaClick(idea._id) : undefined}
+                    />
+                  </KanbanItem>
+                ))}
+                {statusIdeas.length === 0 && (
+                  <div className="flex items-center justify-center h-20 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border)] text-[12px] text-[var(--color-text-tertiary)] opacity-40">
+                    Hierher ziehen
+                  </div>
+                )}
+              </div>
+            </KanbanColumn>
+          );
+        })}
+      </KanbanBoardPrimitive>
+
+      <KanbanOverlay>
+        {({ value }) => {
+          const idea = findIdea(value);
+          if (!idea) return <div className="size-full rounded-md bg-[var(--color-accent)]/10" />;
+          return (
+            <CardContent
+              idea={idea}
+              clientName={clientNames?.[idea.clientId]}
+              isDragging
+            />
+          );
+        }}
+      </KanbanOverlay>
+    </Kanban>
   );
 }
