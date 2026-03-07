@@ -3,6 +3,10 @@
 Items werden von oben nach unten abgearbeitet. Erledigtes kommt ins CHANGELOG.md.
 Neue Wünsche werden unten angehängt oder an der richtigen Prio-Stelle eingefügt.
 
+## Bugs (PRIO!)
+
+- [ ] **Kanban Drag & Drop kaputt:** Mobile: Items lassen sich nicht per Touch verschieben (kurz klicken und langes Drücken funktionieren beide nicht). Desktop: Gegrabte Items sind um hunderte Pixel nach rechts versetzt statt an der Mausposition. Webrecherche machen nach besserer Lösung — jemand hat mit chart.js/einer kostenlosen Library ein perfekt funktionierendes Kanban mit DnD gebaut. Aktuelle dnd-kit Implementation prüfen/ersetzen wenn nötig.
+
 ## Features
 
 - [ ] **TipTap WYSIWYG-Editor:** Kundenkontext-Editor von Textarea auf TipTap/ProseMirror upgraden. Notion-Style. Markdown-Paste muss funktionieren (Copy-Paste aus .md → korrekt formatiert). Headings, Listen, Bold, Code. Package: @tiptap/react, @tiptap/starter-kit, @tiptap/extension-placeholder
