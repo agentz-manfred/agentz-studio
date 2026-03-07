@@ -158,7 +158,7 @@ function NewShootDateModal({ onClose, defaultDate }: { onClose: () => void; defa
   );
 }
 
-export function CalendarPage() {
+export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: string) => void } = {}) {
   const { user } = useAuth();
   const clients = useQuery(api.clients.list);
   const shootDates = useQuery(api.shootDates.list, {});
