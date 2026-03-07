@@ -12,6 +12,7 @@ import { VideosPage } from "./pages/VideosPage";
 import { VideoReview } from "./pages/VideoReview";
 import { SharePage } from "./pages/SharePage";
 import { SettingsPage } from "./pages/SettingsPage";
+import { ClientDetail } from "./pages/ClientDetail";
 import { Sidebar } from "./components/layout/Sidebar";
 import { MobileHeader } from "./components/layout/MobileHeader";
 import { useState, useEffect } from "react";
@@ -22,7 +23,8 @@ import { CommandPalette } from "./components/layout/CommandPalette";
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 
 function AdminRoutes({ currentPage, onNavigate }: { currentPage: string; onNavigate: (page: string, id?: string) => void }) {
-  if (currentPage === "clients") return <ClientsPage />;
+  if (currentPage === "clients") return <ClientsPage onNavigate={onNavigate} />;
+  if (currentPage.startsWith("client:")) return <ClientDetail clientId={currentPage.split(":")[1]} onBack={() => onNavigate("clients")} onNavigate={onNavigate} />;
   if (currentPage === "ideas") return <IdeasPage onNavigate={onNavigate} />;
   if (currentPage.startsWith("idea:")) return <IdeaDetail ideaId={currentPage.split(":")[1]} onBack={() => onNavigate("ideas")} onNavigate={onNavigate} />;
   if (currentPage === "pipeline") return <PipelinePage />;

@@ -209,6 +209,7 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
           const isActive =
             currentPage === item.id ||
             (item.id === "ideas" && currentPage.startsWith("idea:")) ||
+            (item.id === "clients" && currentPage.startsWith("client:")) ||
             (item.id === "videos" && currentPage.startsWith("video:"));
           return (
             <button

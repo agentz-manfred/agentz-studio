@@ -197,7 +197,7 @@ function CreateLoginModal({ client, onClose }: { client: any; onClose: () => voi
   );
 }
 
-export function ClientsPage() {
+export function ClientsPage({ onNavigate }: { onNavigate?: (page: string, id?: string) => void }) {
   const clients = useQuery(api.clients.list);
   const users = useQuery(api.auth.listUsers);
   const [showCreate, setShowCreate] = useState(false);
@@ -256,7 +256,8 @@ export function ClientsPage() {
           return (
             <div
               key={client._id}
-              className={`animate-in stagger-${Math.min(i + 1, 4)} bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-4 hover:shadow-[var(--shadow-sm)] transition-shadow`}
+              onClick={() => onNavigate?.("client", client._id)}
+              className={`animate-in stagger-${Math.min(i + 1, 4)} bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-4 hover:shadow-[var(--shadow-sm)] transition-shadow cursor-pointer`}
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-3 min-w-0">

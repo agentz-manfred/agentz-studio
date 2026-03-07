@@ -72,6 +72,11 @@ function KanbanColumn({
           strategy={verticalListSortingStrategy}
         >
           {children}
+          {ideas.length === 0 && (
+            <div className="flex items-center justify-center h-20 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border)] text-[12px] text-[var(--color-text-tertiary)] opacity-50">
+              Hierher ziehen
+            </div>
+          )}
         </SortableContext>
       </div>
     </div>
