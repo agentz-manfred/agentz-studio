@@ -10,8 +10,9 @@ function setRef<T>(ref: PossibleRef<T>, value: T) {
   if (typeof ref === "function") {
     return ref(value);
   }
+
   if (ref !== null && ref !== undefined) {
-    (ref as React.MutableRefObject<T>).current = value;
+    ref.current = value;
   }
 }
 
@@ -33,7 +34,7 @@ function composeRefs<T>(...refs: PossibleRef<T>[]): React.RefCallback<T> {
           if (typeof cleanup === "function") {
             cleanup();
           } else {
-            setRef(refs[i], null as any);
+            setRef(refs[i], null);
           }
         }
       };
@@ -42,7 +43,7 @@ function composeRefs<T>(...refs: PossibleRef<T>[]): React.RefCallback<T> {
 }
 
 function useComposedRefs<T>(...refs: PossibleRef<T>[]): React.RefCallback<T> {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // biome-ignore lint/correctness/useExhaustiveDependencies: we want to memoize by all values
   return React.useCallback(composeRefs(...refs), refs);
 }
 

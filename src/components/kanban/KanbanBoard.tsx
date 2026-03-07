@@ -4,11 +4,9 @@ import {
   KanbanBoard as KanbanBoardPrimitive,
   KanbanColumn,
   KanbanItem,
-  KanbanItemHandle,
   KanbanOverlay,
 } from "../ui/kanban";
 import { STATUS_LABELS, STATUS_ORDER, STATUS_COLORS, cn } from "../../lib/utils";
-import { GripVertical } from "lucide-react";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 
 interface Idea {
@@ -33,66 +31,7 @@ function hexToRgba(hex: string, alpha: number) {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-function CardContent({
-  idea,
-  clientName,
-  isDragging,
-  onClick,
-}: {
-  idea: Idea;
-  clientName?: string;
-  isDragging?: boolean;
-  onClick?: () => void;
-}) {
-  const statusColor = STATUS_COLORS[idea.status] || "#a3a3a3";
-
-  return (
-    <div
-      className={cn(
-        "group bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-3",
-        "select-none kanban-card-accent",
-        isDragging && "shadow-[var(--shadow-lg)] rotate-[2deg]",
-        onClick && "cursor-pointer",
-      )}
-      style={{ '--kanban-accent': statusColor } as React.CSSProperties}
-      onClick={onClick}
-      role={onClick ? "button" : undefined}
-    >
-      <div className="flex items-start gap-2">
-        <KanbanItemHandle
-          className="mt-0.5 p-0.5 rounded text-[var(--color-text-tertiary)] opacity-30 group-hover:opacity-100 transition-opacity flex-shrink-0"
-        >
-          <GripVertical className="w-3.5 h-3.5" />
-        </KanbanItemHandle>
-        <div className="flex-1 min-w-0">
-          <p className="text-[14px] font-medium leading-tight truncate group-hover:text-[var(--color-accent)] transition-colors">
-            {idea.title}
-          </p>
-          {idea.description && (
-            <p className="mt-1.5 text-[13px] text-[var(--color-text-secondary)] line-clamp-2 leading-relaxed">
-              {idea.description}
-            </p>
-          )}
-          {clientName && (
-            <div className="flex items-center gap-1.5 mt-2">
-              <div className="w-4.5 h-4.5 rounded-full bg-[var(--color-surface-3)] flex items-center justify-center flex-shrink-0">
-                <span className="text-[9px] font-bold text-[var(--color-text-secondary)]">
-                  {clientName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
-                </span>
-              </div>
-              <span className="text-[12px] text-[var(--color-text-tertiary)]">
-                {clientName}
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }: KanbanBoardProps) {
-  // Build column data as Record<status, Idea[]>
   const columns = useMemo(() => {
     const result: Record<string, Idea[]> = {};
     for (const status of STATUS_ORDER) {
@@ -101,11 +40,9 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }:
     return result;
   }, [ideas]);
 
-  // Track columns locally for DnD live updates
   const [localColumns, setLocalColumns] = useState<Record<string, Idea[]> | null>(null);
   const displayColumns = localColumns ?? columns;
 
-  // When ideas change externally, reset local state
   const prevIdeasRef = useRef(ideas);
   if (prevIdeasRef.current !== ideas) {
     prevIdeasRef.current = ideas;
@@ -120,7 +57,6 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }:
   );
 
   const handleDragEnd = useCallback(() => {
-    // After drop, check what moved and fire onStatusChange
     if (!localColumns) return;
     for (const [status, statusIdeas] of Object.entries(localColumns)) {
       for (const idea of statusIdeas) {
@@ -150,7 +86,7 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }:
       getItemValue={(item: Idea) => item._id}
       onDragEnd={handleDragEnd}
     >
-      <KanbanBoardPrimitive className="flex gap-3 overflow-x-auto pb-4 px-1">
+      <KanbanBoardPrimitive className="grid auto-cols-[260px] grid-flow-col gap-3 overflow-x-auto pb-4">
         {STATUS_ORDER.map((status) => {
           const color = STATUS_COLORS[status] || "#a3a3a3";
           const statusIdeas = displayColumns[status] || [];
@@ -159,43 +95,78 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }:
             <KanbanColumn
               key={status}
               value={status}
-              className="flex-shrink-0 w-[280px]"
+              className="!bg-transparent !border-0 !p-0 !rounded-none gap-0"
             >
               {/* Column Header */}
-              <div
-                className="flex items-center justify-between px-3 py-2.5 rounded-t-[var(--radius-lg)]"
-                style={{ background: hexToRgba(color, 0.06) }}
-              >
+              <div className="flex items-center justify-between px-2 py-2 mb-2">
                 <div className="flex items-center gap-2">
                   <div
-                    className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                    style={{ background: color, boxShadow: `0 0 0 2px ${hexToRgba(color, 0.2)}` }}
+                    className="w-2 h-2 rounded-full flex-shrink-0"
+                    style={{ background: color }}
                   />
-                  <span className="text-[13px] font-semibold" style={{ color }}>
+                  <span className="text-[12px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)]">
                     {STATUS_LABELS[status] || status}
                   </span>
                 </div>
                 <span
-                  className="text-[11px] font-bold tabular-nums w-5 h-5 rounded-full flex items-center justify-center"
-                  style={{ background: hexToRgba(color, 0.12), color }}
+                  className="text-[11px] font-medium tabular-nums px-1.5 py-0.5 rounded-md"
+                  style={{ background: hexToRgba(color, 0.1), color }}
                 >
                   {statusIdeas.length}
                 </span>
               </div>
 
               {/* Cards */}
-              <div className="flex-1 px-1.5 pb-2 pt-1.5 space-y-1.5 min-h-[120px]">
-                {statusIdeas.map((idea) => (
-                  <KanbanItem key={idea._id} value={idea._id}>
-                    <CardContent
-                      idea={idea}
-                      clientName={clientNames?.[idea.clientId]}
-                      onClick={onIdeaClick ? () => onIdeaClick(idea._id) : undefined}
-                    />
-                  </KanbanItem>
-                ))}
+              <div className="flex flex-col gap-2 min-h-[100px]">
+                {statusIdeas.map((idea) => {
+                  const clientName = clientNames?.[idea.clientId];
+                  return (
+                    <KanbanItem
+                      key={idea._id}
+                      value={idea._id}
+                      asHandle
+                      asChild
+                    >
+                      <div
+                        className={cn(
+                          "rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] p-3 shadow-sm",
+                          "transition-shadow hover:shadow-md",
+                          "active:shadow-lg active:scale-[1.02]",
+                        )}
+                        onClick={onIdeaClick ? () => onIdeaClick(idea._id) : undefined}
+                      >
+                        {/* Accent bar top */}
+                        <div
+                          className="h-0.5 -mx-3 -mt-3 mb-3 rounded-t-lg"
+                          style={{ background: color }}
+                        />
+                        <p className="text-[13px] font-medium leading-snug line-clamp-2">
+                          {idea.title}
+                        </p>
+                        {idea.description && (
+                          <p className="mt-1.5 text-[12px] text-[var(--color-text-tertiary)] line-clamp-2 leading-relaxed">
+                            {idea.description}
+                          </p>
+                        )}
+                        {clientName && (
+                          <div className="flex items-center gap-1.5 mt-2.5 pt-2 border-t border-[var(--color-border-subtle)]">
+                            <div
+                              className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-[9px] font-bold text-white"
+                              style={{ background: color }}
+                            >
+                              {clientName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+                            </div>
+                            <span className="text-[11px] text-[var(--color-text-tertiary)]">
+                              {clientName}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </KanbanItem>
+                  );
+                })}
                 {statusIdeas.length === 0 && (
-                  <div className="flex items-center justify-center h-20 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border)] text-[12px] text-[var(--color-text-tertiary)] opacity-40">
+                  <div className="flex items-center justify-center h-20 rounded-lg border border-dashed border-[var(--color-border)] text-[11px] text-[var(--color-text-tertiary)] opacity-30">
                     Hierher ziehen
                   </div>
                 )}
@@ -208,13 +179,32 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }:
       <KanbanOverlay>
         {({ value }) => {
           const idea = findIdea(value);
-          if (!idea) return <div className="size-full rounded-md bg-[var(--color-accent)]/10" />;
+          if (!idea) return <div className="size-full rounded-lg bg-[var(--color-accent)]/10" />;
+          const clientName = clientNames?.[idea.clientId];
+          const color = STATUS_COLORS[idea.status] || "#a3a3a3";
           return (
-            <CardContent
-              idea={idea}
-              clientName={clientNames?.[idea.clientId]}
-              isDragging
-            />
+            <div className="rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] p-3 shadow-xl rotate-[2deg] w-[260px]">
+              <div
+                className="h-0.5 -mx-3 -mt-3 mb-3 rounded-t-lg"
+                style={{ background: color }}
+              />
+              <p className="text-[13px] font-medium leading-snug line-clamp-2">
+                {idea.title}
+              </p>
+              {clientName && (
+                <div className="flex items-center gap-1.5 mt-2">
+                  <div
+                    className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-[9px] font-bold text-white"
+                    style={{ background: color }}
+                  >
+                    {clientName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+                  </div>
+                  <span className="text-[11px] text-[var(--color-text-tertiary)]">
+                    {clientName}
+                  </span>
+                </div>
+              )}
+            </div>
           );
         }}
       </KanbanOverlay>

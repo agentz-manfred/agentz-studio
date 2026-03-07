@@ -1,3 +1,77 @@
+# Dice UI Kanban — Referenz für Implementierung
+
+DIESE DATEI ENTHÄLT DEN EXAKTEN CODE VON https://www.diceui.com/docs/components/radix/kanban
+KOPIERE DIESEN CODE 1:1. NICHT UMSCHREIBEN. NICHT "ANPASSEN". NICHT "NACHBAUEN".
+
+## Installation
+
+```bash
+npm install @dnd-kit/core @dnd-kit/modifiers @dnd-kit/sortable @dnd-kit/utilities @radix-ui/react-slot
+```
+
+Oder via shadcn CLI:
+```bash
+npx shadcn@latest add @diceui/kanban
+```
+
+## 1. lib/compose-refs.ts
+
+```ts
+/**
+ * @see https://github.com/radix-ui/primitives/blob/main/packages/react/compose-refs/src/compose-refs.tsx
+ */
+
+import * as React from "react";
+
+type PossibleRef<T> = React.Ref<T> | undefined;
+
+function setRef<T>(ref: PossibleRef<T>, value: T) {
+  if (typeof ref === "function") {
+    return ref(value);
+  }
+
+  if (ref !== null && ref !== undefined) {
+    ref.current = value;
+  }
+}
+
+function composeRefs<T>(...refs: PossibleRef<T>[]): React.RefCallback<T> {
+  return (node) => {
+    let hasCleanup = false;
+    const cleanups = refs.map((ref) => {
+      const cleanup = setRef(ref, node);
+      if (!hasCleanup && typeof cleanup === "function") {
+        hasCleanup = true;
+      }
+      return cleanup;
+    });
+
+    if (hasCleanup) {
+      return () => {
+        for (let i = 0; i < cleanups.length; i++) {
+          const cleanup = cleanups[i];
+          if (typeof cleanup === "function") {
+            cleanup();
+          } else {
+            setRef(refs[i], null);
+          }
+        }
+      };
+    }
+  };
+}
+
+function useComposedRefs<T>(...refs: PossibleRef<T>[]): React.RefCallback<T> {
+  // biome-ignore lint/correctness/useExhaustiveDependencies: we want to memoize by all values
+  return React.useCallback(composeRefs(...refs), refs);
+}
+
+export { composeRefs, useComposedRefs };
+```
+
+## 2. components/ui/kanban.tsx — DER KOMPLETTE KOMPONENTEN-CODE
+
+```tsx
 "use client";
 
 import {
@@ -1078,3 +1152,135 @@ export {
   KanbanOverlay,
   type KanbanProps,
 };
+```
+
+## 3. Demo-Code (KanbanDemo) — so wird die Komponente VERWENDET
+
+```tsx
+"use client";
+
+import { GripVertical } from "lucide-react";
+import * as React from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Kanban,
+  KanbanBoard,
+  KanbanColumn,
+  KanbanColumnHandle,
+  KanbanItem,
+  KanbanOverlay,
+} from "@/components/ui/kanban";
+
+interface Task {
+  id: string;
+  title: string;
+  priority: "low" | "medium" | "high";
+  assignee?: string;
+  dueDate?: string;
+}
+
+const COLUMN_TITLES: Record<string, string> = {
+  backlog: "Backlog",
+  inProgress: "In Progress",
+  done: "Done",
+};
+
+export function KanbanDemo() {
+  const [columns, setColumns] = React.useState<Record<string, Task[]>>({
+    backlog: [
+      { id: "1", title: "Add authentication", priority: "high", assignee: "John Doe", dueDate: "2024-04-01" },
+      { id: "2", title: "Create API endpoints", priority: "medium", assignee: "Jane Smith", dueDate: "2024-04-05" },
+      { id: "3", title: "Write documentation", priority: "low", assignee: "Bob Johnson", dueDate: "2024-04-10" },
+    ],
+    inProgress: [
+      { id: "4", title: "Design system updates", priority: "high", assignee: "Alice Brown", dueDate: "2024-03-28" },
+      { id: "5", title: "Implement dark mode", priority: "medium", assignee: "Charlie Wilson", dueDate: "2024-04-02" },
+    ],
+    done: [
+      { id: "7", title: "Setup project", priority: "high", assignee: "Eve Davis", dueDate: "2024-03-25" },
+      { id: "8", title: "Initial commit", priority: "low", assignee: "Frank White", dueDate: "2024-03-24" },
+    ],
+  });
+
+  return (
+    <Kanban
+      value={columns}
+      onValueChange={setColumns}
+      getItemValue={(item) => item.id}
+    >
+      <KanbanBoard className="grid auto-rows-fr sm:grid-cols-3">
+        {Object.entries(columns).map(([columnValue, tasks]) => (
+          <KanbanColumn key={columnValue} value={columnValue}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-sm">
+                  {COLUMN_TITLES[columnValue]}
+                </span>
+                <Badge variant="secondary" className="pointer-events-none rounded-sm">
+                  {tasks.length}
+                </Badge>
+              </div>
+              <KanbanColumnHandle asChild>
+                <Button variant="ghost" size="icon">
+                  <GripVertical className="h-4 w-4" />
+                </Button>
+              </KanbanColumnHandle>
+            </div>
+            <div className="flex flex-col gap-2 p-0.5">
+              {tasks.map((task) => (
+                <KanbanItem key={task.id} value={task.id} asHandle asChild>
+                  <div className="rounded-md border bg-card p-3 shadow-xs">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="line-clamp-1 font-medium text-sm">
+                          {task.title}
+                        </span>
+                        <Badge
+                          variant={
+                            task.priority === "high"
+                              ? "destructive"
+                              : task.priority === "medium"
+                                ? "default"
+                                : "secondary"
+                          }
+                          className="pointer-events-none h-5 rounded-sm px-1.5 text-[11px] capitalize"
+                        >
+                          {task.priority}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between text-muted-foreground text-xs">
+                        {task.assignee && (
+                          <div className="flex items-center gap-1">
+                            <div className="size-2 rounded-full bg-primary/20" />
+                            <span className="line-clamp-1">{task.assignee}</span>
+                          </div>
+                        )}
+                        {task.dueDate && (
+                          <time className="text-[10px] tabular-nums">
+                            {task.dueDate}
+                          </time>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </KanbanItem>
+              ))}
+            </div>
+          </KanbanColumn>
+        ))}
+      </KanbanBoard>
+      <KanbanOverlay>
+        <div className="size-full rounded-md bg-primary/10" />
+      </KanbanOverlay>
+    </Kanban>
+  );
+}
+```
+
+## WICHTIG für die Implementierung in AgentZ Studio:
+- `KanbanItem` mit `asHandle asChild` = ganze Karte ist Drag-Handle (TOUCH FUNKTIONIERT!)
+- Columns = unsere Status-Pipeline (Idee, Skript, Zur Freigabe, Korrektur, Freigegeben, Gedreht, Geschnitten, Veröffentlicht)
+- `onValueChange` = Status-Update via Convex Mutation
+- `getItemValue` = `(item) => item._id`
+- Dependency: `radix-ui` package (für `Slot`). Falls nicht installiert: `npm install radix-ui`
