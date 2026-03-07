@@ -79,6 +79,7 @@ export function CommandPalette({
       { id: "nav-ideas", label: "Ideen", icon: Lightbulb, page: "ideas" },
       { id: "nav-videos", label: "Videos", icon: Play, page: "videos" },
       { id: "nav-calendar", label: "Kalender", icon: Calendar, page: "calendar" },
+      { id: "nav-team", label: "Team", icon: Users, page: "team" },
       { id: "nav-settings", label: "Einstellungen", icon: Settings, page: "settings" },
     ];
     navItems.forEach((n) =>

@@ -19,7 +19,7 @@ export default defineSchema({
     email: v.string(),
     passwordHash: v.string(),
     name: v.string(),
-    role: v.union(v.literal("admin"), v.literal("client")),
+    role: v.union(v.literal("admin"), v.literal("editor"), v.literal("viewer"), v.literal("client")),
     clientId: v.optional(v.id("clients")),
     createdAt: v.number(),
   }).index("by_email", ["email"]),

@@ -37,6 +37,7 @@ const adminNav = [
   { id: "videos", label: "Videos", icon: Play },
   { id: "library", label: "Mediathek", icon: FolderOpen },
   { id: "calendar", label: "Kalender", icon: Calendar },
+  { id: "team", label: "Team", icon: Users },
   { id: "settings", label: "Einstellungen", icon: Settings },
 ];
 

@@ -13,6 +13,7 @@ import { VideoReview } from "./pages/VideoReview";
 import { SharePage } from "./pages/SharePage";
 import { InvitePage } from "./pages/InvitePage";
 import { SettingsPage } from "./pages/SettingsPage";
+import { TeamPage } from "./pages/TeamPage";
 import { LibraryPage } from "./pages/LibraryPage";
 import { ClientDetail } from "./pages/ClientDetail";
 import { ImpressumPage, DatenschutzPage } from "./pages/LegalPages";
@@ -38,6 +39,7 @@ function AdminRoutes({ currentPage, onNavigate }: { currentPage: string; onNavig
   if (currentPage === "library") return <LibraryPage onNavigate={onNavigate} />;
   if (currentPage.startsWith("video:")) return <VideoReview videoId={currentPage.split(":")[1]} onBack={() => onNavigate("videos")} onNavigate={onNavigate} />;
   if (currentPage === "calendar") return <CalendarPage onNavigate={onNavigate} />;
+  if (currentPage === "team") return <TeamPage />;
   if (currentPage === "settings") return <SettingsPage />;
   return <AdminDashboard onNavigate={onNavigate} />;
 }

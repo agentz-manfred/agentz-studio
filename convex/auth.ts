@@ -27,7 +27,7 @@ export const register = mutation({
     email: v.string(),
     password: v.string(),
     name: v.string(),
-    role: v.union(v.literal("admin"), v.literal("client")),
+    role: v.union(v.literal("admin"), v.literal("editor"), v.literal("viewer"), v.literal("client")),
     clientId: v.optional(v.id("clients")),
     // The session token of the admin performing the registration
     adminToken: v.optional(v.string()),
@@ -191,6 +191,53 @@ export const changePassword = mutation({
     });
 
     return { success: true };
+  },
+});
+
+export const updateUser = mutation({
+  args: {
+    userId: v.id("users"),
+    name: v.optional(v.string()),
+    email: v.optional(v.string()),
+    role: v.optional(v.union(v.literal("admin"), v.literal("editor"), v.literal("viewer"), v.literal("client"))),
+    clientId: v.optional(v.id("clients")),
+  },
+  handler: async (ctx, args) => {
+    const { userId, ...updates } = args;
+    const user = await ctx.db.get(userId);
+    if (!user) throw new Error("Nutzer nicht gefunden");
+
+    // Check email uniqueness if changing
+    if (updates.email && updates.email !== user.email) {
+      const existing = await ctx.db.query("users").withIndex("by_email", (q) => q.eq("email", updates.email!)).first();
+      if (existing) throw new Error("Email bereits vergeben");
+    }
+
+    const filtered = Object.fromEntries(Object.entries(updates).filter(([_, v]) => v !== undefined));
+    if (Object.keys(filtered).length > 0) {
+      await ctx.db.patch(userId, filtered);
+    }
+  },
+});
+
+export const deleteUser = mutation({
+  args: { userId: v.id("users") },
+  handler: async (ctx, args) => {
+    // Delete all sessions for this user
+    const sessions = await ctx.db.query("sessions").filter((q) => q.eq(q.field("userId"), args.userId)).collect();
+    for (const s of sessions) await ctx.db.delete(s._id);
+    await ctx.db.delete(args.userId);
+  },
+});
+
+export const resetPassword = mutation({
+  args: {
+    userId: v.id("users"),
+    newPassword: v.string(),
+  },
+  handler: async (ctx, args) => {
+    if (args.newPassword.length < 6) throw new Error("Passwort muss mindestens 6 Zeichen haben");
+    await ctx.db.patch(args.userId, { passwordHash: simpleHash(args.newPassword) });
   },
 });
 
