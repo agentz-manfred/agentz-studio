@@ -1,5 +1,10 @@
 # AgentZ Studio — CHANGELOG
 
+## v2.0.0 (07.03.2026)
+- **KI-Modell-Auswahl** — Suchbares Model-Picker in Einstellungen, OpenRouter API, Preise pro Token
+- **Settings Store** — Key/Value Convex-Tabelle für globale Einstellungen
+- **AI nutzt gespeichertes Modell** — Skript- und Ideen-Generierung lesen das gewählte Modell
+
 ## v1.9.1 (07.03.2026)
 - **Kategorie-Zuweisung bei Ideen-Erstellung** — Pill-Buttons mit Kundenfarben, dynamisch nach Kundenwahl
 

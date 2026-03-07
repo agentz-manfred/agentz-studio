@@ -5,7 +5,7 @@ Neue Wünsche werden unten angehängt oder an der richtigen Prio-Stelle eingefü
 
 ## Features
 
-- [ ] **KI-Modell-Auswahl (Admin Settings):** OpenRouter API (/api/v1/models) abfragen, suchbares Dropdown mit Modellname + Preise pro Token. Seitenübergreifend speichern. Key: scripts/.openrouter_key
+
 - [ ] **KI Ideen-Generierung:** Button "Ideen generieren" pro Kunde. Monat auswählen, Anzahl = Videos/Monat aus Kundenprofil. Kundenkontext + Plattformen werden mitgegeben. NUR Admin sichtbar!
 - [ ] **KI Skript-Generierung erweitern:** Kundenkontext automatisch mitgeben bei Generierung
 - [ ] **Filesystem/Video-Library:** Ordner erstellen, verschachtelte Ordner, Dateien verschieben (Drag & Drop), umbenennen, Previews. À la Google Drive + Frame.io
