@@ -955,12 +955,12 @@ export function ClientDetail({
           preselectedClientId={clientId}
           onClose={() => setShowAiSuggest(false)}
           onAccept={async (title, description, cId) => {
-            if (!user) return;
+            if (!user || !token) return;
             await createIdea({
+              token,
               clientId: cId as Id<"clients">,
               title,
               description,
-              createdBy: user.userId as Id<"users">,
             });
           }}
         />

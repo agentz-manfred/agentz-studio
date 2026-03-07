@@ -42,6 +42,7 @@ function EventPopover({ event, client, onClose, onDelete, onNavigate, isAdmin }:
   const [editLocation, setEditLocation] = useState(event.data.location || "");
   const [editNotes, setEditNotes] = useState(event.data.notes || "");
   const [saving, setSaving] = useState(false);
+  const { token } = useAuth();
   const updateShootDate = useMutation(api.shootDates.update);
   const updateIdea = useMutation(api.ideas.update);
 
@@ -68,7 +69,8 @@ function EventPopover({ event, client, onClose, onDelete, onNavigate, isAdmin }:
         notes: editNotes || undefined,
       });
     } else {
-      await updateIdea({
+      if (token) await updateIdea({
+        token,
         ideaId: event.data._id,
         scheduledPublishDate: editDate,
       });
@@ -356,7 +358,7 @@ function Legend() {
 }
 
 export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: string) => void } = {}) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { selectedClientId } = useClientFilter();
   const clients = useQuery(api.clients.list);
   const allShootDates = useQuery(api.shootDates.list, {});
@@ -457,7 +459,7 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
     if (selectedEvent.type === "shoot") {
       removeShootDate({ id: selectedEvent.data._id });
     } else {
-      updateIdea({ ideaId: selectedEvent.data._id, scheduledPublishDate: "" });
+      if (token) updateIdea({ token, ideaId: selectedEvent.data._id, scheduledPublishDate: "" });
     }
   };
 

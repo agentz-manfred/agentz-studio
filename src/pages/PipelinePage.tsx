@@ -8,7 +8,7 @@ import { useState } from "react";
 import type { Id } from "../../convex/_generated/dataModel";
 
 export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: string) => void }) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { selectedClientId } = useClientFilter();
   const clientFilter = user?.role === "client" && user.clientId ? user.clientId : selectedClientId;
   const ideas = useQuery(api.ideas.list, clientFilter ? { clientId: clientFilter as any } : {});
@@ -31,23 +31,23 @@ export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: 
   );
 
   const handleStatusChange = async (ideaId: string, newStatus: string) => {
-    if (!user) return;
+    if (!user || !token) return;
     await updateStatus({
+      token,
       ideaId: ideaId as Id<"ideas">,
       status: newStatus,
-      userId: user.userId as Id<"users">,
     });
   };
 
   const handleCreateIdea = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !selectedClient) return;
+    if (!user || !selectedClient || !token) return;
     await createIdea({
+      token,
       clientId: selectedClient as Id<"clients">,
       title: newTitle,
       description: newDesc || undefined,
       categoryId: selectedCategory ? (selectedCategory as Id<"categories">) : undefined,
-      createdBy: user.userId as Id<"users">,
     });
     setNewTitle("");
     setNewDesc("");

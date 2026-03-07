@@ -23,7 +23,7 @@ function StatusDot({ status }: { status: string }) {
 }
 
 function NewIdeaModal({ onClose }: { onClose: () => void }) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const clients = useQuery(api.clients.list);
   const createIdea = useMutation(api.ideas.create);
   const [title, setTitle] = useState("");
@@ -38,14 +38,14 @@ function NewIdeaModal({ onClose }: { onClose: () => void }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !clientId) return;
+    if (!user || !clientId || !token) return;
     setSubmitting(true);
     await createIdea({
+      token,
       clientId: clientId as Id<"clients">,
       title,
       description: description || undefined,
       categoryId: categoryId ? (categoryId as Id<"categories">) : undefined,
-      createdBy: user.userId as Id<"users">,
     });
     onClose();
   };
@@ -286,7 +286,7 @@ export function AiSuggestModal({ onClose, onAccept, preselectedClientId }: { onC
 }
 
 export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: string) => void }) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { selectedClientId } = useClientFilter();
   const clientFilter = user?.role === "client" && user.clientId ? user.clientId : selectedClientId;
   const ideas = useQuery(api.ideas.list, clientFilter ? { clientId: clientFilter as any } : {});
@@ -413,12 +413,12 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
         <AiSuggestModal
           onClose={() => setShowAiSuggest(false)}
           onAccept={async (title, description, clientId, _category) => {
-            if (!user) return;
+            if (!user || !token) return;
             await createIdea({
+              token,
               clientId: clientId as Id<"clients">,
               title,
               description,
-              createdBy: user.userId as Id<"users">,
             });
           }}
         />

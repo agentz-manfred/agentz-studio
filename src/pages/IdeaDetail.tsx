@@ -367,7 +367,7 @@ function VideoSection({ ideaId, onNavigate }: { ideaId: string; onNavigate?: (pa
 }
 
 export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onBack: () => void; onNavigate?: (page: string, id?: string) => void }) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const ideas = useQuery(api.ideas.list, {});
   const clients = useQuery(api.clients.list);
   const shootDates = useQuery(api.shootDates.list, {});
@@ -393,11 +393,11 @@ export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onB
   }
 
   const handleStatusChange = async (newStatus: string) => {
-    if (!user) return;
+    if (!user || !token) return;
     await updateStatus({
+      token,
       ideaId: idea._id as Id<"ideas">,
       status: newStatus,
-      userId: user.userId as Id<"users">,
     });
   };
 
@@ -456,7 +456,7 @@ export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onB
             <input
               type="date"
               value={idea.scheduledPublishDate || ""}
-              onChange={(e) => updateIdea({ ideaId: idea._id as Id<"ideas">, scheduledPublishDate: e.target.value || undefined })}
+              onChange={(e) => { if (token) updateIdea({ token, ideaId: idea._id as Id<"ideas">, scheduledPublishDate: e.target.value || undefined }); }}
               className="h-7 px-2 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[12px] focus:border-[var(--color-accent)] focus:outline-none"
               title="Geplante Veröffentlichung"
             />
