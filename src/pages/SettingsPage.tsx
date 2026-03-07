@@ -375,6 +375,107 @@ function AiModelSection() {
   );
 }
 
+const AI_PROMPT_KEYS = [
+  { key: "ai_prompt_script_system", label: "Skript-Generierung (System-Prompt)", desc: "System-Prompt für alle Skript-Modi (Generieren, Verbessern, Kürzen)" },
+  { key: "ai_prompt_ideas", label: "Ideen-Generierung", desc: "Prompt für KI-Ideenvorschläge" },
+] as const;
+
+function AiPromptsSection() {
+  const setSetting = useMutation(api.settings.set);
+  const prompts = AI_PROMPT_KEYS.map(p => ({
+    ...p,
+    value: useQuery(api.settings.get, { key: p.key }),
+  }));
+  const [editing, setEditing] = useState<string | null>(null);
+  const [draft, setDraft] = useState("");
+  const [saved, setSaved] = useState<string | null>(null);
+
+  const startEdit = (key: string, currentValue: string | null) => {
+    setEditing(key);
+    setDraft(currentValue || "");
+  };
+
+  const save = async (key: string) => {
+    if (draft.trim()) {
+      await setSetting({ key, value: draft.trim() });
+    } else {
+      // Empty = reset to default (delete)
+      await setSetting({ key, value: "" });
+    }
+    setEditing(null);
+    setSaved(key);
+    setTimeout(() => setSaved(null), 2000);
+  };
+
+  return (
+    <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] overflow-hidden">
+      <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-[var(--color-border-subtle)]">
+        <Sparkles className="w-4 h-4 text-[var(--color-text-tertiary)]" strokeWidth={1.75} />
+        <span className="text-[14px] font-semibold">KI-Prompts</span>
+      </div>
+      <div className="px-5 py-4 space-y-4">
+        <p className="text-[12px] text-[var(--color-text-tertiary)]">
+          Globale System-Prompts für die KI-Funktionen. Leer = Standard-Prompt wird verwendet.
+        </p>
+        {prompts.map(({ key, label, desc, value }) => (
+          <div key={key}>
+            <div className="flex items-center justify-between mb-1.5">
+              <div>
+                <span className="text-[13px] font-medium">{label}</span>
+                <p className="text-[11px] text-[var(--color-text-tertiary)]">{desc}</p>
+              </div>
+              {editing !== key && (
+                <button
+                  onClick={() => startEdit(key, value)}
+                  className="text-[12px] text-[var(--color-accent)] hover:underline"
+                >
+                  {value ? "Bearbeiten" : "Anpassen"}
+                </button>
+              )}
+            </div>
+            {editing === key ? (
+              <div className="space-y-2">
+                <textarea
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  rows={6}
+                  className="w-full px-3 py-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[13px] font-mono resize-y"
+                  placeholder="Prompt eingeben… (leer = Standard)"
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => save(key)}
+                    className="h-8 px-3 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[13px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors"
+                  >
+                    Speichern
+                  </button>
+                  <button
+                    onClick={() => setEditing(null)}
+                    className="h-8 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[13px] hover:bg-[var(--color-surface-2)] transition-colors"
+                  >
+                    Abbrechen
+                  </button>
+                </div>
+              </div>
+            ) : value ? (
+              <div className="flex items-center gap-2">
+                <div className="flex-1 px-3 py-2 rounded-[var(--radius-md)] bg-[var(--color-surface-2)] text-[12px] font-mono text-[var(--color-text-secondary)] line-clamp-2">
+                  {value}
+                </div>
+                {saved === key && (
+                  <Check className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                )}
+              </div>
+            ) : (
+              <span className="text-[12px] text-[var(--color-text-tertiary)] italic">Standard-Prompt</span>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function SettingsPage() {
   const { user } = useAuth();
   const clients = useQuery(api.clients.list);
@@ -474,6 +575,9 @@ export function SettingsPage() {
 
         {/* AI Model */}
         {user?.role === "admin" && <AiModelSection />}
+
+        {/* AI Prompts */}
+        {user?.role === "admin" && <AiPromptsSection />}
 
         {/* System */}
         <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] overflow-hidden">

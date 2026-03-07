@@ -28,7 +28,10 @@ export const generateScript = action({
     }
     const model = await getAiModel(ctx);
 
-    const systemPrompt = `Du bist ein erfahrener Social-Media-Skriptautor für TikTok und Instagram Reels.
+    // Check for custom system prompt
+    const customPrompt = await ctx.runQuery(internal.ai.getSetting, { key: "ai_prompt_script_system" });
+
+    const systemPrompt = (customPrompt && customPrompt.trim()) ? customPrompt.trim() : `Du bist ein erfahrener Social-Media-Skriptautor für TikTok und Instagram Reels.
 Du schreibst Skripte für Unternehmen, die kurze, authentische Videos für Social Media produzieren.
 
 WICHTIG — AUSGABEREGELN:
@@ -113,8 +116,8 @@ Gib nur das gekürzte Skript zurück.`;
       throw new Error(`OpenRouter API Fehler: ${response.status} — ${err}`);
     }
 
-    const data = await response.json();
-    let script = data.choices?.[0]?.message?.content;
+    const data: any = await response.json();
+    let script: string = data.choices?.[0]?.message?.content ?? "";
     if (!script) {
       throw new Error("Keine Antwort von der KI erhalten");
     }
@@ -162,6 +165,7 @@ export const suggestIdeas = action({
     }
     const model = await getAiModel(ctx);
 
+    const customIdeasPrompt = await ctx.runQuery(internal.ai.getSetting, { key: "ai_prompt_ideas" });
     const ideaCount = args.count || 5;
     const contextBlock = args.clientContext ? `\n\nKUNDENKONTEXT (wichtig — Tonalität, Zielgruppe, Do's & Don'ts beachten!):\n${args.clientContext}` : "";
     const platformInfo = args.clientMainPlatform ? `\nHauptplattform: ${args.clientMainPlatform}` : (args.clientPlatforms?.length ? `\nPlattformen: ${args.clientPlatforms.join(", ")}` : "");
@@ -185,7 +189,10 @@ Beispiel: [{"title": "...", "description": "..."${args.categoryNames?.length ? '
       },
       body: JSON.stringify({
         model,
-        messages: [{ role: "user", content: prompt }],
+        messages: [
+          ...(customIdeasPrompt?.trim() ? [{ role: "system" as const, content: customIdeasPrompt.trim() }] : []),
+          { role: "user" as const, content: prompt },
+        ],
         max_tokens: 1000,
         temperature: 0.9,
       }),
@@ -195,10 +202,10 @@ Beispiel: [{"title": "...", "description": "..."${args.categoryNames?.length ? '
       throw new Error(`OpenRouter API Fehler: ${response.status}`);
     }
 
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || "[]";
+    const data: any = await response.json();
+    const content: string = data.choices?.[0]?.message?.content || "[]";
     // Extract JSON from response
-    const jsonMatch = content.match(/\[[\s\S]*\]/);
+    const jsonMatch: RegExpMatchArray | null = content.match(/\[[\s\S]*\]/);
     if (!jsonMatch) return [];
     try {
       return JSON.parse(jsonMatch[0]);
@@ -214,6 +221,17 @@ export const getModelSetting = internalQuery({
     const setting = await ctx.db
       .query("settings")
       .withIndex("by_key", (q: any) => q.eq("key", "ai_model"))
+      .first();
+    return setting?.value ?? null;
+  },
+});
+
+export const getSetting = internalQuery({
+  args: { key: v.string() },
+  handler: async (ctx, args) => {
+    const setting = await ctx.db
+      .query("settings")
+      .withIndex("by_key", (q: any) => q.eq("key", args.key))
       .first();
     return setting?.value ?? null;
   },

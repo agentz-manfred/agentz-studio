@@ -1,5 +1,13 @@
 # AgentZ Studio — CHANGELOG
 
+## v2.4.0 (07.03.2026)
+- **Kundenfilter (Admin Sidebar)** — Global client filter
+  - Dropdown in Sidebar (Admin only) to filter all views by client
+  - React Context (ClientFilterProvider) for global state
+  - Affects: Ideen, Pipeline/Kanban, Videos, Kalender
+  - "Alle Kunden" to reset, accent highlight when active
+  - Click-outside to dismiss
+
 ## v2.3.0 (07.03.2026)
 - **Kanban KOMPLETT NEU — Dice UI Primitives** — Fresh rebuild from scratch
   - Deleted old kanban + compose-refs, rebuilt 1:1 from Dice UI reference
