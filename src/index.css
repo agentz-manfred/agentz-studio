@@ -180,46 +180,90 @@ body {
 
 /* ─── Hero gradient for dashboard ─── */
 .hero-gradient {
-  background: linear-gradient(135deg, 
-    rgba(30, 64, 175, 0.08) 0%, 
-    rgba(59, 130, 246, 0.04) 40%, 
-    transparent 70%
+  background: linear-gradient(160deg, 
+    rgba(30, 64, 175, 0.06) 0%, 
+    rgba(59, 130, 246, 0.03) 30%, 
+    transparent 60%
   );
 }
 html.dark .hero-gradient {
-  background: linear-gradient(135deg, 
-    rgba(30, 64, 175, 0.15) 0%, 
-    rgba(59, 130, 246, 0.06) 40%, 
-    transparent 70%
+  background: linear-gradient(160deg, 
+    rgba(30, 64, 175, 0.12) 0%, 
+    rgba(59, 130, 246, 0.05) 30%, 
+    transparent 60%
   );
 }
 
 /* ─── Stat card hover lift ─── */
 .stat-card {
-  transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), border-color 0.25s var(--ease-out);
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out), border-color 0.3s var(--ease-out);
 }
 .stat-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
 }
 
-/* ─── Accent border top for cards ─── */
-.accent-top {
+/* ─── Accent line left for stat cards ─── */
+.accent-left {
   position: relative;
 }
-.accent-top::before {
+.accent-left::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 12px;
-  right: 12px;
-  height: 2px;
-  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-muted));
-  border-radius: 0 0 2px 2px;
+  left: 0;
+  top: 16px;
+  bottom: 16px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--accent-line-color, var(--color-accent));
+  opacity: 0.7;
+  transition: opacity 0.25s var(--ease-out);
+}
+.accent-left:hover::before {
+  opacity: 1;
+}
+
+/* ─── Quick action pill ─── */
+.quick-action {
+  position: relative;
+  overflow: hidden;
+}
+.quick-action::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--color-accent-surface) 0%, transparent 100%);
   opacity: 0;
   transition: opacity 0.2s var(--ease-out);
 }
-.accent-top:hover::before {
+.quick-action:hover::before {
   opacity: 1;
+}
+
+/* ─── Sidebar subtle noise texture ─── */
+.sidebar-texture {
+  position: relative;
+}
+.sidebar-texture::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px;
+  pointer-events: none;
+  z-index: 0;
+}
+html.dark .sidebar-texture::after {
+  opacity: 0.03;
+}
+
+/* ─── Client card ─── */
+.client-card {
+  transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), border-color 0.25s var(--ease-out);
+}
+.client-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 /* ─── Selection color ─── */

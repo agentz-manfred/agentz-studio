@@ -53,43 +53,33 @@ function StatCard({
   value,
   delay,
   onClick,
-  accent,
-  gradient,
+  accentColor,
 }: {
   icon: any;
   label: string;
   value: number | string;
   delay: string;
   onClick?: () => void;
-  accent?: string;
-  gradient?: string;
+  accentColor?: string;
 }) {
   return (
     <button
       onClick={onClick}
-      className={`animate-in ${delay} stat-card accent-top bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] p-5 text-left group w-full relative overflow-hidden hover:shadow-[var(--shadow-md)] hover:border-[var(--color-border)]`}
+      className={`animate-in ${delay} stat-card accent-left bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] p-5 text-left group w-full relative overflow-hidden hover:shadow-[var(--shadow-md)] hover:border-[var(--color-border)]`}
+      style={{ '--accent-line-color': accentColor } as React.CSSProperties}
     >
-      {/* Subtle gradient background */}
-      {gradient && (
-        <div className="absolute inset-0 opacity-[0.04] group-hover:opacity-[0.08] transition-opacity duration-300" style={{ background: gradient }} />
-      )}
       <div className="flex items-center justify-between relative z-10">
-        <div className="flex items-center gap-3.5">
-          <div
-            className="w-10 h-10 rounded-[var(--radius-md)] flex items-center justify-center shadow-sm"
-            style={{ background: accent || "var(--color-surface-2)" }}
-          >
+        <div>
+          <p className="text-[32px] font-bold tracking-[-0.04em] leading-none tabular-nums" style={{ color: accentColor }}>
+            {value}
+          </p>
+          <div className="flex items-center gap-1.5 mt-2">
             <Icon
-              className="w-[18px] h-[18px]"
+              className="w-3.5 h-3.5"
               strokeWidth={1.75}
-              style={{ color: accent ? "#fff" : "var(--color-text-secondary)" }}
+              style={{ color: accentColor, opacity: 0.6 }}
             />
-          </div>
-          <div>
-            <p className="text-[28px] font-semibold tracking-[-0.03em] leading-none tabular-nums">
-              {value}
-            </p>
-            <p className="text-[13px] text-[var(--color-text-tertiary)] mt-1">{label}</p>
+            <p className="text-[13px] text-[var(--color-text-secondary)] font-medium">{label}</p>
           </div>
         </div>
         <ArrowUpRight className="w-4 h-4 text-[var(--color-text-tertiary)] opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all duration-200" />
@@ -113,9 +103,8 @@ function QuickAction({
   return (
     <button
       onClick={onClick}
-      className={`animate-in ${delay} flex items-center gap-2.5 px-4 h-10 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border)] text-[13px] font-medium text-[var(--color-text-secondary)] hover:border-[var(--color-accent)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-accent-surface)] transition-all duration-200 ease-[var(--ease-out)]`}
+      className={`animate-in ${delay} quick-action flex items-center gap-2 px-4 h-9 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-1)] text-[13px] font-medium text-[var(--color-text-secondary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-all duration-200 ease-[var(--ease-out)] shadow-[var(--shadow-xs)]`}
     >
-      <Plus className="w-3.5 h-3.5" strokeWidth={2} />
       <Icon className="w-3.5 h-3.5" strokeWidth={1.75} />
       {label}
     </button>
@@ -399,8 +388,7 @@ export function AdminDashboard({
             value={(clients || []).length}
             delay="stagger-1"
             onClick={() => onNavigate("clients")}
-            accent="#6366f1"
-            gradient="linear-gradient(135deg, #6366f1 0%, transparent 100%)"
+            accentColor="#6366f1"
           />
           <StatCard
             icon={Lightbulb}
@@ -408,8 +396,7 @@ export function AdminDashboard({
             value={(ideas || []).length}
             delay="stagger-2"
             onClick={() => onNavigate("ideas")}
-            accent="#f59e0b"
-            gradient="linear-gradient(135deg, #f59e0b 0%, transparent 100%)"
+            accentColor="#f59e0b"
           />
           <StatCard
             icon={TrendingUp}
@@ -417,8 +404,7 @@ export function AdminDashboard({
             value={inProgress}
             delay="stagger-3"
             onClick={() => onNavigate("pipeline")}
-            accent="#3b82f6"
-            gradient="linear-gradient(135deg, #3b82f6 0%, transparent 100%)"
+            accentColor="#3b82f6"
           />
           <StatCard
             icon={Film}
@@ -426,8 +412,7 @@ export function AdminDashboard({
             value={published}
             delay="stagger-4"
             onClick={() => onNavigate("pipeline")}
-            accent="#16a34a"
-            gradient="linear-gradient(135deg, #16a34a 0%, transparent 100%)"
+            accentColor="#16a34a"
           />
         </div>
       </div>

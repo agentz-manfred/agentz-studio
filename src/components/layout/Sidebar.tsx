@@ -180,7 +180,7 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
   );
 
   return (
-    <aside className="w-[240px] h-dvh flex flex-col border-r border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] relative overflow-y-auto">
+    <aside className="w-[240px] h-dvh flex flex-col border-r border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] relative overflow-y-auto sidebar-texture">
       {/* Brand */}
       <div className="h-16 flex items-center px-6 border-b border-[var(--color-border-subtle)] relative overflow-hidden">
         {/* Subtle brand gradient glow */}

@@ -378,80 +378,85 @@ export function ClientsPage({ onNavigate }: { onNavigate?: (page: string, id?: s
         </div>
       </div>
 
-      {/* Client list */}
-      <div className="px-6 lg:px-8 pb-8 space-y-2">
+      {/* Client cards grid */}
+      <div className="px-6 lg:px-8 pb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
         {filtered.map((client, i) => {
           const hasLogin = clientsWithLogin.has(client._id);
+          const initials = client.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
+          const ideaCount = ideaCountByClient[client._id] || 0;
+          const videoCount = videoCountByClient[client._id] || 0;
           return (
             <div
               key={client._id}
               onClick={() => onNavigate?.("client", client._id)}
-              className={`animate-in stagger-${Math.min(i + 1, 4)} bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-4 hover:shadow-[var(--shadow-sm)] transition-shadow cursor-pointer`}
+              className={`animate-in stagger-${Math.min(i + 1, 4)} client-card bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] p-5 cursor-pointer group`}
             >
-              <div className="flex items-start justify-between gap-4">
+              {/* Top: Avatar + Name + Actions */}
+              <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-full bg-[var(--color-surface-2)] flex items-center justify-center flex-shrink-0">
-                    <Users className="w-[18px] h-[18px] text-[var(--color-text-tertiary)]" />
+                  <div className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 text-white text-[14px] font-bold" style={{ background: 'linear-gradient(135deg, #6366f1 0%, #3b82f6 100%)' }}>
+                    {initials}
                   </div>
                   <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="text-[15px] font-medium truncate">{client.name}</p>
-                      {hasLogin && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ background: "rgba(22,163,74,0.1)", color: "#16a34a" }}>
-                          Login aktiv
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-3 mt-1">
-                      {client.company && (
-                        <div className="flex items-center gap-1">
-                          <Building2 className="w-3 h-3 text-[var(--color-text-tertiary)]" />
-                          <span className="text-[12px] text-[var(--color-text-secondary)] truncate">{client.company}</span>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-1">
-                        <Lightbulb className="w-3 h-3 text-[var(--color-text-tertiary)]" />
-                        <span className="text-[12px] text-[var(--color-text-tertiary)]">{ideaCountByClient[client._id] || 0} Ideen</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Film className="w-3 h-3 text-[var(--color-text-tertiary)]" />
-                        <span className="text-[12px] text-[var(--color-text-tertiary)]">{videoCountByClient[client._id] || 0} Videos</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <div className="flex flex-col items-end gap-1">
-                    <div className="flex items-center gap-1.5">
-                      <Mail className="w-3 h-3 text-[var(--color-text-tertiary)]" />
-                      <span className="text-[12px] text-[var(--color-text-secondary)]">{client.email}</span>
-                    </div>
-                    {client.phone && (
-                      <div className="flex items-center gap-1.5">
-                        <Phone className="w-3 h-3 text-[var(--color-text-tertiary)]" />
-                        <span className="text-[12px] text-[var(--color-text-secondary)]">{client.phone}</span>
-                      </div>
+                    <p className="text-[15px] font-semibold truncate group-hover:text-[var(--color-accent)] transition-colors">{client.name}</p>
+                    {client.company && (
+                      <p className="text-[13px] text-[var(--color-text-secondary)] truncate flex items-center gap-1">
+                        <Building2 className="w-3 h-3 flex-shrink-0" />
+                        {client.company}
+                      </p>
                     )}
                   </div>
-                  {!hasLogin && (
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setInviteClient(client); }}
-                        className="p-2 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-accent)] hover:bg-[var(--color-accent-surface)] transition-colors"
-                        title="Einladungslink erstellen"
-                      >
-                        <Link2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setLoginClient(client); }}
-                        className="p-2 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-accent)] hover:bg-[var(--color-accent-surface)] transition-colors"
-                        title="Kundenzugang manuell erstellen"
-                      >
-                        <UserPlus className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
                 </div>
+                {hasLogin ? (
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-semibold tracking-wide" style={{ background: "rgba(22,163,74,0.1)", color: "#16a34a" }}>
+                    Aktiv
+                  </span>
+                ) : (
+                  <div className="flex items-center gap-0.5">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setInviteClient(client); }}
+                      className="p-1.5 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-accent)] hover:bg-[var(--color-accent-surface)] transition-colors"
+                      title="Einladungslink"
+                    >
+                      <Link2 className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setLoginClient(client); }}
+                      className="p-1.5 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-accent)] hover:bg-[var(--color-accent-surface)] transition-colors"
+                      title="Login erstellen"
+                    >
+                      <UserPlus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Stats row */}
+              <div className="flex items-center gap-4 mb-3">
+                <div className="flex items-center gap-1.5">
+                  <Lightbulb className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
+                  <span className="text-[13px] font-medium tabular-nums">{ideaCount}</span>
+                  <span className="text-[12px] text-[var(--color-text-tertiary)]">Ideen</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Film className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
+                  <span className="text-[13px] font-medium tabular-nums">{videoCount}</span>
+                  <span className="text-[12px] text-[var(--color-text-tertiary)]">Videos</span>
+                </div>
+              </div>
+
+              {/* Contact info */}
+              <div className="pt-3 border-t border-[var(--color-border-subtle)] flex flex-wrap gap-x-4 gap-y-1">
+                <div className="flex items-center gap-1.5">
+                  <Mail className="w-3 h-3 text-[var(--color-text-tertiary)]" />
+                  <span className="text-[12px] text-[var(--color-text-secondary)] truncate">{client.email}</span>
+                </div>
+                {client.phone && (
+                  <div className="flex items-center gap-1.5">
+                    <Phone className="w-3 h-3 text-[var(--color-text-tertiary)]" />
+                    <span className="text-[12px] text-[var(--color-text-secondary)]">{client.phone}</span>
+                  </div>
+                )}
               </div>
             </div>
           );
