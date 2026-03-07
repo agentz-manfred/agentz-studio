@@ -3,8 +3,11 @@
 Items werden von oben nach unten abgearbeitet. Erledigtes kommt ins CHANGELOG.md.
 Neue Wünsche werden unten angehängt oder an der richtigen Prio-Stelle eingefügt.
 
-## Features
+## Bugs (PRIO!)
 
+- [ ] **Kanban Touch-DnD kaputt:** Long-Press aktiviert Drag-Modus (Karte geht schräg), ABER Item bewegt sich nicht mit dem Finger — Seite scrollt stattdessen. Fix: Nach Long-Press muss `touch-action: none` gesetzt und native Scroll geblockt werden. Ganze Karte als Drag-Handle (nicht nur Grip-Icon). Kurzer Tap = öffnen, Long-Press = Drag. dnd-kit TouchSensor mit delay:300/tolerance:5 und touchmove preventDefault. Ggf. andere DnD-Library evaluieren.
+
+## Features
 
 - [ ] **KI Ideen-Generierung:** Button "Ideen generieren" pro Kunde. Monat auswählen, Anzahl = Videos/Monat aus Kundenprofil. Kundenkontext + Plattformen werden mitgegeben. NUR Admin sichtbar!
 - [ ] **KI Skript-Generierung erweitern:** Kundenkontext automatisch mitgeben bei Generierung
