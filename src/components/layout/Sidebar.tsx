@@ -6,6 +6,7 @@ import {
   Calendar,
   LogOut,
   Lightbulb,
+  Play,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 
@@ -19,6 +20,7 @@ const adminNav = [
   { id: "pipeline", label: "Pipeline", icon: Film },
   { id: "clients", label: "Kunden", icon: Users },
   { id: "ideas", label: "Ideen", icon: Lightbulb },
+  { id: "videos", label: "Videos", icon: Play },
   { id: "calendar", label: "Kalender", icon: Calendar },
 ];
 
@@ -49,7 +51,7 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
             onClick={() => onNavigate(item.id)}
             className={cn(
               "w-full flex items-center gap-3 px-3 h-9 rounded-[var(--radius-sm)] text-[14px] transition-all duration-150 ease-[var(--ease-out)]",
-              currentPage === item.id || (item.id === "ideas" && currentPage.startsWith("idea:"))
+              currentPage === item.id || (item.id === "ideas" && currentPage.startsWith("idea:")) || (item.id === "videos" && currentPage.startsWith("video:"))
                 ? "bg-[var(--color-accent)] text-white font-medium"
                 : "text-[var(--color-text-secondary)] hover:bg-[var(--color-accent-surface)] hover:text-[var(--color-text-primary)]"
             )}

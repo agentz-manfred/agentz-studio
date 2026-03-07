@@ -8,6 +8,8 @@ import { IdeasPage } from "./pages/IdeasPage";
 import { IdeaDetail } from "./pages/IdeaDetail";
 import { CalendarPage } from "./pages/CalendarPage";
 import { PipelinePage } from "./pages/PipelinePage";
+import { VideosPage } from "./pages/VideosPage";
+import { VideoReview } from "./pages/VideoReview";
 import { Sidebar } from "./components/layout/Sidebar";
 import { MobileHeader } from "./components/layout/MobileHeader";
 import { useState } from "react";
@@ -18,8 +20,10 @@ const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 function AdminRoutes({ currentPage, onNavigate }: { currentPage: string; onNavigate: (page: string, id?: string) => void }) {
   if (currentPage === "clients") return <ClientsPage />;
   if (currentPage === "ideas") return <IdeasPage onNavigate={onNavigate} />;
-  if (currentPage.startsWith("idea:")) return <IdeaDetail ideaId={currentPage.split(":")[1]} onBack={() => onNavigate("ideas")} />;
+  if (currentPage.startsWith("idea:")) return <IdeaDetail ideaId={currentPage.split(":")[1]} onBack={() => onNavigate("ideas")} onNavigate={onNavigate} />;
   if (currentPage === "pipeline") return <PipelinePage />;
+  if (currentPage === "videos") return <VideosPage onNavigate={onNavigate} />;
+  if (currentPage.startsWith("video:")) return <VideoReview videoId={currentPage.split(":")[1]} onBack={() => onNavigate("videos")} />;
   if (currentPage === "calendar") return <CalendarPage />;
   return <AdminDashboard onNavigate={onNavigate} />;
 }
@@ -27,7 +31,8 @@ function AdminRoutes({ currentPage, onNavigate }: { currentPage: string; onNavig
 function ClientRoutes({ currentPage, onNavigate }: { currentPage: string; onNavigate: (page: string, id?: string) => void }) {
   if (currentPage === "pipeline") return <PipelinePage />;
   if (currentPage === "calendar") return <CalendarPage />;
-  if (currentPage.startsWith("idea:")) return <IdeaDetail ideaId={currentPage.split(":")[1]} onBack={() => onNavigate("dashboard")} />;
+  if (currentPage.startsWith("idea:")) return <IdeaDetail ideaId={currentPage.split(":")[1]} onBack={() => onNavigate("dashboard")} onNavigate={onNavigate} />;
+  if (currentPage.startsWith("video:")) return <VideoReview videoId={currentPage.split(":")[1]} onBack={() => onNavigate("dashboard")} />;
   return <ClientDashboard onNavigate={onNavigate} />;
 }
 

@@ -3,7 +3,8 @@ import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
 import { STATUS_LABELS, STATUS_ORDER } from "../lib/utils";
 import { useState } from "react";
-import { ArrowLeft, MessageSquare, Send, Check, ChevronDown, FileText, Plus, Save, Clock } from "lucide-react";
+import { ArrowLeft, MessageSquare, Send, Check, ChevronDown, FileText, Plus, Save, Clock, Film, Play } from "lucide-react";
+import { VideoUpload } from "../components/video/VideoUpload";
 import type { Id } from "../../convex/_generated/dataModel";
 
 function StatusBadge({ status }: { status: string }) {
@@ -240,7 +241,67 @@ function CommentSection({ ideaId }: { ideaId: string }) {
   );
 }
 
-export function IdeaDetail({ ideaId, onBack }: { ideaId: string; onBack: () => void }) {
+function VideoSection({ ideaId, onNavigate }: { ideaId: string; onNavigate?: (page: string, id?: string) => void }) {
+  const { user } = useAuth();
+  const videos = useQuery(api.videos.list, { ideaId: ideaId as Id<"ideas"> });
+  const cdnHost = import.meta.env.VITE_BUNNY_CDN_HOSTNAME;
+
+  return (
+    <div>
+      <h3 className="text-[15px] font-medium mb-4 flex items-center gap-2">
+        <Film className="w-4 h-4" />
+        Videos
+        {(videos || []).length > 0 && (
+          <span className="text-[12px] text-[var(--color-text-tertiary)] font-normal">
+            ({videos!.length})
+          </span>
+        )}
+      </h3>
+
+      {/* Video list */}
+      {(videos || []).length > 0 && (
+        <div className="space-y-2 mb-4">
+          {(videos || []).map((video) => {
+            const thumb = video.thumbnailUrl || (video.bunnyVideoId && cdnHost ? `https://${cdnHost}/${video.bunnyVideoId}/thumbnail.jpg` : null);
+            return (
+              <button
+                key={video._id}
+                onClick={() => onNavigate?.("video", video._id)}
+                className="w-full flex items-center gap-3 p-3 rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] hover:border-[var(--color-border)] hover:shadow-[var(--shadow-xs)] transition-all text-left group"
+              >
+                <div className="relative w-20 h-12 rounded-[var(--radius-sm)] overflow-hidden bg-neutral-900 flex-shrink-0">
+                  {thumb ? (
+                    <img src={thumb} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Film className="w-5 h-5 text-neutral-600" />
+                    </div>
+                  )}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
+                    <Play className="w-4 h-4 text-white" />
+                  </div>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[14px] font-medium truncate">{video.title}</p>
+                  <p className="text-[12px] text-[var(--color-text-tertiary)]">
+                    {new Date(video.createdAt).toLocaleDateString("de-DE")} · {video.status}
+                  </p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Upload (admin only) */}
+      {user?.role === "admin" && (
+        <VideoUpload ideaId={ideaId} />
+      )}
+    </div>
+  );
+}
+
+export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onBack: () => void; onNavigate?: (page: string, id?: string) => void }) {
   const { user } = useAuth();
   const ideas = useQuery(api.ideas.list, {});
   const clients = useQuery(api.clients.list);
@@ -342,6 +403,11 @@ export function IdeaDetail({ ideaId, onBack }: { ideaId: string; onBack: () => v
       {/* Script Editor */}
       <div className="animate-in stagger-3 mb-8">
         <ScriptEditor ideaId={ideaId} />
+      </div>
+
+      {/* Videos */}
+      <div className="animate-in stagger-4 mb-8">
+        <VideoSection ideaId={ideaId} onNavigate={onNavigate} />
       </div>
 
       {/* Comments */}
