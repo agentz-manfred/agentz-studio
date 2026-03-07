@@ -1,7 +1,9 @@
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
+import { usePWAInstall } from "../hooks/usePWAInstall";
 import { STATUS_BADGE_STYLES } from "../lib/utils";
+import { useState } from "react";
 import {
   Users,
   Film,
@@ -14,6 +16,10 @@ import {
   MapPin,
   Clock,
   ChevronRight,
+  Download,
+  Share,
+  Smartphone,
+  X,
 } from "lucide-react";
 
 /* ─── Status Config ─── */
@@ -320,6 +326,56 @@ function RecentActivity({
   );
 }
 
+/* ─── PWA Install Banner ─── */
+function PWAInstallBanner() {
+  const { canInstall, isInstalled, isIOS, install } = usePWAInstall();
+  const [dismissed, setDismissed] = useState(false);
+  const [installing, setInstalling] = useState(false);
+
+  if (isInstalled || dismissed) return null;
+  if (!canInstall && !isIOS) return null;
+
+  return (
+    <div className="animate-in stagger-1 install-banner rounded-[var(--radius-lg)] p-4 flex items-center gap-4 text-white mb-4">
+      <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+        <Smartphone className="w-5 h-5" strokeWidth={1.75} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[14px] font-semibold">App installieren</p>
+        {isIOS ? (
+          <p className="text-[12px] text-white/70 mt-0.5">
+            Tippe auf <Share className="w-3 h-3 inline -mt-0.5" /> Teilen → „Zum Home-Bildschirm"
+          </p>
+        ) : (
+          <p className="text-[12px] text-white/70 mt-0.5">
+            AgentZ Studio als App auf deinem Gerät nutzen
+          </p>
+        )}
+      </div>
+      {canInstall && (
+        <button
+          onClick={async () => {
+            setInstalling(true);
+            await install();
+            setInstalling(false);
+          }}
+          disabled={installing}
+          className="flex-shrink-0 flex items-center gap-1.5 px-4 h-8 rounded-lg bg-white text-[#1e40af] text-[13px] font-semibold hover:bg-white/90 transition-colors disabled:opacity-50"
+        >
+          <Download className="w-3.5 h-3.5" />
+          {installing ? "…" : "Installieren"}
+        </button>
+      )}
+      <button
+        onClick={() => setDismissed(true)}
+        className="flex-shrink-0 p-1 rounded-md hover:bg-white/10 transition-colors"
+      >
+        <X className="w-4 h-4 text-white/60" />
+      </button>
+    </div>
+  );
+}
+
 /* ─── Main Dashboard ─── */
 export function AdminDashboard({
   onNavigate,
@@ -377,6 +433,11 @@ export function AdminDashboard({
             delay="stagger-4"
           />
         </div>
+      </div>
+
+      {/* PWA Install Banner */}
+      <div className="px-6 lg:px-8 pb-2">
+        <PWAInstallBanner />
       </div>
 
       {/* Stats */}

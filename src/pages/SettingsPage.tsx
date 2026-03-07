@@ -245,7 +245,7 @@ export function SettingsPage() {
     <div className="max-w-[720px] mx-auto pb-12">
       <div className="px-6 lg:px-8 pt-8 pb-6">
         <div className="animate-in">
-          <h1 className="text-[26px] font-semibold tracking-[-0.03em]">Einstellungen</h1>
+          <h1 className="text-[26px] font-semibold tracking-[-0.03em] title-accent">Einstellungen</h1>
           <p className="text-[13px] text-[var(--color-text-tertiary)] mt-1">Konto, Darstellung & System</p>
         </div>
       </div>

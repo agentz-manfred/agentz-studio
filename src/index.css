@@ -266,6 +266,84 @@ html.dark .sidebar-texture::after {
   box-shadow: var(--shadow-md);
 }
 
+/* ─── Dot grid background (distinctive differentiator) ─── */
+.dot-grid {
+  background-image: radial-gradient(circle, var(--color-border-subtle) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+html.dark .dot-grid {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ─── Glassmorphism card ─── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+html.dark .glass-card {
+  background: rgba(20, 20, 20, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ─── Gradient border (sidebar right edge) ─── */
+.gradient-edge-right::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, var(--color-accent) 0%, transparent 40%, transparent 60%, var(--color-accent) 100%);
+  opacity: 0.2;
+  z-index: 10;
+}
+
+/* ─── PWA install banner ─── */
+.install-banner {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%);
+  position: relative;
+  overflow: hidden;
+}
+.install-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ─── Kanban column glass header ─── */
+.kanban-header {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+/* ─── Accent underline for page titles ─── */
+.title-accent {
+  position: relative;
+  display: inline-block;
+}
+.title-accent::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 32px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--color-accent);
+  opacity: 0.6;
+}
+
 /* ─── Selection color ─── */
 ::selection {
   background: rgba(59, 130, 246, 0.25);

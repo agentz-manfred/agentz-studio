@@ -300,7 +300,7 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
       <div className="px-6 lg:px-8 py-6 border-b border-[var(--color-border-subtle)]">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-[22px] font-semibold tracking-[-0.02em]">Kalender</h1>
+            <h1 className="text-[22px] font-semibold tracking-[-0.02em] title-accent">Kalender</h1>
             <p className="text-[14px] text-[var(--color-text-tertiary)] mt-0.5">Drehtermine & Übersicht</p>
           </div>
           {user?.role === "admin" && (

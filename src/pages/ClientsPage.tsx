@@ -350,7 +350,7 @@ export function ClientsPage({ onNavigate }: { onNavigate?: (page: string, id?: s
       <div className="px-6 lg:px-8 py-6 border-b border-[var(--color-border-subtle)]">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-[22px] font-semibold tracking-[-0.02em]">Kunden</h1>
+            <h1 className="text-[22px] font-semibold tracking-[-0.02em] title-accent">Kunden</h1>
             <p className="text-[14px] text-[var(--color-text-tertiary)] mt-0.5">
               {(clients || []).length} {(clients || []).length === 1 ? "Kunde" : "Kunden"}
             </p>

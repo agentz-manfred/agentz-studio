@@ -49,7 +49,7 @@ export function VideosPage({ onNavigate }: VideosPageProps) {
     <div className="max-w-[960px] mx-auto px-6 lg:px-8 py-6">
       <div className="animate-in mb-6 flex items-start justify-between">
         <div>
-          <h1 className="text-[24px] font-semibold tracking-[-0.02em]">Videos</h1>
+          <h1 className="text-[24px] font-semibold tracking-[-0.02em] title-accent">Videos</h1>
           <p className="text-[14px] text-[var(--color-text-tertiary)] mt-1">
             {isClient ? "Ihre Videos — klicken Sie auf ein Video um Feedback zu geben" : `${(videos || []).length} Videos im Überblick`}
           </p>
