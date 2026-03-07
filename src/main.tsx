@@ -1,17 +1,29 @@
-import { StrictMode } from 'react'
+import { StrictMode, Component, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App'
 
-console.log('[AgentZ Studio] Mounting app...')
-try {
-  createRoot(document.getElementById('root')!).render(
-    <StrictMode>
-      <App />
-    </StrictMode>,
-  )
-  console.log('[AgentZ Studio] App mounted successfully')
-} catch (e) {
-  console.error('[AgentZ Studio] Mount error:', e)
-  document.getElementById('root')!.innerHTML = `<div style="padding:40px;font-family:system-ui;color:#dc2626"><h2>Fehler beim Laden</h2><pre>${e}</pre></div>`
+class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
+  state = { error: null as Error | null }
+  static getDerivedStateFromError(error: Error) { return { error } }
+  componentDidCatch(error: Error) { console.error('[AgentZ Studio] Render error:', error) }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ padding: 40, fontFamily: 'system-ui', color: '#dc2626' }}>
+          <h2>Fehler beim Laden</h2>
+          <pre style={{ whiteSpace: 'pre-wrap', fontSize: 13 }}>{this.state.error.message}{'\n'}{this.state.error.stack}</pre>
+        </div>
+      )
+    }
+    return this.props.children
+  }
 }
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
+  </StrictMode>,
+)
