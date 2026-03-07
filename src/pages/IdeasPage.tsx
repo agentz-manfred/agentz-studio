@@ -144,15 +144,27 @@ function NewIdeaModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-function AiSuggestModal({ onClose, onAccept }: { onClose: () => void; onAccept: (title: string, description: string, clientId: string) => void }) {
+const MONTH_NAMES = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+
+export function AiSuggestModal({ onClose, onAccept, preselectedClientId }: { onClose: () => void; onAccept: (title: string, description: string, clientId: string, category?: string) => void; preselectedClientId?: string }) {
   const clients = useQuery(api.clients.list);
   const ideas = useQuery(api.ideas.list, {});
   const suggestIdeas = useAction(api.ai.suggestIdeas);
-  const [clientId, setClientId] = useState("");
-  const [suggestions, setSuggestions] = useState<Array<{ title: string; description: string }>>([]);
+  const [clientId, setClientId] = useState(preselectedClientId || "");
+  const [suggestions, setSuggestions] = useState<Array<{ title: string; description: string; category?: string }>>([]);
   const [loading, setLoading] = useState(false);
+  const now = new Date();
+  const [selectedMonth, setSelectedMonth] = useState(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`);
 
   const selectedClient = (clients || []).find(c => c._id === clientId);
+  const categories = useQuery(api.categories.listByClient, clientId ? { clientId: clientId as Id<"clients"> } : "skip");
+
+  const videosPerMonth = (selectedClient as any)?.videosPerMonth || 5;
+
+  const monthLabel = (() => {
+    const [y, m] = selectedMonth.split("-");
+    return `${MONTH_NAMES[parseInt(m) - 1]} ${y}`;
+  })();
 
   const handleGenerate = async () => {
     if (!selectedClient) return;
@@ -161,10 +173,17 @@ function AiSuggestModal({ onClose, onAccept }: { onClose: () => void; onAccept: 
       const existingIdeas = (ideas || [])
         .filter(i => i.clientId === clientId)
         .map(i => i.title);
+      const categoryNames = (categories || []).map(c => c.name);
       const result = await suggestIdeas({
         clientName: selectedClient.name,
         clientCompany: selectedClient.company,
+        clientContext: (selectedClient as any).context || undefined,
+        clientPlatforms: (selectedClient as any).platforms || undefined,
+        clientMainPlatform: (selectedClient as any).mainPlatform || undefined,
         existingIdeas,
+        categoryNames: categoryNames.length > 0 ? categoryNames : undefined,
+        count: videosPerMonth,
+        month: monthLabel,
       });
       setSuggestions(result);
     } catch (err) {
@@ -188,28 +207,45 @@ function AiSuggestModal({ onClose, onAccept }: { onClose: () => void; onAccept: 
           </button>
         </div>
         <div className="p-6 overflow-y-auto flex-1">
-          <div className="mb-4">
-            <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Kunde wählen</label>
-            <div className="flex gap-2">
+          <div className="mb-4 space-y-3">
+            <div>
+              <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Kunde</label>
               <select
                 value={clientId}
                 onChange={(e) => { setClientId(e.target.value); setSuggestions([]); }}
-                className="flex-1 h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none"
+                className="w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none"
               >
                 <option value="">Kunde wählen…</option>
                 {(clients || []).map((c) => (
                   <option key={c._id} value={c._id}>{c.name}{c.company ? ` (${c.company})` : ""}</option>
                 ))}
               </select>
-              <button
-                onClick={handleGenerate}
-                disabled={!clientId || loading}
-                className="flex items-center gap-1.5 h-10 px-4 rounded-[var(--radius-md)] bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-[13px] font-medium hover:from-violet-700 hover:to-indigo-700 disabled:opacity-50 transition-all"
-              >
-                <Sparkles className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
-                {loading ? "Denkt nach…" : "Generieren"}
-              </button>
             </div>
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Monat</label>
+                <input
+                  type="month"
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  className="w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none"
+                />
+              </div>
+              <div className="w-24">
+                <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Anzahl</label>
+                <div className="h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] flex items-center text-[var(--color-text-secondary)]">
+                  {videosPerMonth}
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={handleGenerate}
+              disabled={!clientId || loading}
+              className="flex items-center justify-center gap-2 w-full h-10 rounded-[var(--radius-md)] bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-[14px] font-medium hover:from-violet-700 hover:to-indigo-700 disabled:opacity-50 transition-all"
+            >
+              <Sparkles className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+              {loading ? "Generiert Ideen…" : `${videosPerMonth} Ideen für ${monthLabel} generieren`}
+            </button>
           </div>
 
           {suggestions.length > 0 && (
@@ -219,10 +255,13 @@ function AiSuggestModal({ onClose, onAccept }: { onClose: () => void; onAccept: 
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="text-[14px] font-medium">{s.title}</p>
+                      {s.category && (
+                        <span className="inline-block mt-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] text-[var(--color-text-tertiary)]">{s.category}</span>
+                      )}
                       <p className="text-[13px] text-[var(--color-text-secondary)] mt-1 leading-relaxed">{s.description}</p>
                     </div>
                     <button
-                      onClick={() => onAccept(s.title, s.description, clientId)}
+                      onClick={() => onAccept(s.title, s.description, clientId, s.category)}
                       className="flex-shrink-0 flex items-center gap-1 h-7 px-3 rounded-[var(--radius-sm)] text-[12px] font-medium bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] opacity-0 group-hover:opacity-100 transition-all"
                     >
                       <Check className="w-3 h-3" />
@@ -370,7 +409,7 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
       {showAiSuggest && (
         <AiSuggestModal
           onClose={() => setShowAiSuggest(false)}
-          onAccept={async (title, description, clientId) => {
+          onAccept={async (title, description, clientId, _category) => {
             if (!user) return;
             await createIdea({
               clientId: clientId as Id<"clients">,
@@ -378,7 +417,6 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
               description,
               createdBy: user.userId as Id<"users">,
             });
-            setShowAiSuggest(false);
           }}
         />
       )}

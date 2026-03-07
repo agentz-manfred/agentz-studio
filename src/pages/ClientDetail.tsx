@@ -1,7 +1,9 @@
 import { useQuery, useMutation } from "convex/react";
+import { useAuth } from "../lib/auth";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 import { useState, useCallback } from "react";
+import { AiSuggestModal } from "./IdeasPage";
 import {
   ArrowLeft,
   Building2,
@@ -13,6 +15,7 @@ import {
   ChevronRight,
   Clock,
   TrendingUp,
+  Sparkles,
   Pencil,
   Save,
   X,
@@ -630,6 +633,7 @@ export function ClientDetail({
   onBack: () => void;
   onNavigate: (page: string, id?: string) => void;
 }) {
+  const { user } = useAuth();
   const client = useQuery(api.clients.get, {
     id: clientId as Id<"clients">,
   });
@@ -645,6 +649,8 @@ export function ClientDetail({
   });
 
   const [editing, setEditing] = useState(false);
+  const [showAiSuggest, setShowAiSuggest] = useState(false);
+  const createIdea = useMutation(api.ideas.create);
 
   const hasLogin = (users || []).some((u) => u.clientId === clientId);
 
@@ -733,6 +739,13 @@ export function ClientDetail({
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowAiSuggest(true)}
+              className="h-8 px-3 rounded-[var(--radius-md)] bg-gradient-to-r from-violet-500/10 to-indigo-500/10 text-violet-700 dark:text-violet-300 border border-violet-200/50 dark:border-violet-500/20 text-[12px] font-medium hover:from-violet-500/20 hover:to-indigo-500/20 transition-all flex items-center gap-1.5"
+            >
+              <Sparkles className="w-3 h-3" />
+              KI-Ideen
+            </button>
             <button
               onClick={() => setEditing(!editing)}
               className="h-8 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[12px] font-medium hover:bg-[var(--color-surface-2)] transition-colors flex items-center gap-1.5"
@@ -936,6 +949,22 @@ export function ClientDetail({
           )}
         </section>
       </div>
+
+      {showAiSuggest && (
+        <AiSuggestModal
+          preselectedClientId={clientId}
+          onClose={() => setShowAiSuggest(false)}
+          onAccept={async (title, description, cId) => {
+            if (!user) return;
+            await createIdea({
+              clientId: cId as Id<"clients">,
+              title,
+              description,
+              createdBy: user.userId as Id<"users">,
+            });
+          }}
+        />
+      )}
     </div>
   );
 }

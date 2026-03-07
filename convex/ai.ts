@@ -125,6 +125,8 @@ export const suggestIdeas = action({
     clientMainPlatform: v.optional(v.string()),
     existingIdeas: v.array(v.string()),
     categoryNames: v.optional(v.array(v.string())),
+    count: v.optional(v.number()),
+    month: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const apiKey = process.env.OPENROUTER_API_KEY;
@@ -133,16 +135,18 @@ export const suggestIdeas = action({
     }
     const model = await getAiModel(ctx);
 
+    const ideaCount = args.count || 5;
     const contextBlock = args.clientContext ? `\n\nKUNDENKONTEXT (wichtig — Tonalität, Zielgruppe, Do's & Don'ts beachten!):\n${args.clientContext}` : "";
     const platformInfo = args.clientMainPlatform ? `\nHauptplattform: ${args.clientMainPlatform}` : (args.clientPlatforms?.length ? `\nPlattformen: ${args.clientPlatforms.join(", ")}` : "");
     const categoryInfo = args.categoryNames?.length ? `\nVerfügbare Kategorien: ${args.categoryNames.join(", ")}` : "";
+    const monthInfo = args.month ? `\nZielmonat: ${args.month} (berücksichtige saisonale Themen, Feiertage, Trends für diesen Monat)` : "";
 
-    const prompt = `Du bist ein kreativer Social-Media-Stratege. Schlage 5 TikTok/Reels Video-Ideen vor für:
+    const prompt = `Du bist ein kreativer Social-Media-Stratege. Schlage ${ideaCount} TikTok/Reels Video-Ideen vor für:
 
-Kunde: ${args.clientName}${args.clientCompany ? ` (${args.clientCompany})` : ""}${platformInfo}${contextBlock}${categoryInfo}
+Kunde: ${args.clientName}${args.clientCompany ? ` (${args.clientCompany})` : ""}${platformInfo}${contextBlock}${categoryInfo}${monthInfo}
 ${args.existingIdeas.length > 0 ? `\nBereits existierende Ideen (NICHT wiederholen):\n${args.existingIdeas.map(i => `- ${i}`).join("\n")}` : ""}
 
-Gib genau 5 Ideen als JSON-Array zurück. Jede Idee hat "title" und "description"${args.categoryNames?.length ? ' und optional "category" (muss einer der verfügbaren Kategorien entsprechen)' : ""}.
+Gib genau ${ideaCount} Ideen als JSON-Array zurück. Jede Idee hat "title" und "description"${args.categoryNames?.length ? ' und optional "category" (muss einer der verfügbaren Kategorien entsprechen)' : ""}.
 Nur das JSON-Array, kein anderer Text.
 Beispiel: [{"title": "...", "description": "..."${args.categoryNames?.length ? ', "category": "Real Talk"' : ""}}]`;
 
