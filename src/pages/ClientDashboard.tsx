@@ -30,7 +30,7 @@ export function ClientDashboard({ onNavigate }: { onNavigate: (page: string, id?
     api.ideas.list,
     user?.clientId ? { clientId: user.clientId as any } : "skip"
   );
-  const shootDates = useQuery(api.shootDates.list);
+  const shootDates = useQuery(api.shootDates.list, {});
 
   const published = (ideas || []).filter((i) => i.status === "veröffentlicht").length;
   const active = (ideas || []).filter((i) => !["veröffentlicht"].includes(i.status)).length;

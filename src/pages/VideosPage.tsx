@@ -8,7 +8,7 @@ interface VideosPageProps {
 }
 
 export function VideosPage({ onNavigate }: VideosPageProps) {
-  const { user } = useAuth();
+  const _auth = useAuth();
   const videos = useQuery(api.videos.list, {});
   const ideas = useQuery(api.ideas.list, {});
   const clients = useQuery(api.clients.list);

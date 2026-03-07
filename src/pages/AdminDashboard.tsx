@@ -340,7 +340,7 @@ export function AdminDashboard({
   const ideas = useQuery(api.ideas.list, {});
   const clients = useQuery(api.clients.list);
   const shoots = useQuery(api.shootDates.list, {});
-  const videos = useQuery(api.videos.list, {});
+  const _videos = useQuery(api.videos.list, {});
 
   const published = (ideas || []).filter((i) => i.status === "veröffentlicht").length;
   const inProgress = (ideas || []).filter(

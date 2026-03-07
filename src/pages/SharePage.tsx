@@ -2,7 +2,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { VideoPlayer } from "../components/video/VideoPlayer";
 import { useState, useEffect, useMemo } from "react";
-import { Film, Lock, Clock, MessageSquare, Send, Eye } from "lucide-react";
+import { Film, Lock, Clock, MessageSquare, Eye } from "lucide-react";
 
 function formatTimestamp(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -18,7 +18,7 @@ export function SharePage({ token }: { token: string }) {
   );
   const incrementViews = useMutation(api.shareLinks.incrementViews);
   const [viewed, setViewed] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
+  const [_currentTime, setCurrentTime] = useState(0);
   const [seekTo, setSeekTo] = useState<number | null>(null);
 
   // Increment view count once
