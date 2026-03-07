@@ -12,7 +12,7 @@ Neue Wünsche werden unten angehängt oder an der richtigen Prio-Stelle eingefü
 
 
 
-- [ ] **KI-Prompts konfigurierbar (Admin):** Globale System-Prompts über Einstellungen editierbar: Ideengenerierung, Skriptgenerierung, Skript kürzen, Skript verbessern. Pro Kunde optional überschreibbar: Eigenes Prompt-Feld pro KI-Funktion beim Kunden. Modus-Auswahl: "Überschreibt global" oder "Ergänzt global" (append). In DB: `settings`-Tabelle für globale Prompts + Felder im Client-Schema für kundenspezifische Overrides. UI: Settings-Seite "KI-Prompts" Tab + Kunden-Detail erweitern.
+
 
 - [ ] **PWA Install prüfen:** Service Worker korrekt registriert? Install-Banner erscheint auf Android? Settings-Seite: "App installieren" Button funktioniert?
 - [ ] **🔴 PRIO 2 — App-Icon neu:** Das jetzige Icon sieht billig aus. Prozess: 1) Erst selbst als SVG designen, 2) Screenshot machen + visuell analysieren, 3) iterieren bis es gut aussieht, 4) wenn SVG nicht reicht → mit Nano Banana Pro (google/gemini-3.0-pro-image-generation via OpenRouter, `scripts/generate_image.py`) generieren, 5) Ergebnis wieder visuell prüfen + iterieren. Muss als PWA Touch-Icon (192x192 + 512x512), Favicon und App-Icon funktionieren. Ziel: Premium-Look, kein billiges Standardding.

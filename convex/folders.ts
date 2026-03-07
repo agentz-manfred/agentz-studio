@@ -2,17 +2,21 @@ import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 export const list = query({
-  args: { parentId: v.optional(v.id("folders")) },
+  args: { parentId: v.optional(v.id("folders")), clientId: v.optional(v.id("clients")) },
   handler: async (ctx, args) => {
     if (args.parentId) {
-      return ctx.db
+      const folders = await ctx.db
         .query("folders")
         .withIndex("by_parent", (q) => q.eq("parentId", args.parentId))
         .collect();
+      if (args.clientId) return folders.filter(f => f.clientId === args.clientId);
+      return folders;
     }
     // Root folders (no parent)
     const all = await ctx.db.query("folders").collect();
-    return all.filter((f) => !f.parentId);
+    const roots = all.filter((f) => !f.parentId);
+    if (args.clientId) return roots.filter(f => f.clientId === args.clientId);
+    return roots;
   },
 });
 

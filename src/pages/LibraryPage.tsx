@@ -20,6 +20,7 @@ import {
   Clock,
 } from "lucide-react";
 import { VIDEO_STATUS_LABELS, STATUS_BADGE_STYLES } from "../lib/utils";
+import { useClientFilter } from "../lib/clientFilter";
 import type { Id } from "../../convex/_generated/dataModel";
 
 interface LibraryPageProps {
@@ -237,7 +238,11 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
   const [renaming, setRenaming] = useState<{ type: "folder" | "video"; id: string; name: string } | null>(null);
   const [dragOverFolder, setDragOverFolder] = useState<string | null>(null);
 
-  const folders = useQuery(api.folders.list, { parentId: currentFolderId });
+  const { selectedClientId } = useClientFilter();
+  const folders = useQuery(api.folders.list, {
+    parentId: currentFolderId,
+    ...(selectedClientId ? { clientId: selectedClientId as Id<"clients"> } : {}),
+  });
   const videos = useQuery(api.videos.listByFolder, { folderId: currentFolderId });
   const breadcrumbs = useQuery(api.folders.getBreadcrumbs, { folderId: currentFolderId });
 
