@@ -27,7 +27,7 @@ export function LoginPage() {
     <div className="min-h-screen flex relative overflow-hidden">
       {/* Left side — Branding */}
       <div className="hidden lg:flex lg:w-[55%] relative items-center justify-center" style={{
-        background: "linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%)",
+        background: "linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e40af 100%)",
       }}>
         {/* Decorative elements */}
         <div className="absolute inset-0 overflow-hidden">
