@@ -2,7 +2,7 @@ import { useQuery, useMutation } from "convex/react";
 import { useClientFilter } from "../lib/clientFilter";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
-import { Calendar, ChevronLeft, ChevronRight, Plus, X, MapPin, Clock, Trash2, FileText, Pencil } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight, Plus, X, MapPin, Clock, Trash2, FileText, Pencil, Video, Send } from "lucide-react";
 import { useState, useMemo, useRef, useEffect } from "react";
 import type { Id } from "../../convex/_generated/dataModel";
 
@@ -18,8 +18,17 @@ function getFirstDayOfMonth(year: number, month: number) {
   return d === 0 ? 6 : d - 1;
 }
 
-function ShootPopover({ shoot, client, onClose, onDelete, onNavigate, isAdmin }: {
-  shoot: any;
+type CalendarEvent = {
+  type: "shoot" | "publish";
+  id: string;
+  date: string;
+  clientId: string;
+  label: string;
+  data: any;
+};
+
+function EventPopover({ event, client, onClose, onDelete, onNavigate, isAdmin }: {
+  event: CalendarEvent;
   client: any;
   onClose: () => void;
   onDelete?: () => void;
@@ -28,12 +37,13 @@ function ShootPopover({ shoot, client, onClose, onDelete, onNavigate, isAdmin }:
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
-  const [editDate, setEditDate] = useState(shoot.date);
-  const [editTime, setEditTime] = useState(shoot.time || "");
-  const [editLocation, setEditLocation] = useState(shoot.location || "");
-  const [editNotes, setEditNotes] = useState(shoot.notes || "");
+  const [editDate, setEditDate] = useState(event.data.date || event.data.scheduledPublishDate || "");
+  const [editTime, setEditTime] = useState(event.data.time || "");
+  const [editLocation, setEditLocation] = useState(event.data.location || "");
+  const [editNotes, setEditNotes] = useState(event.data.notes || "");
   const [saving, setSaving] = useState(false);
   const updateShootDate = useMutation(api.shootDates.update);
+  const updateIdea = useMutation(api.ideas.update);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -43,21 +53,32 @@ function ShootPopover({ shoot, client, onClose, onDelete, onNavigate, isAdmin }:
     return () => document.removeEventListener("mousedown", handler);
   }, [onClose]);
 
+  const isShoot = event.type === "shoot";
+  const accent = isShoot ? { bg: "rgba(139,92,246,0.1)", color: "#8b5cf6" } : { bg: "rgba(22,163,74,0.1)", color: "#16a34a" };
+  const Icon = isShoot ? Calendar : Send;
+
   const handleSave = async () => {
     setSaving(true);
-    await updateShootDate({
-      id: shoot._id,
-      date: editDate,
-      time: editTime || undefined,
-      location: editLocation || undefined,
-      notes: editNotes || undefined,
-    });
+    if (isShoot) {
+      await updateShootDate({
+        id: event.data._id,
+        date: editDate,
+        time: editTime || undefined,
+        location: editLocation || undefined,
+        notes: editNotes || undefined,
+      });
+    } else {
+      await updateIdea({
+        ideaId: event.data._id,
+        scheduledPublishDate: editDate,
+      });
+    }
     setSaving(false);
     setEditing(false);
     onClose();
   };
 
-  const dateObj = new Date(shoot.date + "T00:00:00");
+  const dateObj = new Date(event.date + "T00:00:00");
   const dateStr = dateObj.toLocaleDateString("de-DE", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
 
   return (
@@ -65,13 +86,21 @@ function ShootPopover({ shoot, client, onClose, onDelete, onNavigate, isAdmin }:
       <div ref={ref} className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] border border-[var(--color-border-subtle)] w-full max-w-[420px] mx-4">
         <div className="flex items-start justify-between p-4 pb-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-[var(--radius-md)] flex items-center justify-center flex-shrink-0" style={{ background: "rgba(139,92,246,0.1)" }}>
-              <Calendar className="w-[18px] h-[18px]" style={{ color: "#8b5cf6" }} />
+            <div className="w-10 h-10 rounded-[var(--radius-md)] flex items-center justify-center flex-shrink-0" style={{ background: accent.bg }}>
+              <Icon className="w-[18px] h-[18px]" style={{ color: accent.color }} />
             </div>
             <div>
-              <p className="text-[15px] font-semibold">{client?.name || "Drehtermin"}</p>
-              {client?.company && (
+              <div className="flex items-center gap-2">
+                <p className="text-[15px] font-semibold">{client?.name || event.label}</p>
+                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full" style={{ background: accent.bg, color: accent.color }}>
+                  {isShoot ? "Dreh" : "Veröffentlichung"}
+                </span>
+              </div>
+              {isShoot && client?.company && (
                 <p className="text-[12px] text-[var(--color-text-tertiary)]">{client.company}</p>
+              )}
+              {!isShoot && (
+                <p className="text-[12px] text-[var(--color-text-tertiary)]">{event.data.title}</p>
               )}
             </div>
           </div>
@@ -89,30 +118,36 @@ function ShootPopover({ shoot, client, onClose, onDelete, onNavigate, isAdmin }:
 
         {editing ? (
           <div className="p-4 space-y-3">
-            <div className="grid grid-cols-2 gap-3">
+            <div className={isShoot ? "grid grid-cols-2 gap-3" : ""}>
               <div>
                 <label className="block text-[12px] font-medium text-[var(--color-text-tertiary)] mb-1">Datum</label>
                 <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)}
                   className="w-full h-9 px-2.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none" />
               </div>
-              <div>
-                <label className="block text-[12px] font-medium text-[var(--color-text-tertiary)] mb-1">Uhrzeit</label>
-                <input type="time" value={editTime} onChange={(e) => setEditTime(e.target.value)}
-                  className="w-full h-9 px-2.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none" />
-              </div>
+              {isShoot && (
+                <div>
+                  <label className="block text-[12px] font-medium text-[var(--color-text-tertiary)] mb-1">Uhrzeit</label>
+                  <input type="time" value={editTime} onChange={(e) => setEditTime(e.target.value)}
+                    className="w-full h-9 px-2.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none" />
+                </div>
+              )}
             </div>
-            <div>
-              <label className="block text-[12px] font-medium text-[var(--color-text-tertiary)] mb-1">Ort</label>
-              <input value={editLocation} onChange={(e) => setEditLocation(e.target.value)}
-                className="w-full h-9 px-2.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none"
-                placeholder="z.B. Pflegedienst Kolbe" />
-            </div>
-            <div>
-              <label className="block text-[12px] font-medium text-[var(--color-text-tertiary)] mb-1">Notizen</label>
-              <textarea value={editNotes} onChange={(e) => setEditNotes(e.target.value)}
-                className="w-full h-16 px-2.5 py-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none resize-none"
-                placeholder="Equipment, Ansprechpartner..." />
-            </div>
+            {isShoot && (
+              <>
+                <div>
+                  <label className="block text-[12px] font-medium text-[var(--color-text-tertiary)] mb-1">Ort</label>
+                  <input value={editLocation} onChange={(e) => setEditLocation(e.target.value)}
+                    className="w-full h-9 px-2.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none"
+                    placeholder="z.B. Pflegedienst Kolbe" />
+                </div>
+                <div>
+                  <label className="block text-[12px] font-medium text-[var(--color-text-tertiary)] mb-1">Notizen</label>
+                  <textarea value={editNotes} onChange={(e) => setEditNotes(e.target.value)}
+                    className="w-full h-16 px-2.5 py-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none resize-none"
+                    placeholder="Equipment, Ansprechpartner..." />
+                </div>
+              </>
+            )}
             <div className="flex gap-2 pt-1">
               <button onClick={() => setEditing(false)}
                 className="flex-1 h-8 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[12px] font-medium hover:bg-[var(--color-surface-2)] transition-colors">
@@ -129,29 +164,43 @@ function ShootPopover({ shoot, client, onClose, onDelete, onNavigate, isAdmin }:
             <div className="p-4 space-y-2.5">
               <div className="flex items-center gap-2.5 text-[13px]">
                 <Clock className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
-                <span>{dateStr}{shoot.time ? ` · ${shoot.time} Uhr` : ""}</span>
+                <span>{dateStr}{isShoot && event.data.time ? ` · ${event.data.time} Uhr` : ""}</span>
               </div>
-              {shoot.location && (
+              {isShoot && event.data.location && (
                 <div className="flex items-center gap-2.5 text-[13px]">
                   <MapPin className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
-                  <span className="text-[var(--color-text-secondary)]">{shoot.location}</span>
+                  <span className="text-[var(--color-text-secondary)]">{event.data.location}</span>
                 </div>
               )}
-              {shoot.notes && (
+              {isShoot && event.data.notes && (
                 <div className="flex items-start gap-2.5 text-[13px]">
                   <FileText className="w-3.5 h-3.5 text-[var(--color-text-tertiary)] mt-0.5" />
-                  <span className="text-[var(--color-text-secondary)]">{shoot.notes}</span>
+                  <span className="text-[var(--color-text-secondary)]">{event.data.notes}</span>
+                </div>
+              )}
+              {!isShoot && (
+                <div className="flex items-center gap-2.5 text-[13px]">
+                  <Video className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
+                  <span className="text-[var(--color-text-secondary)]">Status: {event.data.status}</span>
                 </div>
               )}
             </div>
 
             <div className="flex items-center gap-2 p-4 pt-2 border-t border-[var(--color-border-subtle)]">
-              {client && onNavigate && (
+              {isShoot && client && onNavigate && (
                 <button
                   onClick={() => { onClose(); onNavigate("client", client._id); }}
                   className="flex-1 h-8 rounded-[var(--radius-md)] text-[12px] font-medium bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] transition-colors"
                 >
                   Zum Kunden
+                </button>
+              )}
+              {!isShoot && onNavigate && (
+                <button
+                  onClick={() => { onClose(); onNavigate("idea", event.data._id); }}
+                  className="flex-1 h-8 rounded-[var(--radius-md)] text-[12px] font-medium bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] transition-colors"
+                >
+                  Zur Idee
                 </button>
               )}
               {onDelete && (
@@ -161,7 +210,7 @@ function ShootPopover({ shoot, client, onClose, onDelete, onNavigate, isAdmin }:
                   style={{ color: "#ef4444" }}
                 >
                   <Trash2 className="w-3 h-3" />
-                  Löschen
+                  {isShoot ? "Löschen" : "Datum entfernen"}
                 </button>
               )}
             </div>
@@ -237,33 +286,21 @@ function NewShootDateModal({ onClose, defaultDate }: { onClose: () => void; defa
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Datum *</label>
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none"
-                required
-              />
+              <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
+                className="w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none" required />
             </div>
             <div>
               <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Uhrzeit</label>
-              <input
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                className="w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none"
-              />
+              <input type="time" value={time} onChange={(e) => setTime(e.target.value)}
+                className="w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none" />
             </div>
           </div>
 
           <div>
             <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Ort</label>
-            <input
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
+            <input value={location} onChange={(e) => setLocation(e.target.value)}
               className="w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none"
-              placeholder="z.B. Pflegedienst Kolbe, Schwerin"
-            />
+              placeholder="z.B. Pflegedienst Kolbe, Schwerin" />
           </div>
 
           {clientIdeas.length > 0 && (
@@ -272,12 +309,8 @@ function NewShootDateModal({ onClose, defaultDate }: { onClose: () => void; defa
               <div className="space-y-1.5 max-h-32 overflow-y-auto">
                 {clientIdeas.map((idea) => (
                   <label key={idea._id} className="flex items-center gap-2 px-3 py-2 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] cursor-pointer transition-colors">
-                    <input
-                      type="checkbox"
-                      checked={selectedIdeas.includes(idea._id)}
-                      onChange={() => toggleIdea(idea._id)}
-                      className="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-0"
-                    />
+                    <input type="checkbox" checked={selectedIdeas.includes(idea._id)} onChange={() => toggleIdea(idea._id)}
+                      className="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-0" />
                     <span className="text-[13px]">{idea.title}</span>
                   </label>
                 ))}
@@ -287,27 +320,36 @@ function NewShootDateModal({ onClose, defaultDate }: { onClose: () => void; defa
 
           <div>
             <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Notizen</label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+            <textarea value={notes} onChange={(e) => setNotes(e.target.value)}
               className="w-full h-20 px-3 py-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none resize-none"
-              placeholder="Equipment, Ansprechpartner, etc."
-            />
+              placeholder="Equipment, Ansprechpartner, etc." />
           </div>
 
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose} className="flex-1 h-10 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[14px] font-medium hover:bg-[var(--color-surface-2)] transition-colors">
               Abbrechen
             </button>
-            <button
-              type="submit"
-              disabled={submitting || !clientId || !date}
-              className="flex-1 h-10 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[14px] font-medium hover:bg-[var(--color-accent-hover)] disabled:opacity-50 transition-colors"
-            >
+            <button type="submit" disabled={submitting || !clientId || !date}
+              className="flex-1 h-10 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[14px] font-medium hover:bg-[var(--color-accent-hover)] disabled:opacity-50 transition-colors">
               Anlegen
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+}
+
+function Legend() {
+  return (
+    <div className="flex items-center gap-4 text-[11px]">
+      <div className="flex items-center gap-1.5">
+        <div className="w-2.5 h-2.5 rounded-sm" style={{ background: "rgba(139,92,246,0.7)" }} />
+        <span className="text-[var(--color-text-tertiary)]">Drehtermin</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <div className="w-2.5 h-2.5 rounded-sm" style={{ background: "rgba(22,163,74,0.7)" }} />
+        <span className="text-[var(--color-text-tertiary)]">Veröffentlichung</span>
       </div>
     </div>
   );
@@ -318,30 +360,70 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
   const { selectedClientId } = useClientFilter();
   const clients = useQuery(api.clients.list);
   const allShootDates = useQuery(api.shootDates.list, {});
+  const allIdeasWithPublishDates = useQuery(api.ideas.withPublishDates);
   const shootDates = selectedClientId
     ? (allShootDates || []).filter(s => s.clientId === selectedClientId)
     : allShootDates;
+  const ideasWithPublish = selectedClientId
+    ? (allIdeasWithPublishDates || []).filter(i => i.clientId === selectedClientId)
+    : allIdeasWithPublishDates;
   const removeShootDate = useMutation(api.shootDates.remove);
+  const updateIdea = useMutation(api.ideas.update);
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
   const [showNewShoot, setShowNewShoot] = useState(false);
   const [newShootDate, setNewShootDate] = useState<string | undefined>();
-  const [selectedShoot, setSelectedShoot] = useState<any>(null);
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [filterType, setFilterType] = useState<"all" | "shoot" | "publish">("all");
 
   const clientMap = (clients || []).reduce(
     (acc, c) => ({ ...acc, [c._id]: c }),
     {} as Record<string, any>
   );
 
-  const shootsByDate = useMemo(() => {
-    const map: Record<string, typeof shootDates> = {};
-    (shootDates || []).forEach((sd) => {
-      if (!map[sd.date]) map[sd.date] = [];
-      map[sd.date]!.push(sd);
-    });
+  // Merge shoot dates + publish dates into unified events
+  const eventsByDate = useMemo(() => {
+    const map: Record<string, CalendarEvent[]> = {};
+    const addEvent = (evt: CalendarEvent) => {
+      if (!map[evt.date]) map[evt.date] = [];
+      map[evt.date]!.push(evt);
+    };
+
+    if (filterType !== "publish") {
+      (shootDates || []).forEach((sd) => {
+        addEvent({
+          type: "shoot",
+          id: sd._id,
+          date: sd.date,
+          clientId: sd.clientId,
+          label: clientMap[sd.clientId]?.name || "Dreh",
+          data: sd,
+        });
+      });
+    }
+
+    if (filterType !== "shoot") {
+      (ideasWithPublish || []).forEach((idea) => {
+        if (idea.scheduledPublishDate) {
+          addEvent({
+            type: "publish",
+            id: idea._id,
+            date: idea.scheduledPublishDate,
+            clientId: idea.clientId,
+            label: idea.title,
+            data: idea,
+          });
+        }
+      });
+    }
+
     return map;
-  }, [shootDates]);
+  }, [shootDates, ideasWithPublish, clientMap, filterType]);
+
+  const allEvents = useMemo(() => {
+    return Object.values(eventsByDate).flat();
+  }, [eventsByDate]);
 
   const daysInMonth = getDaysInMonth(year, month);
   const firstDay = getFirstDayOfMonth(year, month);
@@ -355,18 +437,27 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
 
   const today = now.toISOString().split("T")[0];
 
-  const upcoming = (shootDates || [])
-    .filter((sd) => sd.date >= today)
+  const upcoming = allEvents
+    .filter((e) => e.date >= today)
     .sort((a, b) => a.date.localeCompare(b.date))
-    .slice(0, 5);
+    .slice(0, 8);
 
   const handleDayClick = (dateStr: string) => {
-    const dayShoots = shootsByDate[dateStr] || [];
-    if (dayShoots.length > 0) {
-      setSelectedShoot(dayShoots[0]);
+    const dayEvents = eventsByDate[dateStr] || [];
+    if (dayEvents.length > 0) {
+      setSelectedEvent(dayEvents[0]);
     } else if (user?.role === "admin") {
       setNewShootDate(dateStr);
       setShowNewShoot(true);
+    }
+  };
+
+  const handleDeleteEvent = () => {
+    if (!selectedEvent) return;
+    if (selectedEvent.type === "shoot") {
+      removeShootDate({ id: selectedEvent.data._id });
+    } else {
+      updateIdea({ ideaId: selectedEvent.data._id, scheduledPublishDate: "" });
     }
   };
 
@@ -376,7 +467,7 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-[22px] font-semibold tracking-[-0.02em] title-accent">Kalender</h1>
-            <p className="text-[14px] text-[var(--color-text-tertiary)] mt-0.5">Drehtermine & Übersicht</p>
+            <p className="text-[14px] text-[var(--color-text-tertiary)] mt-0.5">Drehtermine & Veröffentlichungen</p>
           </div>
           {user?.role === "admin" && (
             <button
@@ -391,6 +482,26 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
       </div>
 
       <div className="px-6 lg:px-8 py-6">
+        {/* Filter + Legend */}
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-1.5">
+            {(["all", "shoot", "publish"] as const).map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilterType(f)}
+                className={`h-7 px-3 rounded-full text-[11px] font-medium transition-colors ${
+                  filterType === f
+                    ? "bg-[var(--color-accent)] text-white"
+                    : "bg-[var(--color-surface-2)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-3)]"
+                }`}
+              >
+                {f === "all" ? "Alle" : f === "shoot" ? "🎬 Drehs" : "📤 Veröffentlichungen"}
+              </button>
+            ))}
+          </div>
+          <Legend />
+        </div>
+
         {/* Month nav */}
         <div className="flex items-center justify-between mb-6">
           <button onClick={prev} className="p-2 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors">
@@ -417,7 +528,7 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
           {Array.from({ length: daysInMonth }).map((_, i) => {
             const day = i + 1;
             const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-            const dayShoots = shootsByDate[dateStr] || [];
+            const dayEvents = eventsByDate[dateStr] || [];
             const isToday = dateStr === today;
             const isPast = dateStr < today;
             return (
@@ -435,16 +546,25 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
                 }`}>
                   {day}
                 </span>
-                {dayShoots.map((sd) => (
-                  <button
-                    key={sd._id}
-                    onClick={(e) => { e.stopPropagation(); setSelectedShoot(sd); }}
-                    className="mt-0.5 px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] truncate border w-full text-left hover:brightness-110 transition-all"
-                    style={{ background: "rgba(139,92,246,0.1)", color: "#8b5cf6", borderColor: "rgba(139,92,246,0.2)" }}
-                  >
-                    🎬 {clientMap[sd.clientId]?.name || "Dreh"}
-                  </button>
-                ))}
+                {dayEvents.slice(0, 3).map((evt) => {
+                  const isShoot = evt.type === "shoot";
+                  const style = isShoot
+                    ? { background: "rgba(139,92,246,0.1)", color: "#8b5cf6", borderColor: "rgba(139,92,246,0.2)" }
+                    : { background: "rgba(22,163,74,0.1)", color: "#16a34a", borderColor: "rgba(22,163,74,0.2)" };
+                  return (
+                    <button
+                      key={evt.id}
+                      onClick={(e) => { e.stopPropagation(); setSelectedEvent(evt); }}
+                      className="mt-0.5 px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] truncate border w-full text-left hover:brightness-110 transition-all"
+                      style={style}
+                    >
+                      {isShoot ? "🎬" : "📤"} {evt.label}
+                    </button>
+                  );
+                })}
+                {dayEvents.length > 3 && (
+                  <span className="text-[10px] text-[var(--color-text-tertiary)] mt-0.5 block">+{dayEvents.length - 3} mehr</span>
+                )}
               </div>
             );
           })}
@@ -453,43 +573,59 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
 
       {/* Upcoming */}
       <div className="px-6 lg:px-8 pb-8">
-        <h3 className="text-[15px] font-medium mb-3">Kommende Drehtermine</h3>
+        <h3 className="text-[15px] font-medium mb-3">Kommende Termine</h3>
         {upcoming.length > 0 ? (
           <div className="space-y-2">
-            {upcoming.map((sd) => (
-              <button
-                key={sd._id}
-                onClick={() => setSelectedShoot(sd)}
-                className="w-full bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] px-4 py-3 flex items-center justify-between hover:shadow-[var(--shadow-sm)] transition-shadow text-left"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-[var(--radius-md)] flex items-center justify-center flex-shrink-0" style={{ background: "rgba(139,92,246,0.1)" }}>
-                    <Calendar className="w-[18px] h-[18px]" style={{ color: "#8b5cf6" }} />
-                  </div>
-                  <div>
-                    <p className="text-[14px] font-medium">
-                      {clientMap[sd.clientId]?.name || "Kunde"}
-                      {clientMap[sd.clientId]?.company && (
-                        <span className="text-[var(--color-text-tertiary)] font-normal"> · {clientMap[sd.clientId].company}</span>
-                      )}
-                    </p>
-                    <div className="flex items-center gap-3 mt-0.5">
-                      <span className="text-[12px] text-[var(--color-text-secondary)] flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {new Date(sd.date + "T00:00:00").toLocaleDateString("de-DE", { weekday: "short", day: "2-digit", month: "long" })}
-                        {sd.time && ` · ${sd.time}`}
-                      </span>
-                      {sd.location && (
-                        <span className="text-[12px] text-[var(--color-text-tertiary)] flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
-                          {sd.location}
+            {upcoming.map((evt) => {
+              const isShoot = evt.type === "shoot";
+              const accent = isShoot ? { bg: "rgba(139,92,246,0.1)", color: "#8b5cf6" } : { bg: "rgba(22,163,74,0.1)", color: "#16a34a" };
+              const Icon = isShoot ? Calendar : Send;
+              const client = clientMap[evt.clientId];
+              return (
+                <button
+                  key={evt.id}
+                  onClick={() => setSelectedEvent(evt)}
+                  className="w-full bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] px-4 py-3 flex items-center justify-between hover:shadow-[var(--shadow-sm)] transition-shadow text-left"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-[var(--radius-md)] flex items-center justify-center flex-shrink-0" style={{ background: accent.bg }}>
+                      <Icon className="w-[18px] h-[18px]" style={{ color: accent.color }} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="text-[14px] font-medium">
+                          {isShoot ? (client?.name || "Kunde") : evt.label}
+                          {isShoot && client?.company && (
+                            <span className="text-[var(--color-text-tertiary)] font-normal"> · {client.company}</span>
+                          )}
+                        </p>
+                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full" style={{ background: accent.bg, color: accent.color }}>
+                          {isShoot ? "Dreh" : "Publish"}
                         </span>
-                      )}
+                      </div>
+                      <div className="flex items-center gap-3 mt-0.5">
+                        <span className="text-[12px] text-[var(--color-text-secondary)] flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {new Date(evt.date + "T00:00:00").toLocaleDateString("de-DE", { weekday: "short", day: "2-digit", month: "long" })}
+                          {isShoot && evt.data.time && ` · ${evt.data.time}`}
+                        </span>
+                        {isShoot && evt.data.location && (
+                          <span className="text-[12px] text-[var(--color-text-tertiary)] flex items-center gap-1">
+                            <MapPin className="w-3 h-3" />
+                            {evt.data.location}
+                          </span>
+                        )}
+                        {!isShoot && client && (
+                          <span className="text-[12px] text-[var(--color-text-tertiary)]">
+                            {client.name}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </button>
-            ))}
+                </button>
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-8 bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)]">
@@ -500,12 +636,12 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
       </div>
 
       {showNewShoot && <NewShootDateModal onClose={() => setShowNewShoot(false)} defaultDate={newShootDate} />}
-      {selectedShoot && (
-        <ShootPopover
-          shoot={selectedShoot}
-          client={clientMap[selectedShoot.clientId]}
-          onClose={() => setSelectedShoot(null)}
-          onDelete={user?.role === "admin" ? () => removeShootDate({ id: selectedShoot._id }) : undefined}
+      {selectedEvent && (
+        <EventPopover
+          event={selectedEvent}
+          client={clientMap[selectedEvent.clientId]}
+          onClose={() => setSelectedEvent(null)}
+          onDelete={user?.role === "admin" ? handleDeleteEvent : undefined}
           onNavigate={onNavigate}
           isAdmin={user?.role === "admin"}
         />

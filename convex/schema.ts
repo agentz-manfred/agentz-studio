@@ -53,6 +53,7 @@ export default defineSchema({
     status: v.string(),
     categoryId: v.optional(v.id("categories")),
     order: v.number(),
+    scheduledPublishDate: v.optional(v.string()), // ISO date YYYY-MM-DD
     createdBy: v.id("users"),
     createdAt: v.number(),
     updatedAt: v.number(),

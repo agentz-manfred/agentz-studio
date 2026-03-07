@@ -105,9 +105,18 @@ export const update = mutation({
     description: v.optional(v.string()),
     order: v.optional(v.number()),
     categoryId: v.optional(v.id("categories")),
+    scheduledPublishDate: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const { ideaId, ...updates } = args;
     await ctx.db.patch(ideaId, { ...updates, updatedAt: Date.now() });
+  },
+});
+
+export const withPublishDates = query({
+  args: {},
+  handler: async (ctx) => {
+    const all = await ctx.db.query("ideas").collect();
+    return all.filter((i) => i.scheduledPublishDate);
   },
 });

@@ -372,6 +372,7 @@ export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onB
   const clients = useQuery(api.clients.list);
   const shootDates = useQuery(api.shootDates.list, {});
   const updateStatus = useMutation(api.ideas.updateStatus);
+  const updateIdea = useMutation(api.ideas.update);
 
   const idea = (ideas || []).find((i) => i._id === ideaId);
   const client = idea && clients ? clients.find((c) => c._id === idea.clientId) : null;
@@ -450,6 +451,16 @@ export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onB
           <span className="text-[12px] text-[var(--color-text-tertiary)]">
             Erstellt am {new Date(idea.createdAt).toLocaleDateString("de-DE")}
           </span>
+          <div className="ml-auto flex items-center gap-2">
+            <Send className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
+            <input
+              type="date"
+              value={idea.scheduledPublishDate || ""}
+              onChange={(e) => updateIdea({ ideaId: idea._id as Id<"ideas">, scheduledPublishDate: e.target.value || undefined })}
+              className="h-7 px-2 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[12px] focus:border-[var(--color-accent)] focus:outline-none"
+              title="Geplante Veröffentlichung"
+            />
+          </div>
         </div>
       )}
 
