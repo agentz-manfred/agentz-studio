@@ -3,7 +3,7 @@ import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
 import { VideoPlayer } from "../components/video/VideoPlayer";
 import { useState, useMemo } from "react";
-import { ArrowLeft, Send, Check, Clock, MessageSquare, Film, ChevronDown, ChevronUp, Share2, Link2, Copy, CheckCheck, Reply, ChevronRight } from "lucide-react";
+import { ArrowLeft, Send, Check, Clock, MessageSquare, Film, ChevronDown, ChevronUp, Share2, Link2, Copy, CheckCheck, Reply, ChevronRight, Lightbulb } from "lucide-react";
 import { STATUS_BADGE_STYLES, VIDEO_STATUS_LABELS } from "../lib/utils";
 import type { Id } from "../../convex/_generated/dataModel";
 
@@ -25,9 +25,10 @@ function TimestampBadge({ time, onClick }: { time: number; onClick?: () => void 
   );
 }
 
-export function VideoReview({ videoId, onBack }: { videoId: string; onBack: () => void }) {
+export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; onBack: () => void; onNavigate?: (page: string, id?: string) => void }) {
   const { user } = useAuth();
   const video = useQuery(api.videos.get, { videoId: videoId as Id<"videos"> });
+  const linkedIdea = useQuery(api.ideas.get, video?.ideaId ? { ideaId: video.ideaId } : "skip");
   const comments = useQuery(api.comments.list, { targetType: "video", targetId: videoId });
   const allUsers = useQuery(api.auth.listUsers);
   const createComment = useMutation(api.comments.create);
@@ -162,6 +163,15 @@ export function VideoReview({ videoId, onBack }: { videoId: string; onBack: () =
           <div className="flex items-center gap-2 min-w-0">
             <Film className="w-4 h-4 text-[var(--color-text-tertiary)] flex-shrink-0" />
             <h1 className="text-[16px] font-semibold tracking-[-0.01em] truncate">{video.title}</h1>
+            {linkedIdea && onNavigate && (
+              <button
+                onClick={() => onNavigate("idea", linkedIdea._id)}
+                className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-[var(--color-accent-surface)] text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 transition-colors flex-shrink-0"
+              >
+                <Lightbulb className="w-3 h-3" />
+                {linkedIdea.title}
+              </button>
+            )}
           </div>
           {/* Video Status - clickable for admin */}
           <div className="ml-auto relative">

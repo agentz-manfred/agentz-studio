@@ -180,12 +180,12 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
   );
 
   return (
-    <aside className="w-[240px] h-screen flex flex-col border-r border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] relative">
+    <aside className="w-[240px] h-dvh flex flex-col border-r border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] relative overflow-y-auto">
       {/* Brand */}
       <div className="h-16 flex items-center px-6 border-b border-[var(--color-border-subtle)]">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-[var(--radius-sm)] bg-[var(--color-accent)] flex items-center justify-center">
-            <span className="text-white text-[13px] font-bold leading-none">A</span>
+          <div className="w-7 h-7 rounded-[var(--radius-sm)] bg-[var(--color-accent)] flex items-center justify-center p-[3px]">
+            <img src="/agentz-logo.svg" alt="AgentZ" className="w-full h-full object-contain" />
           </div>
           <span className="text-[15px] font-semibold tracking-[-0.02em]">
             AgentZ Studio

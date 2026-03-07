@@ -45,8 +45,8 @@ export function LoginPage() {
         <div className="relative z-10 max-w-[420px] px-12">
           {/* Logo */}
           <div className="flex items-center gap-4 mb-10">
-            <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center border border-white/20">
-              <Play className="w-8 h-8 text-white fill-white" />
+            <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center border border-white/20 p-2.5">
+              <img src="/agentz-logo.svg" alt="AgentZ" className="w-full h-full object-contain" />
             </div>
             <div>
               <h1 className="text-[28px] font-bold text-white tracking-[-0.03em]">AgentZ</h1>
@@ -83,8 +83,8 @@ export function LoginPage() {
         <div className="animate-in w-full max-w-[380px] px-6 relative z-10">
           {/* Mobile logo (hidden on lg) */}
           <div className="text-center mb-10 lg:hidden">
-            <div className="w-14 h-14 mx-auto mb-5 bg-[var(--color-accent)] rounded-[14px] flex items-center justify-center shadow-[var(--shadow-md)]">
-              <Play className="w-6 h-6 text-white fill-white" />
+            <div className="w-14 h-14 mx-auto mb-5 bg-[var(--color-accent)] rounded-[14px] flex items-center justify-center shadow-[var(--shadow-md)] p-2">
+              <img src="/agentz-logo.svg" alt="AgentZ" className="w-full h-full object-contain" />
             </div>
             <h1 className="text-[28px] font-bold tracking-[-0.03em] text-[var(--color-text-primary)]">
               AgentZ Studio

@@ -51,8 +51,8 @@ export const getByToken = query({
     if (!video) return null;
 
     // Get idea + client for context
-    const idea = await ctx.db.get(video.ideaId);
-    const client = idea ? await ctx.db.get(idea.clientId) : null;
+    const idea = video.ideaId ? await ctx.db.get(video.ideaId) : null;
+    const client = idea && "clientId" in idea ? await ctx.db.get(idea.clientId) : null;
 
     return {
       ...link,

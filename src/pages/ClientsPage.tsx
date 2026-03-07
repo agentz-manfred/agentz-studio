@@ -25,7 +25,7 @@ function CreateClientModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] w-full max-w-[480px] mx-4">
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border-subtle)]">
           <h3 className="text-[17px] font-semibold">Neuen Kunden anlegen</h3>
@@ -126,7 +126,7 @@ function CreateLoginModal({ client, onClose }: { client: any; onClose: () => voi
 
   if (success) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm">
         <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] w-full max-w-[400px] mx-4 p-6 text-center">
           <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: "rgba(22,163,74,0.1)" }}>
             <Check className="w-6 h-6" style={{ color: "#16a34a" }} />
@@ -148,7 +148,7 @@ function CreateLoginModal({ client, onClose }: { client: any; onClose: () => voi
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] w-full max-w-[400px] mx-4">
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border-subtle)]">
           <h3 className="text-[17px] font-semibold">Kundenzugang erstellen</h3>
@@ -230,7 +230,7 @@ function InviteLinkModal({ client, onClose }: { client: any; onClose: () => void
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] w-full max-w-[480px] mx-4">
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border-subtle)]">
           <h3 className="text-[17px] font-semibold">Einladungslink erstellen</h3>

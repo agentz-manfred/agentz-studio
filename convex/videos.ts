@@ -23,7 +23,7 @@ export const get = query({
 
 export const create = mutation({
   args: {
-    ideaId: v.id("ideas"),
+    ideaId: v.optional(v.id("ideas")),
     title: v.string(),
     uploadedBy: v.id("users"),
     bunnyVideoId: v.optional(v.string()),
@@ -57,7 +57,7 @@ export const updateStatus = mutation({
     await ctx.db.patch(args.videoId, { status: args.status });
 
     // Auto-notify the client when video status changes
-    const idea = await ctx.db.get(video.ideaId);
+    const idea = video.ideaId ? await ctx.db.get(video.ideaId) : null;
     if (idea) {
       // Find client's user account
       const clientUsers = await ctx.db
@@ -153,7 +153,19 @@ export const listByClient = query({
       .collect();
     const ideaIds = new Set(ideas.map((i) => i._id));
     const allVideos = await ctx.db.query("videos").collect();
-    return allVideos.filter((v) => ideaIds.has(v.ideaId));
+    return allVideos.filter((v) => v.ideaId && ideaIds.has(v.ideaId));
+  },
+});
+
+export const linkIdea = mutation({
+  args: {
+    videoId: v.id("videos"),
+    ideaId: v.optional(v.id("ideas")),
+  },
+  handler: async (ctx, args) => {
+    const video = await ctx.db.get(args.videoId);
+    if (!video) throw new Error("Video nicht gefunden");
+    await ctx.db.patch(args.videoId, { ideaId: args.ideaId });
   },
 });
 

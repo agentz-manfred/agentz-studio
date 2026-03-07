@@ -31,7 +31,7 @@ function AdminRoutes({ currentPage, onNavigate }: { currentPage: string; onNavig
   if (currentPage.startsWith("idea:")) return <IdeaDetail ideaId={currentPage.split(":")[1]} onBack={() => onNavigate("ideas")} onNavigate={onNavigate} />;
   if (currentPage === "pipeline") return <PipelinePage onNavigate={onNavigate} />;
   if (currentPage === "videos") return <VideosPage onNavigate={onNavigate} />;
-  if (currentPage.startsWith("video:")) return <VideoReview videoId={currentPage.split(":")[1]} onBack={() => onNavigate("videos")} />;
+  if (currentPage.startsWith("video:")) return <VideoReview videoId={currentPage.split(":")[1]} onBack={() => onNavigate("videos")} onNavigate={onNavigate} />;
   if (currentPage === "calendar") return <CalendarPage onNavigate={onNavigate} />;
   if (currentPage === "settings") return <SettingsPage />;
   return <AdminDashboard onNavigate={onNavigate} />;
@@ -42,7 +42,7 @@ function ClientRoutes({ currentPage, onNavigate }: { currentPage: string; onNavi
   if (currentPage === "pipeline") return <PipelinePage onNavigate={onNavigate} />;
   if (currentPage === "calendar") return <CalendarPage onNavigate={onNavigate} />;
   if (currentPage.startsWith("idea:")) return <IdeaDetail ideaId={currentPage.split(":")[1]} onBack={() => onNavigate("dashboard")} onNavigate={onNavigate} />;
-  if (currentPage.startsWith("video:")) return <VideoReview videoId={currentPage.split(":")[1]} onBack={() => onNavigate("videos")} />;
+  if (currentPage.startsWith("video:")) return <VideoReview videoId={currentPage.split(":")[1]} onBack={() => onNavigate("videos")} onNavigate={onNavigate} />;
   return <ClientDashboard onNavigate={onNavigate} />;
 }
 
@@ -87,7 +87,7 @@ function AppContent() {
   if (!user) return <LoginPage />;
 
   return (
-    <div className="flex h-screen bg-[var(--color-surface-0)]">
+    <div className="flex h-dvh bg-[var(--color-surface-0)]">
       <KeyboardShortcutsDialog />
       <CommandPalette onNavigate={handleNavigate} />
       {/* Mobile overlay */}

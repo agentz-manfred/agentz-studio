@@ -51,7 +51,7 @@ export default defineSchema({
   }).index("by_client", ["clientId"]),
 
   videos: defineTable({
-    ideaId: v.id("ideas"),
+    ideaId: v.optional(v.id("ideas")),
     bunnyVideoId: v.optional(v.string()),
     bunnyUrl: v.optional(v.string()),
     thumbnailUrl: v.optional(v.string()),

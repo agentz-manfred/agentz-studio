@@ -26,6 +26,13 @@ export const list = query({
   },
 });
 
+export const get = query({
+  args: { ideaId: v.id("ideas") },
+  handler: async (ctx, args) => {
+    return ctx.db.get(args.ideaId);
+  },
+});
+
 export const byStatus = query({
   args: { status: v.string() },
   handler: async (ctx, args) => {

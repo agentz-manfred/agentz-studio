@@ -30,7 +30,7 @@ export function VideosPage({ onNavigate }: VideosPageProps) {
       if (statusFilter !== "all" && v.status !== statusFilter) return false;
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
-        const idea = ideaMap.get(v.ideaId);
+        const idea = v.ideaId ? ideaMap.get(v.ideaId) : undefined;
         const client = idea ? clientMap.get(idea.clientId) : null;
         return v.title.toLowerCase().includes(q) ||
           idea?.title.toLowerCase().includes(q) ||
@@ -129,7 +129,7 @@ export function VideosPage({ onNavigate }: VideosPageProps) {
       ) : (
         <div className="animate-in stagger-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {filteredVideos.map((video) => {
-            const idea = ideaMap.get(video.ideaId);
+            const idea = video.ideaId ? ideaMap.get(video.ideaId) : undefined;
             const client = idea ? clientMap.get(idea.clientId) : null;
             const cdnHost = import.meta.env.VITE_BUNNY_CDN_HOSTNAME;
             const thumb = video.thumbnailUrl || (video.bunnyVideoId && cdnHost ? `https://${cdnHost}/${video.bunnyVideoId}/thumbnail.jpg` : null);

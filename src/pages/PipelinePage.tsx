@@ -77,7 +77,7 @@ export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: 
 
       {/* New Idea Modal */}
       {showNewIdea && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] w-full max-w-[440px] mx-4 p-6">
             <h3 className="text-[18px] font-semibold mb-5">Neue Idee</h3>
             <form onSubmit={handleCreateIdea} className="space-y-4">

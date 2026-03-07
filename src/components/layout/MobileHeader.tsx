@@ -9,9 +9,12 @@ export function MobileHeader({ onMenuClick }: { onMenuClick: () => void }) {
       >
         <Menu className="w-5 h-5 text-[var(--color-text-secondary)]" />
       </button>
-      <span className="ml-3 flex-1 text-[15px] font-semibold tracking-[-0.01em]">
-        AgentZ Studio
-      </span>
+      <div className="ml-3 flex-1 flex items-center gap-2">
+        <div className="w-6 h-6 rounded bg-[var(--color-accent)] flex items-center justify-center p-[2px]">
+          <img src="/agentz-logo.svg" alt="AgentZ" className="w-full h-full object-contain" />
+        </div>
+        <span className="text-[15px] font-semibold tracking-[-0.01em]">AgentZ Studio</span>
+      </div>
       <button
         onClick={() => {
           document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true }));

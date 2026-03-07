@@ -38,7 +38,7 @@ function ShootPopover({ shoot, client, onClose, onDelete, onNavigate }: {
   const dateStr = dateObj.toLocaleDateString("de-DE", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
       <div ref={ref} className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] border border-[var(--color-border-subtle)] w-full max-w-[380px] mx-4">
         <div className="flex items-start justify-between p-4 pb-0">
           <div className="flex items-center gap-3">
@@ -139,7 +139,7 @@ function NewShootDateModal({ onClose, defaultDate }: { onClose: () => void; defa
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] w-full max-w-[480px] mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border-subtle)]">
           <h3 className="text-[17px] font-semibold">Neuer Drehtermin</h3>
