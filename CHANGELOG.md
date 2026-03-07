@@ -1,5 +1,15 @@
 # AgentZ Studio — CHANGELOG
 
+## v2.6.0 (08.03.2026) — Nacht-Sprint Run 2
+- **Kalender-View** — Veröffentlichungsdaten (grün) neben Drehterminen (lila), Filter-Buttons, Legende
+- **scheduledPublishDate** auf Ideas + Kalender + IdeaDetail Datepicker
+- **Videos/Ordner Kundenzuordnung** — clientId + clientVisible, Ordner-Kontextmenü, ClientAssignDialog
+- **Benutzerverwaltung (TeamPage)** — CRUD, Rollen Admin/Editor/Viewer/Client, Passwort-Reset, Suche
+- **Multi-Upload Queue** — Mehrere Videos, max 3 parallel, Fortschritt, Cancel, beforeunload
+- **Mediathek Status-Filter** — Dropdown für Video-Status
+- **Security** — DOMPurify für RichTextDisplay, Input-Validation (Register)
+- **Mobile Fix** — Library-Button Overflow auf 375px
+
 ## v2.5.0 (07.03.2026)
 - **App-Icon neu** — Dark navy + white Z + blue play accent (8.5/10 premium rating)
   - All sizes: 512, 192, 180 (apple-touch), 32 (favicon), SVG + PNG
