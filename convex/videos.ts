@@ -203,6 +203,22 @@ export const linkIdea = mutation({
   },
 });
 
+export const update = mutation({
+  args: {
+    videoId: v.id("videos"),
+    title: v.optional(v.string()),
+    clientId: v.optional(v.id("clients")),
+    clientVisible: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const { videoId, ...updates } = args;
+    const filtered = Object.fromEntries(Object.entries(updates).filter(([_, v]) => v !== undefined));
+    if (Object.keys(filtered).length > 0) {
+      await ctx.db.patch(videoId, filtered);
+    }
+  },
+});
+
 export const remove = mutation({
   args: { videoId: v.id("videos") },
   handler: async (ctx, args) => {

@@ -19,6 +19,9 @@ import {
   Search,
   Clock,
   ArrowUpDown,
+  Eye,
+  EyeOff,
+  Users,
 } from "lucide-react";
 import { VIDEO_STATUS_LABELS, STATUS_BADGE_STYLES } from "../lib/utils";
 import { useClientFilter } from "../lib/clientFilter";
@@ -33,16 +36,24 @@ type SortMode = "name" | "date" | "status";
 
 function FolderCard({
   folder,
+  clientName,
+  isAdmin,
   onOpen,
   onRename,
   onDelete,
+  onToggleVisibility,
+  onAssignClient,
   onDragOver,
   onDrop,
 }: {
-  folder: { _id: string; name: string; color?: string; createdAt: number };
+  folder: { _id: string; name: string; color?: string; createdAt: number; clientId?: string; clientVisible?: boolean };
+  clientName?: string;
+  isAdmin?: boolean;
   onOpen: () => void;
   onRename: () => void;
   onDelete: () => void;
+  onToggleVisibility?: () => void;
+  onAssignClient?: () => void;
   onDragOver: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent) => void;
 }) {
@@ -76,9 +87,19 @@ function FolderCard({
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-[14px] font-medium truncate">{folder.name}</p>
-          <p className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5">
-            {new Date(folder.createdAt).toLocaleDateString("de-DE")}
-          </p>
+          <div className="flex items-center gap-2 mt-0.5">
+            <span className="text-[11px] text-[var(--color-text-tertiary)]">
+              {new Date(folder.createdAt).toLocaleDateString("de-DE")}
+            </span>
+            {clientName && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--color-surface-2)] text-[var(--color-text-tertiary)]">
+                {clientName}
+              </span>
+            )}
+            {folder.clientVisible && (
+              <Eye className="w-3 h-3 text-emerald-500" title="Für Kunde sichtbar" />
+            )}
+          </div>
         </div>
         <button
           onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }}
@@ -89,10 +110,21 @@ function FolderCard({
       </div>
 
       {showMenu && (
-        <div ref={menuRef} className="absolute right-2 top-12 z-20 w-40 bg-[var(--color-surface-1)] border border-[var(--color-border-subtle)] rounded-[var(--radius-md)] shadow-[var(--shadow-lg)] py-1">
+        <div ref={menuRef} className="absolute right-2 top-12 z-20 w-48 bg-[var(--color-surface-1)] border border-[var(--color-border-subtle)] rounded-[var(--radius-md)] shadow-[var(--shadow-lg)] py-1">
           <button onClick={(e) => { e.stopPropagation(); setShowMenu(false); onRename(); }} className="w-full flex items-center gap-2 px-3 py-2 text-[13px] hover:bg-[var(--color-accent-surface)] transition-colors">
             <Pencil className="w-3.5 h-3.5" /> Umbenennen
           </button>
+          {isAdmin && onAssignClient && (
+            <button onClick={(e) => { e.stopPropagation(); setShowMenu(false); onAssignClient(); }} className="w-full flex items-center gap-2 px-3 py-2 text-[13px] hover:bg-[var(--color-accent-surface)] transition-colors">
+              <Users className="w-3.5 h-3.5" /> Kunde zuordnen
+            </button>
+          )}
+          {isAdmin && folder.clientId && onToggleVisibility && (
+            <button onClick={(e) => { e.stopPropagation(); setShowMenu(false); onToggleVisibility(); }} className="w-full flex items-center gap-2 px-3 py-2 text-[13px] hover:bg-[var(--color-accent-surface)] transition-colors">
+              {folder.clientVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+              {folder.clientVisible ? "Vor Kunde verbergen" : "Für Kunde sichtbar"}
+            </button>
+          )}
           <button onClick={(e) => { e.stopPropagation(); setShowMenu(false); onDelete(); }} className="w-full flex items-center gap-2 px-3 py-2 text-[13px] text-[var(--color-error)] hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors">
             <Trash2 className="w-3.5 h-3.5" /> Löschen
           </button>
@@ -231,6 +263,41 @@ function NewFolderDialog({ onSave, onCancel }: { onSave: (name: string) => void;
   );
 }
 
+function ClientAssignDialog({
+  currentClientId,
+  onSave,
+  onCancel,
+}: {
+  currentClientId?: string;
+  onSave: (clientId: string | undefined) => void;
+  onCancel: () => void;
+}) {
+  const clients = useQuery(api.clients.list);
+  const [selected, setSelected] = useState(currentClientId || "");
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={onCancel}>
+      <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] shadow-[var(--shadow-lg)] p-5 w-[360px]" onClick={(e) => e.stopPropagation()}>
+        <h3 className="text-[15px] font-semibold mb-3">Kunde zuordnen</h3>
+        <select
+          value={selected}
+          onChange={(e) => setSelected(e.target.value)}
+          className="w-full h-9 px-3 rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none"
+        >
+          <option value="">Kein Kunde</option>
+          {(clients || []).map((c) => (
+            <option key={c._id} value={c._id}>{c.name}{c.company ? ` (${c.company})` : ""}</option>
+          ))}
+        </select>
+        <div className="flex justify-end gap-2 mt-4">
+          <button onClick={onCancel} className="h-8 px-3 rounded-[var(--radius-md)] text-[13px] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] transition-colors">Abbrechen</button>
+          <button onClick={() => onSave(selected || undefined)} className="h-8 px-3 rounded-[var(--radius-md)] text-[13px] bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] transition-colors font-medium">Speichern</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function LibraryPage({ onNavigate }: LibraryPageProps) {
   const { user } = useAuth();
   const [currentFolderId, setCurrentFolderId] = useState<Id<"folders"> | undefined>(undefined);
@@ -240,8 +307,11 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
   const [showNewFolder, setShowNewFolder] = useState(false);
   const [renaming, setRenaming] = useState<{ type: "folder" | "video"; id: string; name: string } | null>(null);
   const [dragOverFolder, setDragOverFolder] = useState<string | null>(null);
+  const [assigningClient, setAssigningClient] = useState<{ type: "folder" | "video"; id: string; clientId?: string } | null>(null);
 
   const { selectedClientId } = useClientFilter();
+  const clients = useQuery(api.clients.list);
+  const clientMap = (clients || []).reduce((acc, c) => ({ ...acc, [c._id]: c }), {} as Record<string, any>);
   const folders = useQuery(api.folders.list, {
     parentId: currentFolderId,
     ...(selectedClientId ? { clientId: selectedClientId as Id<"clients"> } : {}),
@@ -252,7 +322,9 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
   const createFolder = useMutation(api.folders.create);
   const renameFolder = useMutation(api.folders.rename);
   const removeFolder = useMutation(api.folders.remove);
+  const updateFolder = useMutation(api.folders.update);
   const renameVideo = useMutation(api.videos.rename);
+  const updateVideo = useMutation(api.videos.update);
   const moveVideo = useMutation(api.videos.moveToFolder);
 
   const filteredFolders = (folders || [])
@@ -405,9 +477,13 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
                 <FolderCard
                   key={folder._id}
                   folder={folder}
+                  clientName={folder.clientId ? clientMap[folder.clientId]?.name : undefined}
+                  isAdmin={user?.role === "admin"}
                   onOpen={() => setCurrentFolderId(folder._id as Id<"folders">)}
                   onRename={() => setRenaming({ type: "folder", id: folder._id, name: folder.name })}
                   onDelete={() => handleDeleteFolder(folder._id)}
+                  onToggleVisibility={() => updateFolder({ folderId: folder._id as Id<"folders">, clientVisible: !folder.clientVisible })}
+                  onAssignClient={() => setAssigningClient({ type: "folder", id: folder._id, clientId: folder.clientId })}
                   onDragOver={(e) => { e.preventDefault(); setDragOverFolder(folder._id); }}
                   onDrop={(e) => handleDrop(e, folder._id)}
                 />
@@ -487,6 +563,20 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
       {/* Dialogs */}
       {showNewFolder && <NewFolderDialog onSave={handleCreateFolder} onCancel={() => setShowNewFolder(false)} />}
       {renaming && <RenameDialog initialName={renaming.name} onSave={handleRename} onCancel={() => setRenaming(null)} />}
+      {assigningClient && (
+        <ClientAssignDialog
+          currentClientId={assigningClient.clientId}
+          onSave={async (clientId) => {
+            if (assigningClient.type === "folder") {
+              await updateFolder({ folderId: assigningClient.id as Id<"folders">, clientId: clientId as Id<"clients"> | undefined });
+            } else {
+              await updateVideo({ videoId: assigningClient.id as Id<"videos">, clientId: clientId as Id<"clients"> | undefined });
+            }
+            setAssigningClient(null);
+          }}
+          onCancel={() => setAssigningClient(null)}
+        />
+      )}
     </div>
   );
 }

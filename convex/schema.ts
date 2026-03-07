@@ -6,6 +6,7 @@ export default defineSchema({
     name: v.string(),
     parentId: v.optional(v.id("folders")),
     clientId: v.optional(v.id("clients")),
+    clientVisible: v.optional(v.boolean()),
     color: v.optional(v.string()),
     createdBy: v.id("users"),
     createdAt: v.number(),
@@ -82,6 +83,8 @@ export default defineSchema({
   videos: defineTable({
     ideaId: v.optional(v.id("ideas")),
     folderId: v.optional(v.id("folders")),
+    clientId: v.optional(v.id("clients")),
+    clientVisible: v.optional(v.boolean()),
     bunnyVideoId: v.optional(v.string()),
     bunnyUrl: v.optional(v.string()),
     thumbnailUrl: v.optional(v.string()),
@@ -91,7 +94,8 @@ export default defineSchema({
     createdAt: v.number(),
   })
     .index("by_idea", ["ideaId"])
-    .index("by_folder", ["folderId"]),
+    .index("by_folder", ["folderId"])
+    .index("by_client", ["clientId"]),
 
   comments: defineTable({
     targetType: v.union(

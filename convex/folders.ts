@@ -68,6 +68,23 @@ export const rename = mutation({
   },
 });
 
+export const update = mutation({
+  args: {
+    folderId: v.id("folders"),
+    name: v.optional(v.string()),
+    clientId: v.optional(v.id("clients")),
+    clientVisible: v.optional(v.boolean()),
+    color: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { folderId, ...updates } = args;
+    const filtered = Object.fromEntries(Object.entries(updates).filter(([_, v]) => v !== undefined));
+    if (Object.keys(filtered).length > 0) {
+      await ctx.db.patch(folderId, filtered);
+    }
+  },
+});
+
 export const move = mutation({
   args: { folderId: v.id("folders"), parentId: v.optional(v.id("folders")) },
   handler: async (ctx, args) => {
