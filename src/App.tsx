@@ -179,22 +179,34 @@ function InviteRoute() {
   return <InvitePage token={token} onLogin={handleLogin} />;
 }
 
-export default function App() {
-  const hash = window.location.hash;
-  const isShareRoute = hash.startsWith("#/share/");
-  const isInviteRoute = hash.startsWith("#/invite/");
+function AppRouter() {
+  const [route, setRoute] = useState(() => {
+    const h = window.location.hash;
+    if (h.startsWith("#/share/")) return "share";
+    if (h.startsWith("#/invite/")) return "invite";
+    return "app";
+  });
 
+  useEffect(() => {
+    const onHash = () => {
+      const h = window.location.hash;
+      if (h.startsWith("#/share/")) setRoute("share");
+      else if (h.startsWith("#/invite/")) setRoute("invite");
+      else setRoute("app");
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  if (route === "share") return <ShareRoute />;
+  if (route === "invite") return <InviteRoute />;
+  return <AuthProvider><AppContent /></AuthProvider>;
+}
+
+export default function App() {
   return (
     <ConvexProvider client={convex}>
-      {isShareRoute ? (
-        <ShareRoute />
-      ) : isInviteRoute ? (
-        <InviteRoute />
-      ) : (
-        <AuthProvider>
-          <AppContent />
-        </AuthProvider>
-      )}
+      <AppRouter />
     </ConvexProvider>
   );
 }
