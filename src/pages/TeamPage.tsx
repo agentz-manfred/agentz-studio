@@ -151,14 +151,16 @@ function UserModal({
 }
 
 function ResetPasswordModal({ user, onClose }: { user: any; onClose: () => void }) {
+  const { token } = useAuth();
   const resetPassword = useMutation(api.auth.resetPassword);
   const [password, setPassword] = useState("");
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
 
   const handleReset = async () => {
+    if (!token) return;
     setSaving(true);
-    await resetPassword({ userId: user._id as Id<"users">, newPassword: password });
+    await resetPassword({ token, userId: user._id as Id<"users">, newPassword: password });
     setSaving(false);
     setDone(true);
   };
@@ -193,8 +195,8 @@ function ResetPasswordModal({ user, onClose }: { user: any; onClose: () => void 
 }
 
 export function TeamPage() {
-  const { user: currentUser } = useAuth();
-  const users = useQuery(api.auth.listUsers);
+  const { user: currentUser, token } = useAuth();
+  const users = useQuery(api.auth.listUsers, token ? { token } : "skip");
   const clients = useQuery(api.clients.list);
   const registerUser = useMutation(api.auth.register);
   const updateUser = useMutation(api.auth.updateUser);
@@ -223,20 +225,20 @@ export function TeamPage() {
     });
 
   const handleCreate = async (data: any) => {
-    const token = localStorage.getItem("agentz-token") || "";
     await registerUser({
       email: data.email,
       password: data.password,
       name: data.name,
       role: data.role,
       clientId: data.clientId as Id<"clients"> | undefined,
-      adminToken: token,
+      adminToken: token || "",
     });
   };
 
   const handleEdit = async (data: any) => {
-    if (!editingUser) return;
+    if (!editingUser || !token) return;
     await updateUser({
+      token,
       userId: editingUser._id as Id<"users">,
       name: data.name,
       email: data.email,
@@ -246,8 +248,9 @@ export function TeamPage() {
   };
 
   const handleDelete = async (userId: string) => {
+    if (!token) return;
     if (!confirm("Benutzer wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.")) return;
-    await deleteUser({ userId: userId as Id<"users"> });
+    await deleteUser({ token, userId: userId as Id<"users"> });
   };
 
   const roleCounts = (users || []).reduce((acc, u) => {

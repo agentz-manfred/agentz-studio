@@ -238,6 +238,7 @@ interface OpenRouterModel {
 }
 
 function AiModelSection() {
+  const { token } = useAuth();
   const currentModel = useQuery(api.settings.get, { key: "ai_model" });
   const setSetting = useMutation(api.settings.set);
   const [search, setSearch] = useState("");
@@ -292,7 +293,8 @@ function AiModelSection() {
   );
 
   const selectModel = async (modelId: string) => {
-    await setSetting({ key: "ai_model", value: modelId });
+    if (!token) return;
+    await setSetting({ token, key: "ai_model", value: modelId });
     setOpen(false);
     setSearch("");
   };
@@ -381,6 +383,7 @@ const AI_PROMPT_KEYS = [
 ] as const;
 
 function AiPromptsSection() {
+  const { token } = useAuth();
   const setSetting = useMutation(api.settings.set);
   const prompts = AI_PROMPT_KEYS.map(p => ({
     ...p,
@@ -397,10 +400,10 @@ function AiPromptsSection() {
 
   const save = async (key: string) => {
     if (draft.trim()) {
-      await setSetting({ key, value: draft.trim() });
+      if (token) await setSetting({ token, key, value: draft.trim() });
     } else {
       // Empty = reset to default (delete)
-      await setSetting({ key, value: "" });
+      if (token) await setSetting({ token, key, value: "" });
     }
     setEditing(null);
     setSaved(key);
@@ -477,10 +480,10 @@ function AiPromptsSection() {
 }
 
 export function SettingsPage() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const clients = useQuery(api.clients.list);
   const ideas = useQuery(api.ideas.list, {});
-  const users = useQuery(api.auth.listUsers);
+  const users = useQuery(api.auth.listUsers, token ? { token } : "skip");
   const videos = useQuery(api.videos.list, {});
 
   const published = (ideas || []).filter((i) => i.status === "veröffentlicht").length;

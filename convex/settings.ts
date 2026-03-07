@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdmin } from "./lib";
 
 export const get = query({
   args: { key: v.string() },
@@ -12,9 +13,11 @@ export const get = query({
   },
 });
 
+// Settings can only be changed by admins
 export const set = mutation({
-  args: { key: v.string(), value: v.string() },
+  args: { token: v.string(), key: v.string(), value: v.string() },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.token);
     const existing = await ctx.db
       .query("settings")
       .withIndex("by_key", (q) => q.eq("key", args.key))

@@ -1,6 +1,7 @@
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useState } from "react";
+import { useAuth } from "../lib/auth";
 import { Plus, Users, Building2, Mail, Phone, X, Search, UserPlus, Check, Link2, Copy, CheckCheck, Lightbulb, Film } from "lucide-react";
 import type { Id } from "../../convex/_generated/dataModel";
 
@@ -313,8 +314,9 @@ function InviteLinkModal({ client, onClose }: { client: any; onClose: () => void
 }
 
 export function ClientsPage({ onNavigate }: { onNavigate?: (page: string, id?: string) => void }) {
+  const { token } = useAuth();
   const clients = useQuery(api.clients.list);
-  const users = useQuery(api.auth.listUsers);
+  const users = useQuery(api.auth.listUsers, token ? { token } : "skip");
   const ideas = useQuery(api.ideas.list, {});
   const videos = useQuery(api.videos.list, {});
   const [showCreate, setShowCreate] = useState(false);

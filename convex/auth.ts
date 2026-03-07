@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { authenticate, requireAdmin } from "./lib";
 
 // Simple hash function for passwords (in production, use bcrypt via action)
 function simpleHash(password: string): string {
@@ -29,23 +30,14 @@ export const register = mutation({
     name: v.string(),
     role: v.union(v.literal("admin"), v.literal("editor"), v.literal("viewer"), v.literal("client")),
     clientId: v.optional(v.id("clients")),
-    // The session token of the admin performing the registration
     adminToken: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    // Check if any users exist. If none, allow first admin creation (bootstrap).
     const anyUser = await ctx.db.query("users").first();
 
     if (anyUser) {
-      // Users exist — require admin authentication
       if (!args.adminToken) throw new Error("Nur Admins können Nutzer anlegen");
-      const session = await ctx.db
-        .query("sessions")
-        .withIndex("by_token", (q) => q.eq("token", args.adminToken!))
-        .first();
-      if (!session || session.expiresAt < Date.now()) throw new Error("Ungültige Session");
-      const admin = await ctx.db.get(session.userId);
-      if (!admin || admin.role !== "admin") throw new Error("Nur Admins können Nutzer anlegen");
+      await requireAdmin(ctx, args.adminToken);
     }
 
     if (args.password.length < 6) throw new Error("Passwort muss mindestens 6 Zeichen haben");
@@ -56,14 +48,13 @@ export const register = mutation({
       .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.email))
       .first();
-
     if (existing) throw new Error("Email bereits registriert");
 
     const userId = await ctx.db.insert("users", {
       email: args.email,
       passwordHash: simpleHash(args.password),
       name: args.name,
-      role: anyUser ? args.role : "admin", // First user is always admin
+      role: anyUser ? args.role : "admin",
       clientId: args.clientId,
       createdAt: Date.now(),
     });
@@ -151,9 +142,11 @@ export const getSession = query({
   },
 });
 
-// List all users (admin only, used for client user management)
+// List all users — ADMIN ONLY
 export const listUsers = query({
-  handler: async (ctx) => {
+  args: { token: v.string() },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.token);
     const users = await ctx.db.query("users").collect();
     return users.map((u) => ({
       _id: u._id,
@@ -173,14 +166,7 @@ export const changePassword = mutation({
     newPassword: v.string(),
   },
   handler: async (ctx, args) => {
-    const session = await ctx.db
-      .query("sessions")
-      .withIndex("by_token", (q) => q.eq("token", args.token))
-      .first();
-    if (!session || session.expiresAt < Date.now()) throw new Error("Ungültige Session");
-
-    const user = await ctx.db.get(session.userId);
-    if (!user) throw new Error("Nutzer nicht gefunden");
+    const user = await authenticate(ctx, args.token);
 
     if (user.passwordHash !== simpleHash(args.currentPassword)) {
       throw new Error("Aktuelles Passwort ist falsch");
@@ -198,8 +184,10 @@ export const changePassword = mutation({
   },
 });
 
+// Update user — ADMIN ONLY
 export const updateUser = mutation({
   args: {
+    token: v.string(),
     userId: v.id("users"),
     name: v.optional(v.string()),
     email: v.optional(v.string()),
@@ -207,11 +195,12 @@ export const updateUser = mutation({
     clientId: v.optional(v.id("clients")),
   },
   handler: async (ctx, args) => {
-    const { userId, ...updates } = args;
+    await requireAdmin(ctx, args.token);
+
+    const { token: _, userId, ...updates } = args;
     const user = await ctx.db.get(userId);
     if (!user) throw new Error("Nutzer nicht gefunden");
 
-    // Check email uniqueness if changing
     if (updates.email && updates.email !== user.email) {
       const existing = await ctx.db.query("users").withIndex("by_email", (q) => q.eq("email", updates.email!)).first();
       if (existing) throw new Error("Email bereits vergeben");
@@ -224,22 +213,33 @@ export const updateUser = mutation({
   },
 });
 
+// Delete user — ADMIN ONLY
 export const deleteUser = mutation({
-  args: { userId: v.id("users") },
+  args: {
+    token: v.string(),
+    userId: v.id("users"),
+  },
   handler: async (ctx, args) => {
-    // Delete all sessions for this user
+    const admin = await requireAdmin(ctx, args.token);
+
+    // Can't delete yourself
+    if (admin._id === args.userId) throw new Error("Du kannst dich nicht selbst löschen");
+
     const sessions = await ctx.db.query("sessions").filter((q) => q.eq(q.field("userId"), args.userId)).collect();
     for (const s of sessions) await ctx.db.delete(s._id);
     await ctx.db.delete(args.userId);
   },
 });
 
+// Reset password — ADMIN ONLY
 export const resetPassword = mutation({
   args: {
+    token: v.string(),
     userId: v.id("users"),
     newPassword: v.string(),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.token);
     if (args.newPassword.length < 6) throw new Error("Passwort muss mindestens 6 Zeichen haben");
     await ctx.db.patch(args.userId, { passwordHash: simpleHash(args.newPassword) });
   },

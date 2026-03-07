@@ -633,7 +633,7 @@ export function ClientDetail({
   onBack: () => void;
   onNavigate: (page: string, id?: string) => void;
 }) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const client = useQuery(api.clients.get, {
     id: clientId as Id<"clients">,
   });
@@ -643,7 +643,7 @@ export function ClientDetail({
   const shoots = useQuery(api.shootDates.list, {
     clientId: clientId as Id<"clients">,
   });
-  const users = useQuery(api.auth.listUsers);
+  const users = useQuery(api.auth.listUsers, token ? { token } : "skip");
   const categories = useQuery(api.categories.listByClient, {
     clientId: clientId as Id<"clients">,
   });

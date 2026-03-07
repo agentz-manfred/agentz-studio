@@ -17,6 +17,7 @@ import type * as folders from "../folders.js";
 import type * as http from "../http.js";
 import type * as ideas from "../ideas.js";
 import type * as invites from "../invites.js";
+import type * as lib from "../lib.js";
 import type * as notifications from "../notifications.js";
 import type * as scripts from "../scripts.js";
 import type * as seed from "../seed.js";
@@ -41,6 +42,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   ideas: typeof ideas;
   invites: typeof invites;
+  lib: typeof lib;
   notifications: typeof notifications;
   scripts: typeof scripts;
   seed: typeof seed;
