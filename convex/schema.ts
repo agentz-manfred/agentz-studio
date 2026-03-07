@@ -92,4 +92,30 @@ export default defineSchema({
     token: v.string(),
     expiresAt: v.number(),
   }).index("by_token", ["token"]),
+
+  shareLinks: defineTable({
+    videoId: v.id("videos"),
+    token: v.string(),
+    createdBy: v.id("users"),
+    expiresAt: v.optional(v.number()),
+    password: v.optional(v.string()),
+    viewCount: v.number(),
+    active: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_token", ["token"])
+    .index("by_video", ["videoId"]),
+
+  notifications: defineTable({
+    userId: v.id("users"),
+    type: v.string(),
+    title: v.string(),
+    message: v.string(),
+    targetType: v.optional(v.string()),
+    targetId: v.optional(v.string()),
+    read: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_read", ["userId", "read"]),
 });

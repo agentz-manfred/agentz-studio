@@ -3,7 +3,7 @@ import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
 import { VideoPlayer } from "../components/video/VideoPlayer";
 import { useState, useMemo } from "react";
-import { ArrowLeft, Send, Check, Clock, MessageSquare, Film, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, Send, Check, Clock, MessageSquare, Film, ChevronDown, ChevronUp, Share2, Link2, Copy, CheckCheck, Reply } from "lucide-react";
 import type { Id } from "../../convex/_generated/dataModel";
 
 function formatTimestamp(seconds: number): string {
@@ -32,11 +32,19 @@ export function VideoReview({ videoId, onBack }: { videoId: string; onBack: () =
   const createComment = useMutation(api.comments.create);
   const resolveComment = useMutation(api.comments.resolve);
 
+  const shareLinks = useQuery(api.shareLinks.listByVideo, { videoId: videoId as Id<"videos"> });
+  const createShareLink = useMutation(api.shareLinks.create);
+  const deactivateShareLink = useMutation(api.shareLinks.deactivate);
+
   const [newComment, setNewComment] = useState("");
   const [currentTime, setCurrentTime] = useState(0);
   const [seekTo, setSeekTo] = useState<number | null>(null);
   const [addTimestamp, setAddTimestamp] = useState(true);
   const [showResolved, setShowResolved] = useState(false);
+  const [showSharePanel, setShowSharePanel] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
 
   const userMap = useMemo(() => {
     const map: Record<string, string> = {};
@@ -73,6 +81,34 @@ export function VideoReview({ videoId, onBack }: { videoId: string; onBack: () =
     });
     return map;
   }, [comments]);
+
+  const handleCreateShareLink = async () => {
+    if (!user) return;
+    await createShareLink({
+      videoId: videoId as Id<"videos">,
+      createdBy: user.userId as Id<"users">,
+    });
+  };
+
+  const handleCopyShareLink = (token: string) => {
+    const url = `${window.location.origin}/#/share/${token}`;
+    navigator.clipboard.writeText(url);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
+  };
+
+  const handleReply = async (parentId: string) => {
+    if (!replyText.trim() || !user) return;
+    await createComment({
+      targetType: "video",
+      targetId: videoId,
+      userId: user.userId as Id<"users">,
+      content: replyText.trim(),
+      parentId: parentId as Id<"comments">,
+    });
+    setReplyText("");
+    setReplyingTo(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,6 +167,56 @@ export function VideoReview({ videoId, onBack }: { videoId: string; onBack: () =
           }`}>
             {video.status}
           </span>
+          {user?.role === "admin" && (
+            <div className="relative ml-2">
+              <button
+                onClick={() => setShowSharePanel(!showSharePanel)}
+                className="p-1.5 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-2)] transition-colors"
+                title="Teilen"
+              >
+                <Share2 className="w-4 h-4" />
+              </button>
+              {showSharePanel && (
+                <div className="absolute right-0 top-full mt-2 w-[320px] bg-[var(--color-surface-1)] border border-[var(--color-border)] rounded-[var(--radius-md)] shadow-[var(--shadow-lg)] z-50 p-4">
+                  <h3 className="text-[14px] font-medium mb-3">Share-Links</h3>
+                  {(shareLinks || []).filter(l => l.active).length === 0 ? (
+                    <p className="text-[13px] text-[var(--color-text-tertiary)] mb-3">Noch kein Share-Link erstellt.</p>
+                  ) : (
+                    <div className="space-y-2 mb-3">
+                      {(shareLinks || []).filter(l => l.active).map(link => (
+                        <div key={link._id} className="flex items-center gap-2 p-2 rounded-[var(--radius-sm)] bg-[var(--color-surface-2)]">
+                          <Link2 className="w-3.5 h-3.5 text-[var(--color-text-tertiary)] flex-shrink-0" />
+                          <span className="text-[12px] text-[var(--color-text-secondary)] flex-1 truncate font-mono">
+                            …/share/{link.token.slice(0, 8)}…
+                          </span>
+                          <span className="text-[11px] text-[var(--color-text-tertiary)]">{link.viewCount}×</span>
+                          <button
+                            onClick={() => handleCopyShareLink(link.token)}
+                            className="p-1 rounded hover:bg-[var(--color-surface-3)] transition-colors"
+                          >
+                            {copiedLink ? <CheckCheck className="w-3.5 h-3.5 text-[var(--color-success)]" /> : <Copy className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />}
+                          </button>
+                          <button
+                            onClick={() => deactivateShareLink({ linkId: link._id })}
+                            className="text-[11px] text-[var(--color-error)] hover:underline"
+                          >
+                            Löschen
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <button
+                    onClick={handleCreateShareLink}
+                    className="w-full h-8 rounded-[var(--radius-sm)] bg-[var(--color-accent)] text-white text-[13px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors flex items-center justify-center gap-1.5"
+                  >
+                    <Link2 className="w-3.5 h-3.5" />
+                    Neuen Link erstellen
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Player */}
@@ -191,6 +277,12 @@ export function VideoReview({ videoId, onBack }: { videoId: string; onBack: () =
               onSeek={handleSeek}
               onResolve={() => resolveComment({ commentId: comment._id })}
               canResolve={user?.role === "admin"}
+              replyingTo={replyingTo}
+              replyText={replyText}
+              onReplyStart={(id) => { setReplyingTo(id); setReplyText(""); }}
+              onReplyChange={setReplyText}
+              onReplySubmit={handleReply}
+              onReplyCancel={() => { setReplyingTo(null); setReplyText(""); }}
             />
           ))}
 
@@ -273,6 +365,12 @@ function CommentCard({
   onResolve,
   canResolve,
   resolved,
+  replyingTo,
+  replyText,
+  onReplyStart,
+  onReplyChange,
+  onReplySubmit,
+  onReplyCancel,
 }: {
   comment: any;
   userName: string;
@@ -281,7 +379,15 @@ function CommentCard({
   onResolve?: () => void;
   canResolve?: boolean;
   resolved?: boolean;
+  replyingTo?: string | null;
+  replyText?: string;
+  onReplyStart?: (id: string) => void;
+  onReplyChange?: (text: string) => void;
+  onReplySubmit?: (parentId: string) => void;
+  onReplyCancel?: () => void;
 }) {
+  const isReplying = replyingTo === comment._id;
+
   return (
     <div className={`rounded-[var(--radius-md)] border p-3 transition-colors ${
       resolved
@@ -298,15 +404,26 @@ function CommentCard({
           </div>
           <p className="text-[13px] leading-relaxed text-[var(--color-text-secondary)]">{comment.content}</p>
         </div>
-        {!resolved && canResolve && onResolve && (
-          <button
-            onClick={onResolve}
-            className="p-1 rounded hover:bg-[var(--color-surface-2)] text-[var(--color-text-tertiary)] hover:text-[var(--color-success)] transition-colors flex-shrink-0"
-            title="Als erledigt markieren"
-          >
-            <Check className="w-3.5 h-3.5" />
-          </button>
-        )}
+        <div className="flex items-center gap-0.5 flex-shrink-0">
+          {!resolved && onReplyStart && (
+            <button
+              onClick={() => onReplyStart(comment._id)}
+              className="p-1 rounded hover:bg-[var(--color-surface-2)] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
+              title="Antworten"
+            >
+              <Reply className="w-3.5 h-3.5" />
+            </button>
+          )}
+          {!resolved && canResolve && onResolve && (
+            <button
+              onClick={onResolve}
+              className="p-1 rounded hover:bg-[var(--color-surface-2)] text-[var(--color-text-tertiary)] hover:text-[var(--color-success)] transition-colors"
+              title="Als erledigt markieren"
+            >
+              <Check className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Replies */}
@@ -318,6 +435,32 @@ function CommentCard({
               <p className="text-[12px] text-[var(--color-text-secondary)]">{r.content}</p>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Reply input */}
+      {isReplying && (
+        <div className="mt-2 pt-2 border-t border-[var(--color-border-subtle)]">
+          <div className="flex gap-1.5">
+            <input
+              value={replyText || ""}
+              onChange={(e) => onReplyChange?.(e.target.value)}
+              className="flex-1 h-7 px-2.5 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[12px] focus:border-[var(--color-accent)] focus:outline-none"
+              placeholder="Antworten…"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); onReplySubmit?.(comment._id); }
+                if (e.key === "Escape") onReplyCancel?.();
+              }}
+            />
+            <button
+              onClick={() => onReplySubmit?.(comment._id)}
+              disabled={!(replyText || "").trim()}
+              className="h-7 w-7 rounded-[var(--radius-sm)] bg-[var(--color-accent)] text-white flex items-center justify-center hover:bg-[var(--color-accent-hover)] disabled:opacity-30 transition-all"
+            >
+              <Send className="w-3 h-3" />
+            </button>
+          </div>
         </div>
       )}
 

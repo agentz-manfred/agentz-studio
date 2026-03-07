@@ -10,9 +10,10 @@ import { CalendarPage } from "./pages/CalendarPage";
 import { PipelinePage } from "./pages/PipelinePage";
 import { VideosPage } from "./pages/VideosPage";
 import { VideoReview } from "./pages/VideoReview";
+import { SharePage } from "./pages/SharePage";
 import { Sidebar } from "./components/layout/Sidebar";
 import { MobileHeader } from "./components/layout/MobileHeader";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
@@ -92,12 +93,43 @@ function AppContent() {
   );
 }
 
+function ShareRoute() {
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash.startsWith("#/share/")) {
+      setToken(hash.replace("#/share/", ""));
+    }
+
+    const handleHashChange = () => {
+      const h = window.location.hash;
+      if (h.startsWith("#/share/")) {
+        setToken(h.replace("#/share/", ""));
+      } else {
+        setToken(null);
+      }
+    };
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
+
+  if (!token) return null;
+  return <SharePage token={token} />;
+}
+
 export default function App() {
+  const isShareRoute = window.location.hash.startsWith("#/share/");
+
   return (
     <ConvexProvider client={convex}>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
+      {isShareRoute ? (
+        <ShareRoute />
+      ) : (
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      )}
     </ConvexProvider>
   );
 }

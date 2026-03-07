@@ -12,7 +12,9 @@ import type * as auth from "../auth.js";
 import type * as clients from "../clients.js";
 import type * as comments from "../comments.js";
 import type * as ideas from "../ideas.js";
+import type * as notifications from "../notifications.js";
 import type * as scripts from "../scripts.js";
+import type * as shareLinks from "../shareLinks.js";
 import type * as shootDates from "../shootDates.js";
 import type * as videos from "../videos.js";
 
@@ -27,7 +29,9 @@ declare const fullApi: ApiFromModules<{
   clients: typeof clients;
   comments: typeof comments;
   ideas: typeof ideas;
+  notifications: typeof notifications;
   scripts: typeof scripts;
+  shareLinks: typeof shareLinks;
   shootDates: typeof shootDates;
   videos: typeof videos;
 }>;

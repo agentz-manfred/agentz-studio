@@ -30,9 +30,19 @@ export function ClientDashboard({ onNavigate }: { onNavigate: (page: string, id?
     api.ideas.list,
     user?.clientId ? { clientId: user.clientId as any } : "skip"
   );
+  const shootDates = useQuery(api.shootDates.list);
 
   const published = (ideas || []).filter((i) => i.status === "veröffentlicht").length;
   const active = (ideas || []).filter((i) => !["veröffentlicht"].includes(i.status)).length;
+
+  // Find next upcoming shoot for this client
+  const today = new Date().toISOString().split("T")[0];
+  const nextShoot = (shootDates || [])
+    .filter(s => s.clientId === user?.clientId && s.date >= today)
+    .sort((a, b) => a.date.localeCompare(b.date))[0];
+  const nextShootLabel = nextShoot
+    ? new Date(nextShoot.date + "T00:00:00").toLocaleDateString("de-DE", { day: "2-digit", month: "short" })
+    : "—";
 
   return (
     <div className="max-w-[960px] mx-auto">
@@ -67,7 +77,7 @@ export function ClientDashboard({ onNavigate }: { onNavigate: (page: string, id?
             <Calendar className="w-[18px] h-[18px] text-[var(--color-text-secondary)]" />
           </div>
           <div>
-            <p className="text-[24px] font-semibold tracking-[-0.02em] leading-none">—</p>
+            <p className="text-[24px] font-semibold tracking-[-0.02em] leading-none">{nextShootLabel}</p>
             <p className="text-[13px] text-[var(--color-text-tertiary)] mt-1">Nächster Dreh</p>
           </div>
         </div>

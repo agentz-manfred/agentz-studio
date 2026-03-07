@@ -1,4 +1,6 @@
 import { useAuth } from "../../lib/auth";
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 import {
   LayoutDashboard,
   Users,
@@ -7,8 +9,10 @@ import {
   LogOut,
   Lightbulb,
   Play,
+  Bell,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
+import type { Id } from "../../../convex/_generated/dataModel";
 
 interface SidebarProps {
   currentPage: string;
@@ -33,6 +37,10 @@ const clientNav = [
 export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
   const { user, logout } = useAuth();
   const nav = user?.role === "admin" ? adminNav : clientNav;
+  const unreadCount = useQuery(
+    api.notifications.unreadCount,
+    user?.userId ? { userId: user.userId as Id<"users"> } : "skip"
+  );
 
   return (
     <aside className="w-[240px] h-screen flex flex-col border-r border-[var(--color-border-subtle)] bg-[var(--color-surface-1)]">
