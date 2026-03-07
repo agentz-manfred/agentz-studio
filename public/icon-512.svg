@@ -1,6 +1,20 @@
-<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <rect width="512" height="512" rx="0" fill="#1e40af"/>
-  <g transform="translate(75, 173) scale(3.42)">
-    <path fill-rule="evenodd" clip-rule="evenodd" d="M101.937 0L76.5471 3.18953L77.1384 7.89656H78.9584V12.5662H81.8491V18.3786H78.9584V22.3848L80.1996 32.2654L105.59 29.0759L101.937 0ZM91.2643 21.967L99.1023 4.33403L81.7355 6.51565L82.3176 11.1489L90.5755 10.1115L82.6744 27.7524L100.672 25.4916L100.09 20.8584L91.2643 21.967Z" fill="white"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#60a5fa"/>
+    </linearGradient>
+  </defs>
+  <!-- Dark background -->
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+  <!-- Bold Z -->
+  <g transform="translate(88, 100)">
+    <path d="M 0 0 L 336 0 L 336 56 L 92 256 L 336 256 L 336 312 L 0 312 L 0 256 L 244 56 L 0 56 Z" fill="white"/>
   </g>
+  <!-- Small accent play triangle bottom-right -->
+  <path d="M 390 380 L 432 406 L 390 432 Z" fill="url(#accent)"/>
 </svg>
