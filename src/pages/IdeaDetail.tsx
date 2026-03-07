@@ -3,6 +3,7 @@ import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
 import { STATUS_LABELS, STATUS_ORDER, STATUS_BADGE_STYLES } from "../lib/utils";
 import { useState } from "react";
+import { RichTextEditor, RichTextDisplay } from "../components/ui/RichTextEditor";
 import { ArrowLeft, MessageSquare, Send, Check, ChevronDown, FileText, Plus, Save, Clock, Film, Play, ChevronRight, Sparkles, Wand2, Scissors } from "lucide-react";
 import { VideoUpload } from "../components/video/VideoUpload";
 import type { Id } from "../../convex/_generated/dataModel";
@@ -139,12 +140,10 @@ function ScriptEditor({ ideaId, ideaTitle, ideaDescription, clientName, clientCo
 
       {editing ? (
         <div className="p-4">
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="w-full h-64 px-3 py-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] leading-relaxed font-[var(--font-body)] focus:border-[var(--color-accent)] focus:outline-none transition-colors resize-y"
-            placeholder="Skript hier eingeben…&#10;&#10;Szene 1: Intro&#10;[Kamera: Frontal, Halbnah]&#10;Text: ..."
-            autoFocus
+          <RichTextEditor
+            content={content}
+            onChange={setContent}
+            placeholder="Skript hier eingeben… Szene 1: Intro [Kamera: Frontal, Halbnah] Text: ..."
           />
           {/* AI Buttons */}
           {user?.role === "admin" && (
@@ -199,9 +198,7 @@ function ScriptEditor({ ideaId, ideaTitle, ideaDescription, clientName, clientCo
         </div>
       ) : latestScript ? (
         <div className="p-4">
-          <p className="text-[14px] leading-relaxed text-[var(--color-text-secondary)] whitespace-pre-wrap">
-            {latestScript.content}
-          </p>
+          <RichTextDisplay content={latestScript.content} className="text-[var(--color-text-secondary)]" />
           <p className="text-[11px] text-[var(--color-text-tertiary)] mt-3">
             Zuletzt bearbeitet: {new Date(latestScript.createdAt).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
           </p>
@@ -439,9 +436,7 @@ export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onB
       {/* Description */}
       {idea.description && (
         <div className="animate-in stagger-1 bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-4 mb-6">
-          <p className="text-[14px] leading-relaxed text-[var(--color-text-secondary)]">
-            {idea.description}
-          </p>
+          <RichTextDisplay content={idea.description} className="text-[var(--color-text-secondary)]" />
         </div>
       )}
 

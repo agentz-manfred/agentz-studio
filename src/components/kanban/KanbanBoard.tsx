@@ -3,6 +3,9 @@ import {
   DragOverlay,
   closestCorners,
   PointerSensor,
+  TouchSensor,
+  KeyboardSensor,
+  MeasuringStrategy,
   useSensor,
   useSensors,
   type DragStartEvent,
@@ -11,6 +14,7 @@ import {
 import {
   SortableContext,
   verticalListSortingStrategy,
+  sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { useDroppable } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
@@ -140,7 +144,8 @@ function KanbanCard({
       ref={setNodeRef}
       style={{ ...style, '--kanban-accent': statusColor } as React.CSSProperties}
       className={cn(
-        "group bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-3 cursor-default kanban-card-accent",
+        "group bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-3 cursor-default",
+        !isDragging && "kanban-card-accent",
         isDragging && "shadow-[var(--shadow-lg)] rotate-[2deg]"
       )}
     >
@@ -179,10 +184,18 @@ function KanbanCard({
   );
 }
 
+const measuringConfig = {
+  droppable: {
+    strategy: MeasuringStrategy.Always,
+  },
+};
+
 export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }: KanbanBoardProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
   const columns = STATUS_ORDER.map((status) => ({
@@ -221,6 +234,7 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }:
       collisionDetection={closestCorners}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      measuring={measuringConfig}
     >
       <div className="flex gap-3 overflow-x-auto pb-4 px-1">
         {columns.map(({ status, ideas: columnIdeas }) => (

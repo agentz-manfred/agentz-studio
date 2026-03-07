@@ -24,6 +24,7 @@ import {
   CalendarDays,
   Hash,
 } from "lucide-react";
+import { RichTextEditor, RichTextDisplay } from "../components/ui/RichTextEditor";
 
 const STATUS_LABELS: Record<string, string> = {
   idea: "Idee",
@@ -305,14 +306,10 @@ function ProfileEditor({
             <FileText className="w-3.5 h-3.5 inline mr-1" />
             Kundenkontext (wird bei KI-Generierung mitgegeben)
           </label>
-          <textarea
-            value={form.context}
-            onChange={(e) => setForm({ ...form, context: e.target.value })}
-            rows={8}
-            className="w-full px-3 py-2.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] leading-relaxed focus:border-[var(--color-accent)] focus:outline-none transition-colors resize-y"
-            placeholder="Tonalität, Do's & Don'ts, Zielgruppe, Besonderheiten, Referenz-Videos, Branche...
-
-Dieser Text wird automatisch als Kontext bei der KI-Ideen- und Skript-Generierung verwendet."
+          <RichTextEditor
+            content={form.context}
+            onChange={(html) => setForm({ ...form, context: html })}
+            placeholder="Tonalität, Do's & Don'ts, Zielgruppe, Besonderheiten, Referenz-Videos, Branche… Markdown einfügen funktioniert!"
           />
         </div>
 
@@ -614,8 +611,8 @@ function ProfileInfo({ client }: { client: any }) {
             <FileText className="w-3 h-3" />
             Kundenkontext
           </span>
-          <div className="mt-2 text-[13px] leading-relaxed text-[var(--color-text-secondary)] whitespace-pre-wrap max-h-[200px] overflow-y-auto">
-            {client.context}
+          <div className="mt-2 max-h-[200px] overflow-y-auto">
+            <RichTextDisplay content={client.context} className="text-[13px] text-[var(--color-text-secondary)]" />
           </div>
         </div>
       )}
