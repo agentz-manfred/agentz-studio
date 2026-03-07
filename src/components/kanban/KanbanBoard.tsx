@@ -19,7 +19,7 @@ import {
 import { useDroppable } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useState } from "react";
+import { useState, useCallback, useRef } from "react";
 import { STATUS_LABELS, STATUS_ORDER, STATUS_COLORS, cn } from "../../lib/utils";
 import { GripVertical, Clock } from "lucide-react";
 
@@ -122,12 +122,44 @@ function KanbanCard({
     isDragging: isSortDragging,
   } = useSortable({ id: idea._id, data: { status: idea.status } });
 
+  // Track whether drag activated so we suppress the click
+  const didDragRef = useRef(false);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
 
+  // Wrap listeners to track drag activation
+  const wrappedListeners = listeners
+    ? Object.fromEntries(
+        Object.entries(listeners).map(([key, handler]) => [
+          key,
+          (e: any) => {
+            if (key === "onPointerDown" || key === "onTouchStart") {
+              didDragRef.current = false;
+              if (e.touches?.[0]) {
+                touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+              }
+            }
+            return (handler as any)(e);
+          },
+        ])
+      )
+    : {};
+
+  const handleClick = useCallback(() => {
+    // Don't navigate if we just finished dragging
+    if (didDragRef.current) {
+      didDragRef.current = false;
+      return;
+    }
+    onClick?.();
+  }, [onClick]);
+
   if (isSortDragging) {
+    didDragRef.current = true;
     return (
       <div
         ref={setNodeRef}
@@ -142,22 +174,23 @@ function KanbanCard({
   return (
     <div
       ref={setNodeRef}
-      style={{ ...style, '--kanban-accent': statusColor } as React.CSSProperties}
+      {...attributes}
+      {...wrappedListeners}
+      style={{ ...style, '--kanban-accent': statusColor, touchAction: 'manipulation' } as React.CSSProperties}
       className={cn(
-        "group bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-3 cursor-default",
+        "group bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-3",
+        "cursor-grab active:cursor-grabbing select-none",
         !isDragging && "kanban-card-accent",
         isDragging && "shadow-[var(--shadow-lg)] rotate-[2deg]"
       )}
+      onClick={handleClick}
+      role={onClick ? "button" : undefined}
     >
       <div className="flex items-start gap-2">
-        <button
-          {...attributes}
-          {...listeners}
-          className="mt-0.5 p-0.5 rounded opacity-0 group-hover:opacity-100 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-opacity cursor-grab active:cursor-grabbing"
-        >
+        <div className="mt-0.5 p-0.5 rounded text-[var(--color-text-tertiary)] opacity-30 group-hover:opacity-100 transition-opacity flex-shrink-0">
           <GripVertical className="w-3.5 h-3.5" />
-        </button>
-        <div className="flex-1 min-w-0" onClick={onClick} role={onClick ? "button" : undefined} style={onClick ? { cursor: "pointer" } : undefined}>
+        </div>
+        <div className="flex-1 min-w-0">
           <p className="text-[14px] font-medium leading-tight truncate group-hover:text-[var(--color-accent)] transition-colors">
             {idea.title}
           </p>
@@ -194,7 +227,7 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }:
   const [activeId, setActiveId] = useState<string | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
@@ -207,11 +240,17 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }:
 
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
+    // Prevent body scroll during drag on touch devices
+    document.body.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
+    // Restore scrolling
+    document.body.style.overflow = "";
+    document.body.style.touchAction = "";
 
     if (!over) return;
 
@@ -234,6 +273,11 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }:
       collisionDetection={closestCorners}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      onDragCancel={() => {
+        setActiveId(null);
+        document.body.style.overflow = "";
+        document.body.style.touchAction = "";
+      }}
       measuring={measuringConfig}
     >
       <div className="flex gap-3 overflow-x-auto pb-4 px-1">
