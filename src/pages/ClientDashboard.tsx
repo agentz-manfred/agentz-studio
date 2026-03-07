@@ -2,7 +2,7 @@ import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
 import { Film, Calendar, CheckCircle2, ChevronRight, Play, MessageSquare, HelpCircle } from "lucide-react";
-import { STATUS_LABELS, STATUS_BADGE_STYLES, VIDEO_STATUS_LABELS } from "../lib/utils";
+import { STATUS_LABELS, STATUS_BADGE_STYLES, VIDEO_STATUS_LABELS, STATUS_DESCRIPTIONS, CLIENT_PIPELINE_STEPS, STATUS_COLORS } from "../lib/utils";
 import type { Id } from "../../convex/_generated/dataModel";
 
 function StatusBadge({ status }: { status: string }) {
@@ -82,28 +82,87 @@ export function ClientDashboard({ onNavigate }: { onNavigate: (page: string, id?
         </div>
       </div>
 
-      {/* Ideas List */}
+      {/* Ideas List with Progress Tracker */}
       <div className="px-6 lg:px-8 pb-8">
         <h2 className="text-[16px] font-medium mb-3">Projekte</h2>
-        <div className="space-y-1.5">
-          {(ideas || []).map((idea, i) => (
-            <button
-              key={idea._id}
-              onClick={() => onNavigate("idea", idea._id)}
-              className={`animate-in stagger-${Math.min(i + 1, 4)} w-full text-left bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-4 flex items-center justify-between hover:shadow-[var(--shadow-sm)] transition-shadow group`}
-            >
-              <div className="min-w-0">
-                <p className="text-[14px] font-medium">{idea.title}</p>
-                {idea.description && (
-                  <p className="text-[13px] text-[var(--color-text-secondary)] mt-0.5 line-clamp-1">{idea.description}</p>
-                )}
-              </div>
-              <div className="flex items-center gap-2 flex-shrink-0 ml-3">
-                <StatusBadge status={idea.status} />
-                <ChevronRight className="w-4 h-4 text-[var(--color-text-tertiary)] opacity-0 group-hover:opacity-100 transition-opacity" />
-              </div>
-            </button>
-          ))}
+        <div className="space-y-3">
+          {(ideas || []).map((idea, i) => {
+            // Find current step index for progress display
+            const stepKeys = CLIENT_PIPELINE_STEPS.map(s => s.key);
+            const currentStepIdx = (() => {
+              // Map intermediate statuses to their parent step
+              const statusMap: Record<string, string> = {
+                idee: "idee", skript: "skript", freigabe: "freigabe",
+                korrektur: "freigabe", freigegeben: "gedreht",
+                gedreht: "gedreht", geschnitten: "review",
+                review: "review", "veröffentlicht": "veröffentlicht",
+              };
+              const mapped = statusMap[idea.status] || idea.status;
+              return stepKeys.indexOf(mapped);
+            })();
+            const needsAction = idea.status === "freigabe" || idea.status === "review";
+
+            return (
+              <button
+                key={idea._id}
+                onClick={() => onNavigate("idea", idea._id)}
+                className={`animate-in stagger-${Math.min(i + 1, 4)} w-full text-left bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border overflow-hidden hover:shadow-[var(--shadow-md)] transition-all duration-200 group ${
+                  needsAction
+                    ? "border-[var(--color-warning)] ring-1 ring-[var(--color-warning)]/20"
+                    : "border-[var(--color-border-subtle)] hover:border-[var(--color-border)]"
+                }`}
+              >
+                <div className="p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-[14px] font-medium">{idea.title}</p>
+                      <p className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5">
+                        {STATUS_DESCRIPTIONS[idea.status] || STATUS_LABELS[idea.status]}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {needsAction && (
+                        <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[var(--color-warning)] text-white">
+                          Aktion nötig
+                        </span>
+                      )}
+                      <ChevronRight className="w-4 h-4 text-[var(--color-text-tertiary)] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                  </div>
+
+                  {/* Mini progress tracker */}
+                  <div className="flex items-center gap-1 mt-3">
+                    {CLIENT_PIPELINE_STEPS.map((step, idx) => {
+                      const isCompleted = idx < currentStepIdx;
+                      const isCurrent = idx === currentStepIdx;
+                      return (
+                        <div key={step.key} className="flex items-center flex-1">
+                          <div className="flex flex-col items-center flex-1">
+                            <div
+                              className="h-1 w-full rounded-full transition-all duration-300"
+                              style={{
+                                background: isCompleted
+                                  ? "var(--color-success)"
+                                  : isCurrent
+                                    ? (STATUS_COLORS[idea.status] || "var(--color-accent)")
+                                    : "var(--color-surface-3)",
+                                opacity: isCompleted ? 0.7 : isCurrent ? 1 : 0.4,
+                              }}
+                            />
+                            <span className={`text-[10px] mt-1 ${
+                              isCurrent ? "text-[var(--color-text-primary)] font-medium" : "text-[var(--color-text-tertiary)]"
+                            }`}>
+                              {step.icon}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
           {(ideas || []).length === 0 && (
             <div className="text-center py-16 text-[var(--color-text-tertiary)]">
               <Film className="w-10 h-10 mx-auto mb-3 opacity-30" />

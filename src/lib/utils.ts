@@ -65,3 +65,26 @@ export const VIDEO_STATUS_LABELS: Record<string, string> = {
   freigegeben: "Freigegeben",
   final: "Final",
 };
+
+/** Client-friendly status descriptions (for tooltips / onboarding) */
+export const STATUS_DESCRIPTIONS: Record<string, string> = {
+  idee: "Die Idee wurde angelegt und wird entwickelt.",
+  skript: "Das Skript wird geschrieben.",
+  freigabe: "Das Skript wartet auf Ihre Freigabe — bitte prüfen!",
+  korrektur: "Ihr Feedback wird eingearbeitet.",
+  freigegeben: "Alles freigegeben — der Dreh wird vorbereitet.",
+  gedreht: "Das Video wurde gedreht und wird jetzt geschnitten.",
+  geschnitten: "Der Schnitt ist fertig und wird vorbereitet.",
+  review: "Das fertige Video wartet auf Ihr Feedback!",
+  "veröffentlicht": "Das Video ist live — fertig! 🎉",
+};
+
+/** Simplified pipeline steps for client view */
+export const CLIENT_PIPELINE_STEPS = [
+  { key: "idee", label: "Idee", icon: "💡" },
+  { key: "skript", label: "Skript", icon: "📝" },
+  { key: "freigabe", label: "Freigabe", icon: "✅" },
+  { key: "gedreht", label: "Dreh", icon: "🎬" },
+  { key: "review", label: "Review", icon: "👀" },
+  { key: "veröffentlicht", label: "Live", icon: "🚀" },
+] as const;

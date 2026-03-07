@@ -12,6 +12,7 @@ import type * as ai from "../ai.js";
 import type * as auth from "../auth.js";
 import type * as clients from "../clients.js";
 import type * as comments from "../comments.js";
+import type * as http from "../http.js";
 import type * as ideas from "../ideas.js";
 import type * as invites from "../invites.js";
 import type * as notifications from "../notifications.js";
@@ -32,6 +33,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   clients: typeof clients;
   comments: typeof comments;
+  http: typeof http;
   ideas: typeof ideas;
   invites: typeof invites;
   notifications: typeof notifications;

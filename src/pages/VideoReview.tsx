@@ -94,7 +94,7 @@ export function VideoReview({ videoId, onBack }: { videoId: string; onBack: () =
   };
 
   const handleCopyShareLink = (token: string) => {
-    const url = `${window.location.origin}/#/share/${token}`;
+    const url = `${window.location.origin}/share/${token}`;
     navigator.clipboard.writeText(url);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
