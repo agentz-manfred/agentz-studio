@@ -40,13 +40,30 @@ function ClientRoutes({ currentPage, onNavigate }: { currentPage: string; onNavi
   return <ClientDashboard onNavigate={onNavigate} />;
 }
 
+function parseHash(): string {
+  const hash = window.location.hash.replace(/^#\/?/, "");
+  if (!hash || hash.startsWith("share/")) return "dashboard";
+  return hash;
+}
+
 function AppContent() {
   const { user, loading } = useAuth();
-  const [currentPage, setCurrentPage] = useState("dashboard");
+  const [currentPage, setCurrentPage] = useState(parseHash);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  useEffect(() => {
+    const onHash = () => {
+      const p = parseHash();
+      if (!p.startsWith("share/")) setCurrentPage(p);
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
   const handleNavigate = (page: string, id?: string) => {
-    setCurrentPage(id ? `${page}:${id}` : page);
+    const route = id ? `${page}:${id}` : page;
+    window.location.hash = `#/${route}`;
+    setCurrentPage(route);
     setSidebarOpen(false);
   };
 
