@@ -162,6 +162,38 @@ export const listUsers = query({
   },
 });
 
+export const changePassword = mutation({
+  args: {
+    token: v.string(),
+    currentPassword: v.string(),
+    newPassword: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const session = await ctx.db
+      .query("sessions")
+      .withIndex("by_token", (q) => q.eq("token", args.token))
+      .first();
+    if (!session || session.expiresAt < Date.now()) throw new Error("Ungültige Session");
+
+    const user = await ctx.db.get(session.userId);
+    if (!user) throw new Error("Nutzer nicht gefunden");
+
+    if (user.passwordHash !== simpleHash(args.currentPassword)) {
+      throw new Error("Aktuelles Passwort ist falsch");
+    }
+
+    if (args.newPassword.length < 6) {
+      throw new Error("Neues Passwort muss mindestens 6 Zeichen haben");
+    }
+
+    await ctx.db.patch(user._id, {
+      passwordHash: simpleHash(args.newPassword),
+    });
+
+    return { success: true };
+  },
+});
+
 export const logout = mutation({
   args: { token: v.string() },
   handler: async (ctx, args) => {

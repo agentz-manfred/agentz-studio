@@ -1,8 +1,8 @@
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
-import { Calendar, ChevronLeft, ChevronRight, Plus, X, MapPin, Clock, Trash2 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { Calendar, ChevronLeft, ChevronRight, Plus, X, MapPin, Clock, Trash2, FileText } from "lucide-react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import type { Id } from "../../convex/_generated/dataModel";
 
 const WEEKDAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
@@ -15,6 +15,90 @@ function getDaysInMonth(year: number, month: number) {
 function getFirstDayOfMonth(year: number, month: number) {
   const d = new Date(year, month, 1).getDay();
   return d === 0 ? 6 : d - 1;
+}
+
+function ShootPopover({ shoot, client, onClose, onDelete, onNavigate }: {
+  shoot: any;
+  client: any;
+  onClose: () => void;
+  onDelete?: () => void;
+  onNavigate?: (page: string, id?: string) => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [onClose]);
+
+  const dateObj = new Date(shoot.date + "T00:00:00");
+  const dateStr = dateObj.toLocaleDateString("de-DE", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
+      <div ref={ref} className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] border border-[var(--color-border-subtle)] w-full max-w-[380px] mx-4">
+        <div className="flex items-start justify-between p-4 pb-0">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-[var(--radius-md)] flex items-center justify-center flex-shrink-0" style={{ background: "rgba(139,92,246,0.1)" }}>
+              <Calendar className="w-[18px] h-[18px]" style={{ color: "#8b5cf6" }} />
+            </div>
+            <div>
+              <p className="text-[15px] font-semibold">{client?.name || "Drehtermin"}</p>
+              {client?.company && (
+                <p className="text-[12px] text-[var(--color-text-tertiary)]">{client.company}</p>
+              )}
+            </div>
+          </div>
+          <button onClick={onClose} className="p-1 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors">
+            <X className="w-4 h-4 text-[var(--color-text-tertiary)]" />
+          </button>
+        </div>
+
+        <div className="p-4 space-y-2.5">
+          <div className="flex items-center gap-2.5 text-[13px]">
+            <Clock className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
+            <span>{dateStr}{shoot.time ? ` · ${shoot.time} Uhr` : ""}</span>
+          </div>
+          {shoot.location && (
+            <div className="flex items-center gap-2.5 text-[13px]">
+              <MapPin className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
+              <span className="text-[var(--color-text-secondary)]">{shoot.location}</span>
+            </div>
+          )}
+          {shoot.notes && (
+            <div className="flex items-start gap-2.5 text-[13px]">
+              <FileText className="w-3.5 h-3.5 text-[var(--color-text-tertiary)] mt-0.5" />
+              <span className="text-[var(--color-text-secondary)]">{shoot.notes}</span>
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 p-4 pt-2 border-t border-[var(--color-border-subtle)]">
+          {client && onNavigate && (
+            <button
+              onClick={() => { onClose(); onNavigate("client", client._id); }}
+              className="flex-1 h-8 rounded-[var(--radius-md)] text-[12px] font-medium bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] transition-colors"
+            >
+              Zum Kunden
+            </button>
+          )}
+          {onDelete && (
+            <button
+              onClick={() => { onDelete(); onClose(); }}
+              className="h-8 px-3 rounded-[var(--radius-md)] text-[12px] font-medium hover:bg-[var(--color-surface-2)] transition-colors flex items-center gap-1.5"
+              style={{ color: "#ef4444" }}
+            >
+              <Trash2 className="w-3 h-3" />
+              Löschen
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function NewShootDateModal({ onClose, defaultDate }: { onClose: () => void; defaultDate?: string }) {
@@ -168,6 +252,7 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
   const [month, setMonth] = useState(now.getMonth());
   const [showNewShoot, setShowNewShoot] = useState(false);
   const [newShootDate, setNewShootDate] = useState<string | undefined>();
+  const [selectedShoot, setSelectedShoot] = useState<any>(null);
 
   const clientMap = (clients || []).reduce(
     (acc, c) => ({ ...acc, [c._id]: c }),
@@ -195,16 +280,19 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
 
   const today = now.toISOString().split("T")[0];
 
-  // Upcoming shoot dates
   const upcoming = (shootDates || [])
     .filter((sd) => sd.date >= today)
     .sort((a, b) => a.date.localeCompare(b.date))
     .slice(0, 5);
 
   const handleDayClick = (dateStr: string) => {
-    if (user?.role !== "admin") return;
-    setNewShootDate(dateStr);
-    setShowNewShoot(true);
+    const dayShoots = shootsByDate[dateStr] || [];
+    if (dayShoots.length > 0) {
+      setSelectedShoot(dayShoots[0]);
+    } else if (user?.role === "admin") {
+      setNewShootDate(dateStr);
+      setShowNewShoot(true);
+    }
   };
 
   return (
@@ -256,13 +344,14 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
             const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
             const dayShoots = shootsByDate[dateStr] || [];
             const isToday = dateStr === today;
+            const isPast = dateStr < today;
             return (
               <div
                 key={day}
                 onClick={() => handleDayClick(dateStr)}
-                className={`bg-[var(--color-surface-1)] min-h-[80px] sm:min-h-[100px] p-1.5 ${
+                className={`bg-[var(--color-surface-1)] min-h-[80px] sm:min-h-[100px] p-1.5 cursor-pointer hover:bg-[var(--color-surface-2)] transition-colors ${
                   isToday ? "ring-2 ring-inset ring-[var(--color-accent)]" : ""
-                } ${user?.role === "admin" ? "cursor-pointer hover:bg-[var(--color-surface-2)] transition-colors" : ""}`}
+                } ${isPast ? "opacity-60" : ""}`}
               >
                 <span className={`text-[12px] tabular-nums ${
                   isToday
@@ -272,14 +361,14 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
                   {day}
                 </span>
                 {dayShoots.map((sd) => (
-                  <div
+                  <button
                     key={sd._id}
-                    className="mt-0.5 px-1 py-0.5 rounded text-[10px] sm:text-[11px] truncate border"
-                    style={{ background: "rgba(139,92,246,0.1)", color: "#8b5cf6", borderColor: "rgba(139,92,246,0.15)" }}
-                    title={`${clientMap[sd.clientId]?.name || "Kunde"} ${sd.time ? `· ${sd.time}` : ""} ${sd.location ? `· ${sd.location}` : ""}`}
+                    onClick={(e) => { e.stopPropagation(); setSelectedShoot(sd); }}
+                    className="mt-0.5 px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] truncate border w-full text-left hover:brightness-110 transition-all"
+                    style={{ background: "rgba(139,92,246,0.1)", color: "#8b5cf6", borderColor: "rgba(139,92,246,0.2)" }}
                   >
                     🎬 {clientMap[sd.clientId]?.name || "Dreh"}
-                  </div>
+                  </button>
                 ))}
               </div>
             );
@@ -287,13 +376,17 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
         </div>
       </div>
 
-      {/* Upcoming shoot dates */}
+      {/* Upcoming */}
       <div className="px-6 lg:px-8 pb-8">
         <h3 className="text-[15px] font-medium mb-3">Kommende Drehtermine</h3>
         {upcoming.length > 0 ? (
           <div className="space-y-2">
             {upcoming.map((sd) => (
-              <div key={sd._id} className="bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] px-4 py-3 flex items-center justify-between">
+              <button
+                key={sd._id}
+                onClick={() => setSelectedShoot(sd)}
+                className="w-full bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] px-4 py-3 flex items-center justify-between hover:shadow-[var(--shadow-sm)] transition-shadow text-left"
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-[var(--radius-md)] flex items-center justify-center flex-shrink-0" style={{ background: "rgba(139,92,246,0.1)" }}>
                     <Calendar className="w-[18px] h-[18px]" style={{ color: "#8b5cf6" }} />
@@ -320,16 +413,7 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
                     </div>
                   </div>
                 </div>
-                {user?.role === "admin" && (
-                  <button
-                    onClick={() => removeShootDate({ id: sd._id })}
-                    className="p-1.5 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-error)] hover:bg-[var(--color-accent-surface)] transition-colors"
-                    title="Löschen"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
+              </button>
             ))}
           </div>
         ) : (
@@ -341,6 +425,15 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
       </div>
 
       {showNewShoot && <NewShootDateModal onClose={() => setShowNewShoot(false)} defaultDate={newShootDate} />}
+      {selectedShoot && (
+        <ShootPopover
+          shoot={selectedShoot}
+          client={clientMap[selectedShoot.clientId]}
+          onClose={() => setSelectedShoot(null)}
+          onDelete={user?.role === "admin" ? () => removeShootDate({ id: selectedShoot._id }) : undefined}
+          onNavigate={onNavigate}
+        />
+      )}
     </div>
   );
 }

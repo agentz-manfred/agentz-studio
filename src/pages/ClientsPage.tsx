@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useState } from "react";
-import { Plus, Users, Building2, Mail, Phone, X, Search, UserPlus, Check, Link2, Copy, CheckCheck } from "lucide-react";
+import { Plus, Users, Building2, Mail, Phone, X, Search, UserPlus, Check, Link2, Copy, CheckCheck, Lightbulb, Film } from "lucide-react";
 import type { Id } from "../../convex/_generated/dataModel";
 
 function CreateClientModal({ onClose }: { onClose: () => void }) {
@@ -315,6 +315,8 @@ function InviteLinkModal({ client, onClose }: { client: any; onClose: () => void
 export function ClientsPage({ onNavigate }: { onNavigate?: (page: string, id?: string) => void }) {
   const clients = useQuery(api.clients.list);
   const users = useQuery(api.auth.listUsers);
+  const ideas = useQuery(api.ideas.list, {});
+  const videos = useQuery(api.videos.list, {});
   const [showCreate, setShowCreate] = useState(false);
   const [search, setSearch] = useState("");
   const [loginClient, setLoginClient] = useState<any>(null);
@@ -324,6 +326,17 @@ export function ClientsPage({ onNavigate }: { onNavigate?: (page: string, id?: s
   const clientsWithLogin = new Set(
     (users || []).filter((u) => u.clientId).map((u) => u.clientId)
   );
+
+  // Stats per client
+  const ideaCountByClient = (ideas || []).reduce((acc, i) => {
+    acc[i.clientId] = (acc[i.clientId] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const videoCountByClient = (videos || []).reduce((acc, v) => {
+    if (v.clientId) acc[v.clientId] = (acc[v.clientId] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 
   const filtered = (clients || []).filter(
     (c) =>
@@ -389,12 +402,22 @@ export function ClientsPage({ onNavigate }: { onNavigate?: (page: string, id?: s
                         </span>
                       )}
                     </div>
-                    {client.company && (
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        <Building2 className="w-3 h-3 text-[var(--color-text-tertiary)]" />
-                        <p className="text-[13px] text-[var(--color-text-secondary)] truncate">{client.company}</p>
+                    <div className="flex items-center gap-3 mt-1">
+                      {client.company && (
+                        <div className="flex items-center gap-1">
+                          <Building2 className="w-3 h-3 text-[var(--color-text-tertiary)]" />
+                          <span className="text-[12px] text-[var(--color-text-secondary)] truncate">{client.company}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-1">
+                        <Lightbulb className="w-3 h-3 text-[var(--color-text-tertiary)]" />
+                        <span className="text-[12px] text-[var(--color-text-tertiary)]">{ideaCountByClient[client._id] || 0} Ideen</span>
                       </div>
-                    )}
+                      <div className="flex items-center gap-1">
+                        <Film className="w-3 h-3 text-[var(--color-text-tertiary)]" />
+                        <span className="text-[12px] text-[var(--color-text-tertiary)]">{videoCountByClient[client._id] || 0} Videos</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
