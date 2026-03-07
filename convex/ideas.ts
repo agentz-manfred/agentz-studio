@@ -102,6 +102,7 @@ export const update = mutation({
     title: v.optional(v.string()),
     description: v.optional(v.string()),
     order: v.optional(v.number()),
+    categoryId: v.optional(v.id("categories")),
   },
   handler: async (ctx, args) => {
     const { ideaId, ...updates } = args;

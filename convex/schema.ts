@@ -16,14 +16,30 @@ export default defineSchema({
     company: v.optional(v.string()),
     email: v.string(),
     phone: v.optional(v.string()),
+    // Extended profile
+    contractStart: v.optional(v.string()), // ISO date
+    contractEnd: v.optional(v.string()), // ISO date
+    platforms: v.optional(v.array(v.string())), // ["tiktok","instagram","youtube"]
+    mainPlatform: v.optional(v.string()),
+    videosPerMonth: v.optional(v.number()),
+    context: v.optional(v.string()), // Rich text / WYSIWYG content (HTML)
     createdAt: v.number(),
   }),
+
+  categories: defineTable({
+    clientId: v.id("clients"),
+    name: v.string(),
+    color: v.string(), // hex color
+    order: v.number(),
+    createdAt: v.number(),
+  }).index("by_client", ["clientId"]),
 
   ideas: defineTable({
     clientId: v.id("clients"),
     title: v.string(),
     description: v.optional(v.string()),
     status: v.string(),
+    categoryId: v.optional(v.id("categories")),
     order: v.number(),
     createdBy: v.id("users"),
     createdAt: v.number(),
