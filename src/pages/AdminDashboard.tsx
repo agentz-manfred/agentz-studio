@@ -34,6 +34,18 @@ const STATUS_ORDER = [
   "gedreht", "geschnitten", "review", "veröffentlicht",
 ];
 
+const STATUS_COLORS: Record<string, string> = {
+  idee: "#a3a3a3",
+  skript: "#8b5cf6",
+  freigabe: "#f59e0b",
+  korrektur: "#ef4444",
+  freigegeben: "#3b82f6",
+  gedreht: "#06b6d4",
+  geschnitten: "#8b5cf6",
+  review: "#f97316",
+  veröffentlicht: "#16a34a",
+};
+
 /* ─── Stat Card ─── */
 function StatCard({
   icon: Icon,
@@ -42,6 +54,7 @@ function StatCard({
   delay,
   onClick,
   accent,
+  gradient,
 }: {
   icon: any;
   label: string;
@@ -49,16 +62,21 @@ function StatCard({
   delay: string;
   onClick?: () => void;
   accent?: string;
+  gradient?: string;
 }) {
   return (
     <button
       onClick={onClick}
-      className={`animate-in ${delay} bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] p-5 text-left group w-full relative overflow-hidden transition-all duration-200 ease-[var(--ease-out)] hover:shadow-[var(--shadow-md)] hover:border-[var(--color-border)]`}
+      className={`animate-in ${delay} stat-card accent-top bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] p-5 text-left group w-full relative overflow-hidden hover:shadow-[var(--shadow-md)] hover:border-[var(--color-border)]`}
     >
+      {/* Subtle gradient background */}
+      {gradient && (
+        <div className="absolute inset-0 opacity-[0.04] group-hover:opacity-[0.08] transition-opacity duration-300" style={{ background: gradient }} />
+      )}
       <div className="flex items-center justify-between relative z-10">
         <div className="flex items-center gap-3.5">
           <div
-            className="w-10 h-10 rounded-[var(--radius-md)] flex items-center justify-center"
+            className="w-10 h-10 rounded-[var(--radius-md)] flex items-center justify-center shadow-sm"
             style={{ background: accent || "var(--color-surface-2)" }}
           >
             <Icon
@@ -132,12 +150,7 @@ function PipelineProgress({ ideas }: { ideas: any[] }) {
                 className="transition-all duration-500 ease-[var(--ease-out)]"
                 style={{
                   width: `${pct}%`,
-                  background: isPublished
-                    ? "var(--color-success)"
-                    : status === "idee"
-                      ? "var(--color-text-tertiary)"
-                      : "var(--color-accent)",
-                  opacity: isPublished ? 1 : STATUS_ORDER.indexOf(status) * 0.1 + 0.3,
+                  background: STATUS_COLORS[status] || "var(--color-accent)",
                 }}
               />
             );
@@ -150,16 +163,7 @@ function PipelineProgress({ ideas }: { ideas: any[] }) {
             <div key={status} className="flex items-center gap-1.5">
               <div
                 className="w-2 h-2 rounded-full"
-                style={{
-                  background:
-                    status === "veröffentlicht"
-                      ? "var(--color-success)"
-                      : "var(--color-accent)",
-                  opacity:
-                    status === "veröffentlicht"
-                      ? 1
-                      : STATUS_ORDER.indexOf(status) * 0.1 + 0.3,
-                }}
+                style={{ background: STATUS_COLORS[status] || "var(--color-accent)" }}
               />
               <span className="text-[12px] text-[var(--color-text-tertiary)]">
                 {STATUS_LABELS[status]} ({statusCounts[status]})
@@ -350,11 +354,11 @@ export function AdminDashboard({
 
   return (
     <div className="max-w-[1000px] mx-auto pb-12">
-      {/* Header */}
-      <div className="px-6 lg:px-8 pt-8 pb-6">
+      {/* Header with hero gradient */}
+      <div className="px-6 lg:px-8 pt-8 pb-6 hero-gradient rounded-b-[24px]">
         <div className="animate-in">
           <p className="text-[13px] text-[var(--color-text-tertiary)] mb-1">{greeting}</p>
-          <h1 className="text-[26px] font-semibold tracking-[-0.03em]">{user?.name}</h1>
+          <h1 className="text-[28px] font-bold tracking-[-0.04em]">{user?.name}</h1>
         </div>
 
         {/* Quick Actions */}
@@ -396,6 +400,7 @@ export function AdminDashboard({
             delay="stagger-1"
             onClick={() => onNavigate("clients")}
             accent="#6366f1"
+            gradient="linear-gradient(135deg, #6366f1 0%, transparent 100%)"
           />
           <StatCard
             icon={Lightbulb}
@@ -404,6 +409,7 @@ export function AdminDashboard({
             delay="stagger-2"
             onClick={() => onNavigate("ideas")}
             accent="#f59e0b"
+            gradient="linear-gradient(135deg, #f59e0b 0%, transparent 100%)"
           />
           <StatCard
             icon={TrendingUp}
@@ -412,6 +418,7 @@ export function AdminDashboard({
             delay="stagger-3"
             onClick={() => onNavigate("pipeline")}
             accent="#3b82f6"
+            gradient="linear-gradient(135deg, #3b82f6 0%, transparent 100%)"
           />
           <StatCard
             icon={Film}
@@ -419,7 +426,8 @@ export function AdminDashboard({
             value={published}
             delay="stagger-4"
             onClick={() => onNavigate("pipeline")}
-            accent="var(--color-success)"
+            accent="#16a34a"
+            gradient="linear-gradient(135deg, #16a34a 0%, transparent 100%)"
           />
         </div>
       </div>
