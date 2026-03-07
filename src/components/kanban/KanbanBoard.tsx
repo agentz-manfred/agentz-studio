@@ -31,6 +31,7 @@ interface KanbanBoardProps {
   ideas: Idea[];
   onStatusChange: (ideaId: string, newStatus: string) => void;
   clientNames?: Record<string, string>;
+  onIdeaClick?: (ideaId: string) => void;
 }
 
 function KanbanColumn({
@@ -87,10 +88,12 @@ function KanbanCard({
   idea,
   clientName,
   isDragging,
+  onClick,
 }: {
   idea: Idea;
   clientName?: string;
   isDragging?: boolean;
+  onClick?: () => void;
 }) {
   const {
     attributes,
@@ -133,8 +136,8 @@ function KanbanCard({
         >
           <GripVertical className="w-3.5 h-3.5" />
         </button>
-        <div className="flex-1 min-w-0">
-          <p className="text-[14px] font-medium leading-tight truncate">
+        <div className="flex-1 min-w-0" onClick={onClick} role={onClick ? "button" : undefined} style={onClick ? { cursor: "pointer" } : undefined}>
+          <p className="text-[14px] font-medium leading-tight truncate group-hover:text-[var(--color-accent)] transition-colors">
             {idea.title}
           </p>
           {clientName && (
@@ -153,7 +156,7 @@ function KanbanCard({
   );
 }
 
-export function KanbanBoard({ ideas, onStatusChange, clientNames }: KanbanBoardProps) {
+export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }: KanbanBoardProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
@@ -204,6 +207,7 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames }: KanbanBoardP
                 key={idea._id}
                 idea={idea}
                 clientName={clientNames?.[idea.clientId]}
+                onClick={onIdeaClick ? () => onIdeaClick(idea._id) : undefined}
               />
             ))}
           </KanbanColumn>

@@ -14,6 +14,7 @@ import type * as comments from "../comments.js";
 import type * as ideas from "../ideas.js";
 import type * as notifications from "../notifications.js";
 import type * as scripts from "../scripts.js";
+import type * as seed from "../seed.js";
 import type * as shareLinks from "../shareLinks.js";
 import type * as shootDates from "../shootDates.js";
 import type * as videos from "../videos.js";
@@ -31,6 +32,7 @@ declare const fullApi: ApiFromModules<{
   ideas: typeof ideas;
   notifications: typeof notifications;
   scripts: typeof scripts;
+  seed: typeof seed;
   shareLinks: typeof shareLinks;
   shootDates: typeof shootDates;
   videos: typeof videos;

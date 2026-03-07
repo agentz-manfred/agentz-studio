@@ -28,18 +28,18 @@ function AdminRoutes({ currentPage, onNavigate }: { currentPage: string; onNavig
   if (currentPage.startsWith("client:")) return <ClientDetail clientId={currentPage.split(":")[1]} onBack={() => onNavigate("clients")} onNavigate={onNavigate} />;
   if (currentPage === "ideas") return <IdeasPage onNavigate={onNavigate} />;
   if (currentPage.startsWith("idea:")) return <IdeaDetail ideaId={currentPage.split(":")[1]} onBack={() => onNavigate("ideas")} onNavigate={onNavigate} />;
-  if (currentPage === "pipeline") return <PipelinePage />;
+  if (currentPage === "pipeline") return <PipelinePage onNavigate={onNavigate} />;
   if (currentPage === "videos") return <VideosPage onNavigate={onNavigate} />;
   if (currentPage.startsWith("video:")) return <VideoReview videoId={currentPage.split(":")[1]} onBack={() => onNavigate("videos")} />;
-  if (currentPage === "calendar") return <CalendarPage />;
+  if (currentPage === "calendar") return <CalendarPage onNavigate={onNavigate} />;
   if (currentPage === "settings") return <SettingsPage />;
   return <AdminDashboard onNavigate={onNavigate} />;
 }
 
 function ClientRoutes({ currentPage, onNavigate }: { currentPage: string; onNavigate: (page: string, id?: string) => void }) {
   if (currentPage === "videos") return <VideosPage onNavigate={onNavigate} />;
-  if (currentPage === "pipeline") return <PipelinePage />;
-  if (currentPage === "calendar") return <CalendarPage />;
+  if (currentPage === "pipeline") return <PipelinePage onNavigate={onNavigate} />;
+  if (currentPage === "calendar") return <CalendarPage onNavigate={onNavigate} />;
   if (currentPage.startsWith("idea:")) return <IdeaDetail ideaId={currentPage.split(":")[1]} onBack={() => onNavigate("dashboard")} onNavigate={onNavigate} />;
   if (currentPage.startsWith("video:")) return <VideoReview videoId={currentPage.split(":")[1]} onBack={() => onNavigate("videos")} />;
   return <ClientDashboard onNavigate={onNavigate} />;

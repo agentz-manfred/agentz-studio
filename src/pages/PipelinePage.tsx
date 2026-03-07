@@ -6,7 +6,7 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import type { Id } from "../../convex/_generated/dataModel";
 
-export function PipelinePage() {
+export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: string) => void }) {
   const { user } = useAuth();
   const ideas = useQuery(api.ideas.list, user?.role === "client" && user.clientId ? { clientId: user.clientId as any } : {});
   const clients = useQuery(api.clients.list);
@@ -71,6 +71,7 @@ export function PipelinePage() {
           ideas={(ideas || []) as any}
           onStatusChange={handleStatusChange}
           clientNames={clientNames}
+          onIdeaClick={onNavigate ? (id) => onNavigate("idea", id) : undefined}
         />
       </div>
 
