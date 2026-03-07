@@ -1,4 +1,5 @@
 import { useEditor, EditorContent } from "@tiptap/react";
+import DOMPurify from "dompurify";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
@@ -203,10 +204,12 @@ export function RichTextDisplay({
 }) {
   if (!content || content === "<p></p>") return null;
 
+  const clean = DOMPurify.sanitize(content);
+
   return (
     <div
       className={cn("tiptap-display", className)}
-      dangerouslySetInnerHTML={{ __html: content }}
+      dangerouslySetInnerHTML={{ __html: clean }}
     />
   );
 }

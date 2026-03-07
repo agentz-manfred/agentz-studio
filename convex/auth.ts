@@ -48,6 +48,10 @@ export const register = mutation({
       if (!admin || admin.role !== "admin") throw new Error("Nur Admins können Nutzer anlegen");
     }
 
+    if (args.password.length < 6) throw new Error("Passwort muss mindestens 6 Zeichen haben");
+    if (!args.email.includes("@")) throw new Error("Ungültige E-Mail-Adresse");
+    if (!args.name.trim()) throw new Error("Name darf nicht leer sein");
+
     const existing = await ctx.db
       .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.email))
