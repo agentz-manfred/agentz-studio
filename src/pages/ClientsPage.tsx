@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useState } from "react";
-import { Plus, Users, Building2, Mail, Phone, X, Search, UserPlus, Check } from "lucide-react";
+import { Plus, Users, Building2, Mail, Phone, X, Search, UserPlus, Check, Link2, Copy, CheckCheck } from "lucide-react";
 import type { Id } from "../../convex/_generated/dataModel";
 
 function CreateClientModal({ onClose }: { onClose: () => void }) {
@@ -197,12 +197,128 @@ function CreateLoginModal({ client, onClose }: { client: any; onClose: () => voi
   );
 }
 
+function InviteLinkModal({ client, onClose }: { client: any; onClose: () => void }) {
+  const createInvite = useMutation(api.invites.create);
+  const [inviteUrl, setInviteUrl] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [error, setError] = useState("");
+
+  const sessionToken = localStorage.getItem("session_token") || "";
+
+  const handleCreate = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const result = await createInvite({
+        clientId: client._id as Id<"clients">,
+        adminToken: sessionToken,
+        expiresInDays: 7,
+      });
+      const url = `${window.location.origin}${window.location.pathname}#/invite/${result.token}`;
+      setInviteUrl(url);
+    } catch (err: any) {
+      setError(err.message || "Fehler beim Erstellen");
+    }
+    setLoading(false);
+  };
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(inviteUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] w-full max-w-[480px] mx-4">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border-subtle)]">
+          <h3 className="text-[17px] font-semibold">Einladungslink erstellen</h3>
+          <button onClick={onClose} className="p-1 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors">
+            <X className="w-4 h-4 text-[var(--color-text-tertiary)]" />
+          </button>
+        </div>
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-5 pb-5 border-b border-[var(--color-border-subtle)]">
+            <div className="w-10 h-10 rounded-full bg-[var(--color-surface-2)] flex items-center justify-center flex-shrink-0">
+              <span className="text-[15px] font-semibold text-[var(--color-text-secondary)]">{client.name.charAt(0)}</span>
+            </div>
+            <div>
+              <p className="text-[15px] font-medium">{client.name}</p>
+              {client.company && <p className="text-[13px] text-[var(--color-text-secondary)]">{client.company}</p>}
+              <p className="text-[12px] text-[var(--color-text-tertiary)]">{client.email}</p>
+            </div>
+          </div>
+
+          {!inviteUrl ? (
+            <>
+              <p className="text-[14px] text-[var(--color-text-secondary)] mb-4">
+                Erstellen Sie einen Einladungslink, den Sie dem Kunden per E-Mail oder WhatsApp senden können.
+                Der Kunde kann damit selbst ein Passwort setzen und sich anmelden.
+              </p>
+              <p className="text-[12px] text-[var(--color-text-tertiary)] mb-5">
+                Der Link ist 7 Tage gültig und kann nur einmal verwendet werden.
+              </p>
+              {error && (
+                <div className="px-3 py-2.5 rounded-[var(--radius-md)] text-[13px] font-medium mb-4" style={{ background: "rgba(239,68,68,0.08)", color: "#ef4444" }}>
+                  {error}
+                </div>
+              )}
+              <div className="flex gap-3">
+                <button onClick={onClose} className="flex-1 h-10 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[14px] font-medium hover:bg-[var(--color-surface-2)] transition-colors">
+                  Abbrechen
+                </button>
+                <button
+                  onClick={handleCreate}
+                  disabled={loading}
+                  className="flex-1 h-10 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[14px] font-medium hover:bg-[var(--color-accent-hover)] disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Link2 className="w-4 h-4" />
+                  Link erstellen
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-[14px] text-[var(--color-text-secondary)] mb-3">
+                Einladungslink erstellt! Kopieren und an den Kunden senden:
+              </p>
+              <div className="flex gap-2 mb-4">
+                <div className="flex-1 h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[12px] font-mono flex items-center overflow-hidden">
+                  <span className="truncate text-[var(--color-text-secondary)]">{inviteUrl}</span>
+                </div>
+                <button
+                  onClick={handleCopy}
+                  className="h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] hover:bg-[var(--color-surface-2)] transition-colors flex items-center gap-1.5"
+                >
+                  {copied ? <CheckCheck className="w-4 h-4" style={{ color: "#16a34a" }} /> : <Copy className="w-4 h-4 text-[var(--color-text-tertiary)]" />}
+                  <span className="text-[13px]">{copied ? "Kopiert" : "Kopieren"}</span>
+                </button>
+              </div>
+              <p className="text-[11px] text-[var(--color-text-tertiary)] mb-5">
+                Gültig bis {new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString("de-DE")} · Einmalig verwendbar
+              </p>
+              <button
+                onClick={onClose}
+                className="w-full h-10 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[14px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors"
+              >
+                Fertig
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ClientsPage({ onNavigate }: { onNavigate?: (page: string, id?: string) => void }) {
   const clients = useQuery(api.clients.list);
   const users = useQuery(api.auth.listUsers);
   const [showCreate, setShowCreate] = useState(false);
   const [search, setSearch] = useState("");
   const [loginClient, setLoginClient] = useState<any>(null);
+  const [inviteClient, setInviteClient] = useState<any>(null);
 
   // Check which clients have user accounts
   const clientsWithLogin = new Set(
@@ -295,13 +411,22 @@ export function ClientsPage({ onNavigate }: { onNavigate?: (page: string, id?: s
                     )}
                   </div>
                   {!hasLogin && (
-                    <button
-                      onClick={() => setLoginClient(client)}
-                      className="p-2 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-accent)] hover:bg-[var(--color-accent-surface)] transition-colors"
-                      title="Kundenzugang erstellen"
-                    >
-                      <UserPlus className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setInviteClient(client); }}
+                        className="p-2 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-accent)] hover:bg-[var(--color-accent-surface)] transition-colors"
+                        title="Einladungslink erstellen"
+                      >
+                        <Link2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setLoginClient(client); }}
+                        className="p-2 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-accent)] hover:bg-[var(--color-accent-surface)] transition-colors"
+                        title="Kundenzugang manuell erstellen"
+                      >
+                        <UserPlus className="w-4 h-4" />
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -321,6 +446,7 @@ export function ClientsPage({ onNavigate }: { onNavigate?: (page: string, id?: s
 
       {showCreate && <CreateClientModal onClose={() => setShowCreate(false)} />}
       {loginClient && <CreateLoginModal client={loginClient} onClose={() => setLoginClient(null)} />}
+      {inviteClient && <InviteLinkModal client={inviteClient} onClose={() => setInviteClient(null)} />}
     </div>
   );
 }

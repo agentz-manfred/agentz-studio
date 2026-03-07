@@ -11,6 +11,7 @@ import { PipelinePage } from "./pages/PipelinePage";
 import { VideosPage } from "./pages/VideosPage";
 import { VideoReview } from "./pages/VideoReview";
 import { SharePage } from "./pages/SharePage";
+import { InvitePage } from "./pages/InvitePage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { ClientDetail } from "./pages/ClientDetail";
 import { Sidebar } from "./components/layout/Sidebar";
@@ -147,13 +148,48 @@ function ShareRoute() {
   return <SharePage token={token} />;
 }
 
+function InviteRoute() {
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash.startsWith("#/invite/")) {
+      setToken(hash.replace("#/invite/", ""));
+    }
+    const handleHashChange = () => {
+      const h = window.location.hash;
+      if (h.startsWith("#/invite/")) {
+        setToken(h.replace("#/invite/", ""));
+      } else {
+        setToken(null);
+      }
+    };
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
+
+  if (!token) return null;
+
+  const handleLogin = (sessionToken: string) => {
+    localStorage.setItem("session_token", sessionToken);
+    window.location.hash = "#/dashboard";
+    window.location.reload();
+  };
+
+  return <InvitePage token={token} onLogin={handleLogin} />;
+}
+
 export default function App() {
-  const isShareRoute = window.location.hash.startsWith("#/share/");
+  const hash = window.location.hash;
+  const isShareRoute = hash.startsWith("#/share/");
+  const isInviteRoute = hash.startsWith("#/invite/");
 
   return (
     <ConvexProvider client={convex}>
       {isShareRoute ? (
         <ShareRoute />
+      ) : isInviteRoute ? (
+        <InviteRoute />
       ) : (
         <AuthProvider>
           <AppContent />

@@ -106,6 +106,19 @@ export default defineSchema({
     .index("by_token", ["token"])
     .index("by_video", ["videoId"]),
 
+  inviteLinks: defineTable({
+    clientId: v.id("clients"),
+    token: v.string(),
+    createdBy: v.id("users"),
+    expiresAt: v.number(),
+    usedAt: v.optional(v.number()),
+    usedBy: v.optional(v.id("users")),
+    active: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_token", ["token"])
+    .index("by_client", ["clientId"]),
+
   notifications: defineTable({
     userId: v.id("users"),
     type: v.string(),
