@@ -405,10 +405,10 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
         {user?.role === "admin" && (
           <button
             onClick={() => setShowNewFolder(true)}
-            className="flex items-center gap-2 h-9 px-4 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[14px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors"
+            className="flex items-center gap-2 h-9 px-3 sm:px-4 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[13px] sm:text-[14px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors flex-shrink-0"
           >
             <FolderPlus className="w-4 h-4" />
-            Neuer Ordner
+            <span className="hidden sm:inline">Neuer Ordner</span>
           </button>
         )}
       </div>
