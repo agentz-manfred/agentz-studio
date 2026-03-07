@@ -50,7 +50,42 @@ export const updateStatus = mutation({
     status: v.string(),
   },
   handler: async (ctx, args) => {
+    const video = await ctx.db.get(args.videoId);
+    if (!video) throw new Error("Video nicht gefunden");
+    
+    const oldStatus = video.status;
     await ctx.db.patch(args.videoId, { status: args.status });
+
+    // Auto-notify the client when video status changes
+    const idea = await ctx.db.get(video.ideaId);
+    if (idea) {
+      // Find client's user account
+      const clientUsers = await ctx.db
+        .query("users")
+        .filter((q) => q.eq(q.field("clientId"), idea.clientId))
+        .collect();
+      
+      const statusLabels: Record<string, string> = {
+        hochgeladen: "Hochgeladen",
+        review: "Bereit zur Überprüfung",
+        korrektur: "Wird überarbeitet",
+        freigegeben: "Freigegeben",
+        final: "Fertiggestellt",
+      };
+      
+      for (const clientUser of clientUsers) {
+        await ctx.db.insert("notifications", {
+          userId: clientUser._id,
+          type: "video_status",
+          title: `Video: ${video.title}`,
+          message: `Status geändert: ${statusLabels[args.status] || args.status}`,
+          targetType: "video",
+          targetId: args.videoId,
+          read: false,
+          createdAt: Date.now(),
+        });
+      }
+    }
   },
 });
 
@@ -105,6 +140,20 @@ export const createBunnyVideo = action({
       libraryId,
       authKey: apiKey,
     };
+  },
+});
+
+// List videos for a specific client (via their ideas)
+export const listByClient = query({
+  args: { clientId: v.id("clients") },
+  handler: async (ctx, args) => {
+    const ideas = await ctx.db
+      .query("ideas")
+      .withIndex("by_client", (q) => q.eq("clientId", args.clientId))
+      .collect();
+    const ideaIds = new Set(ideas.map((i) => i._id));
+    const allVideos = await ctx.db.query("videos").collect();
+    return allVideos.filter((v) => ideaIds.has(v.ideaId));
   },
 });
 

@@ -39,16 +39,19 @@ const adminNav = [
 
 const clientNav = [
   { id: "dashboard", label: "Übersicht", icon: LayoutDashboard },
-  { id: "pipeline", label: "Meine Videos", icon: Film },
+  { id: "videos", label: "Videos", icon: Play },
+  { id: "pipeline", label: "Pipeline", icon: Film },
   { id: "calendar", label: "Termine", icon: Calendar },
 ];
 
 function NotificationPanel({
   userId,
   onClose,
+  onNavigate,
 }: {
   userId: Id<"users">;
   onClose: () => void;
+  onNavigate?: (page: string, id?: string) => void;
 }) {
   const notifications = useQuery(api.notifications.list, { userId, limit: 15 });
   const markRead = useMutation(api.notifications.markRead);
@@ -106,6 +109,10 @@ function NotificationPanel({
                 key={n._id}
                 onClick={() => {
                   if (!n.read) markRead({ notificationId: n._id });
+                  if (n.targetType && n.targetId && onNavigate) {
+                    onNavigate(n.targetType, n.targetId);
+                    onClose();
+                  }
                 }}
                 className={cn(
                   "w-full text-left px-5 py-3 border-b border-[var(--color-border-subtle)] transition-colors hover:bg-[var(--color-accent-surface)]",
@@ -278,6 +285,7 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
         <NotificationPanel
           userId={user.userId as Id<"users">}
           onClose={() => setShowNotifications(false)}
+          onNavigate={onNavigate}
         />
       )}
     </aside>

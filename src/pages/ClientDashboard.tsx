@@ -1,8 +1,9 @@
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
-import { Film, Calendar, CheckCircle2, ChevronRight } from "lucide-react";
-import { STATUS_LABELS, STATUS_BADGE_STYLES } from "../lib/utils";
+import { Film, Calendar, CheckCircle2, ChevronRight, Play, MessageSquare, HelpCircle } from "lucide-react";
+import { STATUS_LABELS, STATUS_BADGE_STYLES, VIDEO_STATUS_LABELS } from "../lib/utils";
+import type { Id } from "../../convex/_generated/dataModel";
 
 function StatusBadge({ status }: { status: string }) {
   const s = STATUS_BADGE_STYLES[status] || { bg: "rgba(163,163,163,0.12)", color: "#737373" };
@@ -23,6 +24,10 @@ export function ClientDashboard({ onNavigate }: { onNavigate: (page: string, id?
     user?.clientId ? { clientId: user.clientId as any } : "skip"
   );
   const shootDates = useQuery(api.shootDates.list, {});
+  const videos = useQuery(
+    api.videos.listByClient,
+    user?.clientId ? { clientId: user.clientId as Id<"clients"> } : "skip"
+  );
 
   const published = (ideas || []).filter((i) => i.status === "veröffentlicht").length;
   const active = (ideas || []).filter((i) => !["veröffentlicht"].includes(i.status)).length;
@@ -110,6 +115,85 @@ export function ClientDashboard({ onNavigate }: { onNavigate: (page: string, id?
           )}
         </div>
       </div>
+
+      {/* Videos Section */}
+      {(videos || []).length > 0 && (
+        <div className="px-6 lg:px-8 pb-8">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-[16px] font-medium">Aktuelle Videos</h2>
+            <button
+              onClick={() => onNavigate("videos")}
+              className="text-[12px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] flex items-center gap-0.5 transition-colors"
+            >
+              Alle ansehen <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {(videos || []).slice(0, 4).map((video) => {
+              const cdnHost = import.meta.env.VITE_BUNNY_CDN_HOSTNAME;
+              const thumb = video.thumbnailUrl || (video.bunnyVideoId && cdnHost ? `https://${cdnHost}/${video.bunnyVideoId}/thumbnail.jpg` : null);
+              const statusStyle = STATUS_BADGE_STYLES[video.status] || STATUS_BADGE_STYLES.hochgeladen;
+              const needsFeedback = video.status === "review";
+              return (
+                <button
+                  key={video._id}
+                  onClick={() => onNavigate("video", video._id)}
+                  className={`group text-left bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border overflow-hidden hover:shadow-[var(--shadow-md)] transition-all duration-200 ${
+                    needsFeedback ? "border-[var(--color-warning)] ring-1 ring-[var(--color-warning)]/20" : "border-[var(--color-border-subtle)] hover:border-[var(--color-border)]"
+                  }`}
+                >
+                  <div className="relative aspect-video bg-black">
+                    {thumb ? (
+                      <img src={thumb} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Film className="w-8 h-8 text-neutral-600" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
+                      <div className="w-9 h-9 rounded-full bg-white/90 flex items-center justify-center">
+                        <Play className="w-4 h-4 text-[#0a0a0a] ml-0.5" />
+                      </div>
+                    </div>
+                    {needsFeedback && (
+                      <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-full bg-[var(--color-warning)] text-white text-[11px] font-medium">
+                        <MessageSquare className="w-3 h-3" />
+                        Feedback gewünscht
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <h3 className="text-[14px] font-medium truncate">{video.title}</h3>
+                      <span
+                        className="text-[11px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0"
+                        style={{ background: statusStyle.bg, color: statusStyle.color }}
+                      >
+                        {VIDEO_STATUS_LABELS[video.status] || video.status}
+                      </span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Help hint for first-time users */}
+      {(ideas || []).length > 0 && (videos || []).length === 0 && (
+        <div className="px-6 lg:px-8 pb-8">
+          <div className="flex items-start gap-3 p-4 bg-[var(--color-accent-surface)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)]">
+            <HelpCircle className="w-5 h-5 text-[var(--color-text-tertiary)] flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-[13px] font-medium text-[var(--color-text-secondary)]">So funktioniert's</p>
+              <p className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5 leading-relaxed">
+                Sobald Ihr Produktionsteam ein Video hochlädt, erscheint es hier. Sie können dann direkt im Video Kommentare hinterlassen — einfach auf eine Stelle klicken und Ihr Feedback schreiben.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

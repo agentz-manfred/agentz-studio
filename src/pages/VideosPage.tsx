@@ -1,15 +1,22 @@
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { useAuth } from "../lib/auth";
 import { Film, Play, Clock } from "lucide-react";
 import { STATUS_BADGE_STYLES, VIDEO_STATUS_LABELS } from "../lib/utils";
+import type { Id } from "../../convex/_generated/dataModel";
 
 interface VideosPageProps {
   onNavigate: (page: string, id?: string) => void;
 }
 
 export function VideosPage({ onNavigate }: VideosPageProps) {
-  const videos = useQuery(api.videos.list, {});
-  const ideas = useQuery(api.ideas.list, {});
+  const { user } = useAuth();
+  const isClient = user?.role === "client";
+  const videos = useQuery(
+    isClient ? api.videos.listByClient : api.videos.list,
+    isClient && user?.clientId ? { clientId: user.clientId as Id<"clients"> } : (isClient ? "skip" : {})
+  );
+  const ideas = useQuery(api.ideas.list, isClient && user?.clientId ? { clientId: user.clientId as Id<"clients"> } : {});
   const clients = useQuery(api.clients.list);
 
   const ideaMap = new Map((ideas || []).map(i => [i._id, i]));
@@ -21,7 +28,9 @@ export function VideosPage({ onNavigate }: VideosPageProps) {
     <div className="max-w-[960px] mx-auto px-6 lg:px-8 py-6">
       <div className="animate-in mb-6">
         <h1 className="text-[24px] font-semibold tracking-[-0.02em]">Videos</h1>
-        <p className="text-[14px] text-[var(--color-text-tertiary)] mt-1">Alle Videos im Überblick</p>
+        <p className="text-[14px] text-[var(--color-text-tertiary)] mt-1">
+          {isClient ? "Ihre Videos — klicken Sie auf ein Video um Feedback zu geben" : "Alle Videos im Überblick"}
+        </p>
       </div>
 
       {(!videos || videos.length === 0) ? (

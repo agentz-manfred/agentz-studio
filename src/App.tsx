@@ -19,6 +19,7 @@ import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { KeyboardShortcutsDialog } from "./components/layout/KeyboardShortcuts";
 import { CommandPalette } from "./components/layout/CommandPalette";
+import { PageTransition } from "./components/layout/PageTransition";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 
@@ -36,10 +37,11 @@ function AdminRoutes({ currentPage, onNavigate }: { currentPage: string; onNavig
 }
 
 function ClientRoutes({ currentPage, onNavigate }: { currentPage: string; onNavigate: (page: string, id?: string) => void }) {
+  if (currentPage === "videos") return <VideosPage onNavigate={onNavigate} />;
   if (currentPage === "pipeline") return <PipelinePage />;
   if (currentPage === "calendar") return <CalendarPage />;
   if (currentPage.startsWith("idea:")) return <IdeaDetail ideaId={currentPage.split(":")[1]} onBack={() => onNavigate("dashboard")} onNavigate={onNavigate} />;
-  if (currentPage.startsWith("video:")) return <VideoReview videoId={currentPage.split(":")[1]} onBack={() => onNavigate("dashboard")} />;
+  if (currentPage.startsWith("video:")) return <VideoReview videoId={currentPage.split(":")[1]} onBack={() => onNavigate("videos")} />;
   return <ClientDashboard onNavigate={onNavigate} />;
 }
 
@@ -108,10 +110,12 @@ function AppContent() {
       <div className="flex-1 flex flex-col min-w-0">
         <MobileHeader onMenuClick={() => setSidebarOpen(true)} />
         <div className="flex-1 overflow-auto">
-          {user.role === "admin"
-            ? <AdminRoutes currentPage={currentPage} onNavigate={handleNavigate} />
-            : <ClientRoutes currentPage={currentPage} onNavigate={handleNavigate} />
-          }
+          <PageTransition pageKey={currentPage}>
+            {user.role === "admin"
+              ? <AdminRoutes currentPage={currentPage} onNavigate={handleNavigate} />
+              : <ClientRoutes currentPage={currentPage} onNavigate={handleNavigate} />
+            }
+          </PageTransition>
         </div>
       </div>
     </div>
