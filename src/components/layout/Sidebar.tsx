@@ -229,7 +229,7 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
               className={cn(
                 "w-full flex items-center gap-3 px-3 h-9 rounded-[var(--radius-sm)] text-[14px] transition-all duration-150 ease-[var(--ease-out)]",
                 isActive
-                  ? "bg-[var(--color-accent)] text-white font-medium shadow-[var(--shadow-xs)]"
+                  ? "nav-item-active text-white font-medium"
                   : "text-[var(--color-text-secondary)] hover:bg-[var(--color-accent-surface)] hover:text-[var(--color-text-primary)]"
               )}
             >

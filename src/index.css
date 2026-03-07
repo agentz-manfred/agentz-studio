@@ -344,6 +344,55 @@ html.dark .glass-card {
   opacity: 0.6;
 }
 
+/* ─── Kanban card status accent ─── */
+.kanban-card-accent {
+  position: relative;
+  border-left: 3px solid var(--kanban-accent, var(--color-border));
+  transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out), border-color 0.2s var(--ease-out);
+}
+.kanban-card-accent:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ─── Login right side mesh pattern ─── */
+.login-mesh {
+  background-image: 
+    radial-gradient(at 20% 30%, rgba(30, 64, 175, 0.04) 0%, transparent 50%),
+    radial-gradient(at 80% 70%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(147, 197, 253, 0.02) 0%, transparent 70%);
+}
+html.dark .login-mesh {
+  background-image: 
+    radial-gradient(at 20% 30%, rgba(30, 64, 175, 0.08) 0%, transparent 50%),
+    radial-gradient(at 80% 70%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+}
+
+/* ─── Sidebar refined active pill ─── */
+.nav-item-active {
+  position: relative;
+  background: linear-gradient(135deg, var(--color-accent) 0%, #2563eb 100%);
+  box-shadow: 0 2px 8px rgba(30, 64, 175, 0.25);
+}
+html.dark .nav-item-active {
+  box-shadow: 0 2px 12px rgba(59, 130, 246, 0.2);
+}
+
+/* ─── Modal backdrop enhancement ─── */
+.modal-backdrop {
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+}
+
+/* ─── Tooltip micro ─── */
+@keyframes tooltipIn {
+  from { opacity: 0; transform: translateY(4px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.tooltip-animate {
+  animation: tooltipIn 0.15s var(--ease-out) both;
+}
+
 /* ─── Selection color ─── */
 ::selection {
   background: rgba(59, 130, 246, 0.25);

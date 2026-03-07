@@ -17,7 +17,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
 import { STATUS_LABELS, STATUS_ORDER, STATUS_COLORS, cn } from "../../lib/utils";
-import { GripVertical } from "lucide-react";
+import { GripVertical, Clock } from "lucide-react";
 
 interface Idea {
   _id: string;
@@ -133,12 +133,14 @@ function KanbanCard({
     );
   }
 
+  const statusColor = STATUS_COLORS[idea.status] || "#a3a3a3";
+
   return (
     <div
       ref={setNodeRef}
-      style={style}
+      style={{ ...style, '--kanban-accent': statusColor } as React.CSSProperties}
       className={cn(
-        "group bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-3 cursor-default transition-shadow duration-200 hover:shadow-[var(--shadow-sm)]",
+        "group bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-3 cursor-default kanban-card-accent",
         isDragging && "shadow-[var(--shadow-lg)] rotate-[2deg]"
       )}
     >

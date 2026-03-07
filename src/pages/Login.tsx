@@ -78,7 +78,7 @@ export function LoginPage() {
       </div>
 
       {/* Right side — Login Form */}
-      <div className="flex-1 flex items-center justify-center bg-[var(--color-surface-0)] relative">
+      <div className="flex-1 flex items-center justify-center bg-[var(--color-surface-0)] relative login-mesh">
         {/* Subtle accent glow */}
         <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full opacity-[0.06] pointer-events-none"
           style={{ background: "radial-gradient(circle, var(--color-accent) 0%, transparent 70%)" }} />
