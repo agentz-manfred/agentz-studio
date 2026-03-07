@@ -34,3 +34,30 @@
 ### Geschätzte verbleibende Arbeit:
 - ~3-4 Runs für die restlichen 7 Items
 - Benutzerverwaltung und Multi-Upload sind die größten Brocken
+
+---
+
+## Run 2/9 — 23:02 — 7 Items offen, 8 Runs verbleibend
+
+### ✅ Erledigt in diesem Run:
+1. **Kalender-View verbessern** — scheduledPublishDate Feld auf Ideas, Kalender zeigt Drehs (lila) + Veröffentlichungen (grün), Filter-Buttons, Legende, Event-Popover für beide Typen, Publish-Datum in IdeaDetail
+2. **PWA Install prüfen** — Alles korrekt: manifest.json, sw.js, usePWAInstall Hook, Settings Install-Button, apple-touch-icon ✅
+3. **Videos/Ordner Kundenzuordnung** — clientId + clientVisible auf Videos + Folders, Folder-Kontextmenü "Kunde zuordnen" + "Für Kunde sichtbar", ClientAssignDialog, Eye-Icon + Client-Badge auf Ordnern
+4. **Benutzerverwaltung (Admin)** — TeamPage mit User-Liste, Suche, Rollen-Filter (Admin/Editor/Viewer/Client), CRUD-Modals, Passwort-Reset, Sidebar + Command Palette Integration
+5. **Multi-Upload + Upload-Queue** — Multiple file selection + drag & drop, max 3 parallel, per-file progress, cancel, beforeunload warning, summary bar
+6. **Mediathek Sortierung + Filter** — Status-Filter Dropdown (Alle/Hochgeladen/Review/...), Client-Filter Integration
+7. **Generelles Styling-Audit** — Mobile 375px + Desktop 1280px geprüft, Library Button-Overflow fix, Pipeline/Dashboard/Kunden/Kalender alle konsistent
+
+### 📋 TODO.md ist jetzt LEER! 🎉
+Alle Features aus der Liste abgearbeitet.
+
+### Commits:
+- `d6ced43` — Calendar: publish dates
+- `3e19632` — Videos/Ordner Kundenzuordnung
+- `d959e84` — Team/Benutzerverwaltung
+- `a342f0c` — Multi-Upload Queue
+- `6e475f0` — Mediathek Status-Filter
+- `20fbb77` — Styling fix mobile
+
+### Nächster Run:
+TODO ist leer → Security Review, Funktionalitätstests, visueller Tiefencheck, Edge Cases
