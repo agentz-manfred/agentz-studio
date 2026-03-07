@@ -305,6 +305,7 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
   const [sortMode, setSortMode] = useState<SortMode>("name");
   const [searchQuery, setSearchQuery] = useState("");
   const [showNewFolder, setShowNewFolder] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [renaming, setRenaming] = useState<{ type: "folder" | "video"; id: string; name: string } | null>(null);
   const [dragOverFolder, setDragOverFolder] = useState<string | null>(null);
   const [assigningClient, setAssigningClient] = useState<{ type: "folder" | "video"; id: string; clientId?: string } | null>(null);
@@ -331,7 +332,12 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
     .filter((f) => !searchQuery || f.name.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => sortMode === "date" ? b.createdAt - a.createdAt : a.name.localeCompare(b.name));
   const filteredVideos = (videos || [])
-    .filter((v) => !searchQuery || v.title.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter((v) => {
+      if (searchQuery && !v.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+      if (statusFilter !== "all" && v.status !== statusFilter) return false;
+      if (selectedClientId && (v as any).clientId && (v as any).clientId !== selectedClientId) return false;
+      return true;
+    })
     .sort((a, b) => {
       if (sortMode === "date") return b.createdAt - a.createdAt;
       if (sortMode === "status") return (a.status || "").localeCompare(b.status || "");
@@ -440,6 +446,19 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
             className="w-full h-9 pl-9 pr-3 rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] text-[13px] focus:border-[var(--color-border)] focus:outline-none transition-colors"
           />
         </div>
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="h-9 px-2 pr-7 rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] text-[12px] appearance-none cursor-pointer"
+          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 6px center" }}
+        >
+          <option value="all">Alle Status</option>
+          <option value="hochgeladen">Hochgeladen</option>
+          <option value="review">Review</option>
+          <option value="korrektur">Korrektur</option>
+          <option value="freigegeben">Freigegeben</option>
+          <option value="final">Final</option>
+        </select>
         <select
           value={sortMode}
           onChange={(e) => setSortMode(e.target.value as SortMode)}
