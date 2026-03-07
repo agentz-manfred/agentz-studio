@@ -45,23 +45,30 @@ function KanbanColumn({
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: status });
   const color = STATUS_COLORS[status] || "#a3a3a3";
+  // Convert hex to rgba for alpha support
+  const hexToRgba = (hex: string, alpha: number) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  };
 
   return (
     <div
       ref={setNodeRef}
       className={cn(
-        "flex-shrink-0 w-[280px] flex flex-col rounded-[var(--radius-lg)] transition-all duration-200",
-        isOver && "ring-2 ring-offset-2 ring-offset-[var(--color-surface-0)]"
+        "flex-shrink-0 w-[280px] flex flex-col rounded-[var(--radius-lg)] transition-all duration-200 border border-transparent",
+        isOver && "border-[var(--color-border)]"
       )}
-      style={isOver ? { ringColor: color } as any : undefined}
+      style={isOver ? { borderColor: color, background: hexToRgba(color, 0.04) } : undefined}
     >
       <div className="flex items-center justify-between px-3 py-2.5 rounded-t-[var(--radius-lg)]"
-        style={{ background: `${color}08` }}
+        style={{ background: hexToRgba(color, 0.06) }}
       >
         <div className="flex items-center gap-2">
           <div
-            className="w-2.5 h-2.5 rounded-full flex-shrink-0 ring-2 ring-white/50"
-            style={{ background: color }}
+            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+            style={{ background: color, boxShadow: `0 0 0 2px ${hexToRgba(color, 0.2)}` }}
           />
           <span className="text-[13px] font-semibold" style={{ color }}>
             {STATUS_LABELS[status] || status}
@@ -69,7 +76,7 @@ function KanbanColumn({
         </div>
         <span
           className="text-[11px] font-bold tabular-nums w-5 h-5 rounded-full flex items-center justify-center"
-          style={{ background: `${color}15`, color }}
+          style={{ background: hexToRgba(color, 0.12), color }}
         >
           {ideas.length}
         </span>
