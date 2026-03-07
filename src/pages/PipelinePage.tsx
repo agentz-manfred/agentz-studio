@@ -1,6 +1,7 @@
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
+import { useClientFilter } from "../lib/clientFilter";
 import { KanbanBoard } from "../components/kanban/KanbanBoard";
 import { Plus } from "lucide-react";
 import { useState } from "react";
@@ -8,7 +9,9 @@ import type { Id } from "../../convex/_generated/dataModel";
 
 export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: string) => void }) {
   const { user } = useAuth();
-  const ideas = useQuery(api.ideas.list, user?.role === "client" && user.clientId ? { clientId: user.clientId as any } : {});
+  const { selectedClientId } = useClientFilter();
+  const clientFilter = user?.role === "client" && user.clientId ? user.clientId : selectedClientId;
+  const ideas = useQuery(api.ideas.list, clientFilter ? { clientId: clientFilter as any } : {});
   const clients = useQuery(api.clients.list);
   const updateStatus = useMutation(api.ideas.updateStatus);
   const createIdea = useMutation(api.ideas.create);

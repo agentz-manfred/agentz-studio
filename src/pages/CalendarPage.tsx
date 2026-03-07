@@ -1,4 +1,5 @@
 import { useQuery, useMutation } from "convex/react";
+import { useClientFilter } from "../lib/clientFilter";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
 import { Calendar, ChevronLeft, ChevronRight, Plus, X, MapPin, Clock, Trash2, FileText, Pencil } from "lucide-react";
@@ -314,8 +315,12 @@ function NewShootDateModal({ onClose, defaultDate }: { onClose: () => void; defa
 
 export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: string) => void } = {}) {
   const { user } = useAuth();
+  const { selectedClientId } = useClientFilter();
   const clients = useQuery(api.clients.list);
-  const shootDates = useQuery(api.shootDates.list, {});
+  const allShootDates = useQuery(api.shootDates.list, {});
+  const shootDates = selectedClientId
+    ? (allShootDates || []).filter(s => s.clientId === selectedClientId)
+    : allShootDates;
   const removeShootDate = useMutation(api.shootDates.remove);
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());

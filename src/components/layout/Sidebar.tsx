@@ -19,9 +19,10 @@ import {
   FolderOpen,
 } from "lucide-react";
 import { useTheme } from "../../hooks/useTheme";
+import { useClientFilter } from "../../lib/clientFilter";
 import { cn } from "../../lib/utils";
 import type { Id } from "../../../convex/_generated/dataModel";
-import { Search, Command } from "lucide-react";
+import { Search, Command, ChevronDown } from "lucide-react";
 
 interface SidebarProps {
   currentPage: string;
@@ -172,6 +173,68 @@ function ThemeToggle() {
   );
 }
 
+function ClientFilterDropdown() {
+  const clients = useQuery(api.clients.list);
+  const { selectedClientId, setSelectedClientId } = useClientFilter();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const selectedClient = (clients || []).find(c => c._id === selectedClientId);
+
+  return (
+    <div className="px-3 pb-1" ref={ref}>
+      <button
+        onClick={() => setOpen(!open)}
+        className={cn(
+          "w-full flex items-center gap-2 px-3 h-8 rounded-[var(--radius-sm)] text-[13px] transition-all duration-150",
+          selectedClientId
+            ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium border border-[var(--color-accent)]/20"
+            : "text-[var(--color-text-tertiary)] hover:bg-[var(--color-accent-surface)] border border-transparent"
+        )}
+      >
+        <Users className="w-3.5 h-3.5 flex-shrink-0" />
+        <span className="flex-1 text-left truncate">
+          {selectedClient ? selectedClient.name : "Alle Kunden"}
+        </span>
+        <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", open && "rotate-180")} />
+      </button>
+      {open && (
+        <div className="mt-1 py-1 rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] shadow-[var(--shadow-lg)] max-h-[240px] overflow-auto z-50 relative">
+          <button
+            onClick={() => { setSelectedClientId(null); setOpen(false); }}
+            className={cn(
+              "w-full text-left px-3 py-1.5 text-[13px] hover:bg-[var(--color-accent-surface)] transition-colors",
+              !selectedClientId && "text-[var(--color-accent)] font-medium"
+            )}
+          >
+            Alle Kunden
+          </button>
+          {(clients || []).map(c => (
+            <button
+              key={c._id}
+              onClick={() => { setSelectedClientId(c._id); setOpen(false); }}
+              className={cn(
+                "w-full text-left px-3 py-1.5 text-[13px] hover:bg-[var(--color-accent-surface)] transition-colors truncate",
+                selectedClientId === c._id && "text-[var(--color-accent)] font-medium"
+              )}
+            >
+              {c.name}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
   const { user, logout } = useAuth();
   const nav = user?.role === "admin" ? adminNav : clientNav;
@@ -215,6 +278,9 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
           </kbd>
         </button>
       </div>
+
+      {/* Client filter (Admin only) */}
+      {user?.role === "admin" && <ClientFilterDropdown />}
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-0.5">

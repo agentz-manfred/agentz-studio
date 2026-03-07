@@ -19,6 +19,7 @@ import { ImpressumPage, DatenschutzPage } from "./pages/LegalPages";
 import { CookieBanner } from "./components/CookieBanner";
 import { Sidebar } from "./components/layout/Sidebar";
 import { MobileHeader } from "./components/layout/MobileHeader";
+import { ClientFilterProvider } from "./lib/clientFilter";
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { KeyboardShortcutsDialog } from "./components/layout/KeyboardShortcuts";
@@ -212,7 +213,7 @@ function AppRouter() {
   if (route === "invite") return <><InviteRoute /><CookieBanner /></>;
   if (route === "impressum") return <><ImpressumPage onBack={goBack} /><CookieBanner /></>;
   if (route === "datenschutz") return <><DatenschutzPage onBack={goBack} /><CookieBanner /></>;
-  return <AuthProvider><AppContent /></AuthProvider>;
+  return <AuthProvider><ClientFilterProvider><AppContent /></ClientFilterProvider></AuthProvider>;
 }
 
 export default function App() {

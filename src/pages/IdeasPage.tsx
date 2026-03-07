@@ -4,6 +4,7 @@ import { useAuth } from "../lib/auth";
 import { Lightbulb, ChevronRight, Search, Plus, X, Sparkles, Check } from "lucide-react";
 import { useState } from "react";
 import { STATUS_LABELS } from "../lib/utils";
+import { useClientFilter } from "../lib/clientFilter";
 import type { Id } from "../../convex/_generated/dataModel";
 
 function StatusDot({ status }: { status: string }) {
@@ -286,7 +287,9 @@ export function AiSuggestModal({ onClose, onAccept, preselectedClientId }: { onC
 
 export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: string) => void }) {
   const { user } = useAuth();
-  const ideas = useQuery(api.ideas.list, user?.role === "client" && user.clientId ? { clientId: user.clientId as any } : {});
+  const { selectedClientId } = useClientFilter();
+  const clientFilter = user?.role === "client" && user.clientId ? user.clientId : selectedClientId;
+  const ideas = useQuery(api.ideas.list, clientFilter ? { clientId: clientFilter as any } : {});
   const clients = useQuery(api.clients.list);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");

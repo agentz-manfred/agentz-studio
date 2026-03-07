@@ -1,5 +1,16 @@
 # AgentZ Studio — CHANGELOG
 
+## v2.3.0 (07.03.2026)
+- **Kanban KOMPLETT NEU — Dice UI Primitives** — Fresh rebuild from scratch
+  - Deleted old kanban + compose-refs, rebuilt 1:1 from Dice UI reference
+  - `KanbanItem asHandle asChild` — whole card is drag handle (no more GripVertical icon)
+  - Touch drag works natively (touch-none + select-none on handle)
+  - New card design: accent bar top, shadow elevation on hover/active, cleaner layout
+  - Grid layout with auto-cols-[260px] instead of fixed flex widths
+  - Status-colored client avatars in cards
+  - Drag overlay with subtle rotate[2deg] effect
+  - radix-ui package added for Slot primitive
+
 ## v2.2.0 (07.03.2026)
 - **Mediathek (Filesystem/Video-Library)** — Google Drive-Style Dateimanager
   - Ordner erstellen, verschachteln, umbenennen, löschen

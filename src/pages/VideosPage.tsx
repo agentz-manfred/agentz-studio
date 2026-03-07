@@ -3,6 +3,7 @@ import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
 import { Film, Play, Clock, Upload, Search } from "lucide-react";
 import { STATUS_BADGE_STYLES, VIDEO_STATUS_LABELS } from "../lib/utils";
+import { useClientFilter } from "../lib/clientFilter";
 import { useState } from "react";
 import type { Id } from "../../convex/_generated/dataModel";
 
@@ -12,12 +13,14 @@ interface VideosPageProps {
 
 export function VideosPage({ onNavigate }: VideosPageProps) {
   const { user } = useAuth();
+  const { selectedClientId } = useClientFilter();
   const isClient = user?.role === "client";
+  const clientFilter = isClient && user?.clientId ? user.clientId : selectedClientId;
   const videos = useQuery(
-    isClient ? api.videos.listByClient : api.videos.list,
-    isClient && user?.clientId ? { clientId: user.clientId as Id<"clients"> } : (isClient ? "skip" : {})
+    clientFilter ? api.videos.listByClient : api.videos.list,
+    clientFilter ? { clientId: clientFilter as Id<"clients"> } : (isClient ? "skip" : {})
   );
-  const ideas = useQuery(api.ideas.list, isClient && user?.clientId ? { clientId: user.clientId as Id<"clients"> } : {});
+  const ideas = useQuery(api.ideas.list, clientFilter ? { clientId: clientFilter as Id<"clients"> } : {});
   const clients = useQuery(api.clients.list);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");

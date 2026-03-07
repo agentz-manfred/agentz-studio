@@ -5,11 +5,7 @@ Neue Wünsche werden unten angehängt oder an der richtigen Prio-Stelle eingefü
 
 ## Features
 
-- [ ] **🔴🔴🔴 ABSOLUT PRIO 1 — Kanban KOMPLETT NEU! Fresh Start!** Der letzte Versuch war Mist — sieht visuell und funktional 1:1 wie vorher aus. DIESMAL RICHTIG: 1) `rm src/components/kanban/KanbanBoard.tsx` — LÖSCHEN, 2) `rm src/components/ui/kanban.tsx` — LÖSCHEN, 3) `rm src/lib/compose-refs.ts` — LÖSCHEN, 4) Alles was mit dem alten Kanban zu tun hat aus package.json entfernen, `rm -rf node_modules && npm install`, 5) JETZT: Lies `DICE-UI-KANBAN-REFERENCE.md` im Projekt-Root — da steht der EXAKTE Code, 6) `src/lib/compose-refs.ts` = Section 1 aus der Referenz, 1:1 kopieren, 7) `src/components/ui/kanban.tsx` = Section 2 aus der Referenz, 1:1 kopieren, 8) `npm install radix-ui` (für Slot), 9) PipelinePage.tsx NEU SCHREIBEN nach Section 3 Demo-Pattern: `<KanbanItem asHandle asChild>` = GANZE Karte ist Handle, KEIN separates GripVertical-Icon!, 10) Das Ergebnis MUSS visuell ANDERS aussehen als vorher — wenn es gleich aussieht, hast du was falsch gemacht!, 11) Columns = unsere Status-Pipeline, `onValueChange` = Convex Mutation, 12) TESTEN auf Mobile 375px — Karte anfassen und draggen muss funktionieren, 13) Styling ERSTMAL so lassen wie Dice UI es hat (light bg, border, shadow), Farbanpassungen kommen DANACH
-- [ ] **KI-Skript Output fixen:** Zwei Probleme: 1) KI gibt Gelaber vor dem eigentlichen Skript aus ("Hier kommt dein Skript...") → Prompt verschärfen: "Gib AUSSCHLIESSLICH das Skript aus. Keine Einleitung, kein Kommentar, keine Erklärung." + Post-Processing das Floskeln vor dem eigentlichen Content rausschneidet. 2) Skript kommt als Markdown zurück, aber Tiptap-Editor erwartet HTML → KI-Prompt auf HTML-Output umstellen (`<h3>`, `<p>`, `<strong>`, `<em>`, `<hr>` statt Markdown). Tiptap rendert HTML nativ. Datei: `convex/ai.ts` (systemPrompt + userPrompt anpassen).
-- [ ] **Video Upload + Review (Frame.io Style):** Timestamp-Kommentare auf Timeline, Marker, abhaken, antworten, Share-Links
-- [ ] **Video ↔ Idee Verknüpfung testen:** Beim Upload optional Idee auswählen. Bidirektionale Navigation prüfen.
-- [ ] **Share-Links mit OG-Tags:** Für Videos, korrekte Thumbnail-Preview in WhatsApp etc.
+
 - [ ] **Kalender-View verbessern:** Drehtermine + Veröffentlichungsdaten visuell anzeigen
 - [ ] **Kunden-Dashboard verfeinern:** Super einfach für Nicht-Techniker, Tooltips, Hilfetexte, Onboarding
 
