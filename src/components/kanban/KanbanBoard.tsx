@@ -44,37 +44,44 @@ function KanbanColumn({
   children: React.ReactNode;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: status });
+  const color = STATUS_COLORS[status] || "#a3a3a3";
 
   return (
     <div
       ref={setNodeRef}
       className={cn(
-        "flex-shrink-0 w-[280px] flex flex-col rounded-[var(--radius-lg)] transition-colors duration-200",
-        isOver && "bg-[var(--color-accent-surface)]"
+        "flex-shrink-0 w-[280px] flex flex-col rounded-[var(--radius-lg)] transition-all duration-200",
+        isOver && "ring-2 ring-offset-2 ring-offset-[var(--color-surface-0)]"
       )}
+      style={isOver ? { ringColor: color } as any : undefined}
     >
-      <div className="flex items-center justify-between px-3 py-3">
+      <div className="flex items-center justify-between px-3 py-2.5 rounded-t-[var(--radius-lg)]"
+        style={{ background: `${color}08` }}
+      >
         <div className="flex items-center gap-2">
           <div
-            className="w-2 h-2 rounded-full flex-shrink-0"
-            style={{ background: STATUS_COLORS[status] || "#a3a3a3" }}
+            className="w-2.5 h-2.5 rounded-full flex-shrink-0 ring-2 ring-white/50"
+            style={{ background: color }}
           />
-          <span className="text-[13px] font-medium text-[var(--color-text-secondary)]">
+          <span className="text-[13px] font-semibold" style={{ color }}>
             {STATUS_LABELS[status] || status}
           </span>
-          <span className="text-[12px] text-[var(--color-text-tertiary)] tabular-nums">
-            {ideas.length}
-          </span>
         </div>
+        <span
+          className="text-[11px] font-bold tabular-nums w-5 h-5 rounded-full flex items-center justify-center"
+          style={{ background: `${color}15`, color }}
+        >
+          {ideas.length}
+        </span>
       </div>
-      <div className="flex-1 px-1.5 pb-2 space-y-1.5 min-h-[120px]">
+      <div className="flex-1 px-1.5 pb-2 pt-1.5 space-y-1.5 min-h-[120px]">
         <SortableContext
           items={ideas.map((i) => i._id)}
           strategy={verticalListSortingStrategy}
         >
           {children}
           {ideas.length === 0 && (
-            <div className="flex items-center justify-center h-20 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border)] text-[12px] text-[var(--color-text-tertiary)] opacity-50">
+            <div className="flex items-center justify-center h-20 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border)] text-[12px] text-[var(--color-text-tertiary)] opacity-40">
               Hierher ziehen
             </div>
           )}
@@ -140,15 +147,22 @@ function KanbanCard({
           <p className="text-[14px] font-medium leading-tight truncate group-hover:text-[var(--color-accent)] transition-colors">
             {idea.title}
           </p>
-          {clientName && (
-            <p className="mt-1 text-[12px] text-[var(--color-text-tertiary)]">
-              {clientName}
-            </p>
-          )}
           {idea.description && (
             <p className="mt-1.5 text-[13px] text-[var(--color-text-secondary)] line-clamp-2 leading-relaxed">
               {idea.description}
             </p>
+          )}
+          {clientName && (
+            <div className="flex items-center gap-1.5 mt-2">
+              <div className="w-4.5 h-4.5 rounded-full bg-[var(--color-surface-3)] flex items-center justify-center flex-shrink-0">
+                <span className="text-[9px] font-bold text-[var(--color-text-secondary)]">
+                  {clientName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+                </span>
+              </div>
+              <span className="text-[12px] text-[var(--color-text-tertiary)]">
+                {clientName}
+              </span>
+            </div>
           )}
         </div>
       </div>

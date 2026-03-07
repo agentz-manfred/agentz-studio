@@ -1,8 +1,9 @@
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
-import { Film, Play, Clock } from "lucide-react";
+import { Film, Play, Clock, Upload, Search } from "lucide-react";
 import { STATUS_BADGE_STYLES, VIDEO_STATUS_LABELS } from "../lib/utils";
+import { useState } from "react";
 import type { Id } from "../../convex/_generated/dataModel";
 
 interface VideosPageProps {
@@ -18,32 +19,116 @@ export function VideosPage({ onNavigate }: VideosPageProps) {
   );
   const ideas = useQuery(api.ideas.list, isClient && user?.clientId ? { clientId: user.clientId as Id<"clients"> } : {});
   const clients = useQuery(api.clients.list);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   const ideaMap = new Map((ideas || []).map(i => [i._id, i]));
   const clientMap = new Map((clients || []).map(c => [c._id, c]));
 
-  // Status colors now handled via STATUS_BADGE_STYLES
+  const filteredVideos = (videos || [])
+    .filter(v => {
+      if (statusFilter !== "all" && v.status !== statusFilter) return false;
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        const idea = ideaMap.get(v.ideaId);
+        const client = idea ? clientMap.get(idea.clientId) : null;
+        return v.title.toLowerCase().includes(q) ||
+          idea?.title.toLowerCase().includes(q) ||
+          client?.name.toLowerCase().includes(q);
+      }
+      return true;
+    })
+    .sort((a, b) => b.createdAt - a.createdAt);
+
+  const statusCounts = (videos || []).reduce((acc, v) => {
+    acc[v.status] = (acc[v.status] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 
   return (
     <div className="max-w-[960px] mx-auto px-6 lg:px-8 py-6">
-      <div className="animate-in mb-6">
-        <h1 className="text-[24px] font-semibold tracking-[-0.02em]">Videos</h1>
-        <p className="text-[14px] text-[var(--color-text-tertiary)] mt-1">
-          {isClient ? "Ihre Videos — klicken Sie auf ein Video um Feedback zu geben" : "Alle Videos im Überblick"}
-        </p>
+      <div className="animate-in mb-6 flex items-start justify-between">
+        <div>
+          <h1 className="text-[24px] font-semibold tracking-[-0.02em]">Videos</h1>
+          <p className="text-[14px] text-[var(--color-text-tertiary)] mt-1">
+            {isClient ? "Ihre Videos — klicken Sie auf ein Video um Feedback zu geben" : `${(videos || []).length} Videos im Überblick`}
+          </p>
+        </div>
+        {user?.role === "admin" && (videos || []).length > 0 && (
+          <button
+            onClick={() => {
+              // Navigate to ideas page where videos can be uploaded per idea
+              onNavigate("ideas");
+            }}
+            className="flex items-center gap-2 h-9 px-4 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[14px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors"
+          >
+            <Upload className="w-4 h-4" />
+            Video hochladen
+          </button>
+        )}
       </div>
+
+      {/* Search & Filter Bar */}
+      {(videos || []).length > 0 && (
+        <div className="animate-in stagger-1 flex flex-col sm:flex-row gap-3 mb-5">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-tertiary)]" />
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Videos durchsuchen…"
+              className="w-full h-9 pl-9 pr-3 rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] text-[13px] focus:border-[var(--color-border)] focus:outline-none transition-colors"
+            />
+          </div>
+          <div className="flex gap-1.5 flex-wrap">
+            <button
+              onClick={() => setStatusFilter("all")}
+              className={`h-9 px-3 rounded-[var(--radius-md)] text-[12px] font-medium transition-colors ${statusFilter === "all" ? "bg-[var(--color-accent)] text-white" : "bg-[var(--color-surface-2)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-3)]"}`}
+            >
+              Alle
+            </button>
+            {Object.entries(VIDEO_STATUS_LABELS).map(([key, label]) => (
+              statusCounts[key] ? (
+                <button
+                  key={key}
+                  onClick={() => setStatusFilter(statusFilter === key ? "all" : key)}
+                  className={`h-9 px-3 rounded-[var(--radius-md)] text-[12px] font-medium transition-colors ${statusFilter === key ? "bg-[var(--color-accent)] text-white" : "bg-[var(--color-surface-2)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-3)]"}`}
+                >
+                  {label} ({statusCounts[key]})
+                </button>
+              ) : null
+            ))}
+          </div>
+        </div>
+      )}
 
       {(!videos || videos.length === 0) ? (
         <div className="animate-in stagger-1 text-center py-20 bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)]">
-          <Film className="w-12 h-12 mx-auto mb-3 text-[var(--color-text-tertiary)] opacity-30" />
-          <p className="text-[15px] font-medium text-[var(--color-text-secondary)]">Noch keine Videos</p>
-          <p className="text-[13px] text-[var(--color-text-tertiary)] mt-1">
-            Videos werden über die Ideen-Detailseite hochgeladen
+          <div className="w-16 h-16 rounded-2xl bg-[var(--color-surface-2)] flex items-center justify-center mx-auto mb-4">
+            <Film className="w-7 h-7 text-[var(--color-text-tertiary)]" />
+          </div>
+          <p className="text-[16px] font-semibold text-[var(--color-text-primary)]">Noch keine Videos</p>
+          <p className="text-[13px] text-[var(--color-text-tertiary)] mt-1.5 max-w-[300px] mx-auto">
+            Laden Sie Videos über die Ideen-Detailseite hoch, um den Review-Prozess zu starten.
           </p>
+          {user?.role === "admin" && (
+            <button
+              onClick={() => onNavigate("ideas")}
+              className="mt-5 inline-flex items-center gap-2 h-9 px-4 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[14px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors"
+            >
+              <Upload className="w-4 h-4" />
+              Zur Ideen-Übersicht
+            </button>
+          )}
+        </div>
+      ) : filteredVideos.length === 0 && (searchQuery || statusFilter !== "all") ? (
+        <div className="animate-in stagger-1 text-center py-16">
+          <Search className="w-10 h-10 mx-auto mb-3 text-[var(--color-text-tertiary)] opacity-30" />
+          <p className="text-[14px] text-[var(--color-text-secondary)]">Keine Videos gefunden</p>
         </div>
       ) : (
         <div className="animate-in stagger-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {(videos || []).sort((a, b) => b.createdAt - a.createdAt).map((video) => {
+          {filteredVideos.map((video) => {
             const idea = ideaMap.get(video.ideaId);
             const client = idea ? clientMap.get(idea.clientId) : null;
             const cdnHost = import.meta.env.VITE_BUNNY_CDN_HOSTNAME;
