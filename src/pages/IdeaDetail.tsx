@@ -1,9 +1,9 @@
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
 import { STATUS_LABELS, STATUS_ORDER, STATUS_BADGE_STYLES } from "../lib/utils";
 import { useState } from "react";
-import { ArrowLeft, MessageSquare, Send, Check, ChevronDown, FileText, Plus, Save, Clock, Film, Play, ChevronRight } from "lucide-react";
+import { ArrowLeft, MessageSquare, Send, Check, ChevronDown, FileText, Plus, Save, Clock, Film, Play, ChevronRight, Sparkles, Wand2, Scissors } from "lucide-react";
 import { VideoUpload } from "../components/video/VideoUpload";
 import type { Id } from "../../convex/_generated/dataModel";
 
@@ -53,14 +53,17 @@ function StatusSelector({ current, onChange }: { current: string; onChange: (s: 
   );
 }
 
-function ScriptEditor({ ideaId }: { ideaId: string }) {
+function ScriptEditor({ ideaId, ideaTitle, ideaDescription, clientName, clientCompany }: { ideaId: string; ideaTitle: string; ideaDescription?: string; clientName: string; clientCompany?: string }) {
   const { user } = useAuth();
   const scripts = useQuery(api.scripts.listByIdea, { ideaId: ideaId as Id<"ideas"> });
   const createScript = useMutation(api.scripts.create);
   const updateScript = useMutation(api.scripts.update);
+  const generateScript = useAction(api.ai.generateScript);
   const [editing, setEditing] = useState(false);
   const [content, setContent] = useState("");
   const [saving, setSaving] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiMode, setAiMode] = useState<string | null>(null);
 
   const latestScript = scripts && scripts.length > 0
     ? [...scripts].sort((a, b) => b.version - a.version)[0]
@@ -87,6 +90,29 @@ function ScriptEditor({ ideaId }: { ideaId: string }) {
     setEditing(false);
   };
 
+  const handleAI = async (mode: "generate" | "improve" | "shorten") => {
+    setAiLoading(true);
+    setAiMode(mode);
+    try {
+      const result = await generateScript({
+        ideaTitle,
+        ideaDescription,
+        clientName,
+        clientCompany,
+        existingScript: content || latestScript?.content || undefined,
+        mode,
+      });
+      setContent(result);
+      if (!editing) setEditing(true);
+    } catch (err) {
+      console.error("AI error:", err);
+      alert("KI-Fehler: " + (err instanceof Error ? err.message : "Unbekannt"));
+    } finally {
+      setAiLoading(false);
+      setAiMode(null);
+    }
+  };
+
   return (
     <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--color-border-subtle)]">
@@ -99,14 +125,16 @@ function ScriptEditor({ ideaId }: { ideaId: string }) {
             </span>
           )}
         </div>
-        {user?.role === "admin" && !editing && (
-          <button
-            onClick={handleStartEdit}
-            className="flex items-center gap-1.5 h-7 px-3 rounded-[var(--radius-sm)] text-[12px] font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] transition-colors"
-          >
-            {latestScript ? "Bearbeiten" : <><Plus className="w-3 h-3" /> Skript erstellen</>}
-          </button>
-        )}
+        <div className="flex items-center gap-1.5">
+          {user?.role === "admin" && !editing && (
+            <button
+              onClick={handleStartEdit}
+              className="flex items-center gap-1.5 h-7 px-3 rounded-[var(--radius-sm)] text-[12px] font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] transition-colors"
+            >
+              {latestScript ? "Bearbeiten" : <><Plus className="w-3 h-3" /> Skript erstellen</>}
+            </button>
+          )}
+        </div>
       </div>
 
       {editing ? (
@@ -118,6 +146,40 @@ function ScriptEditor({ ideaId }: { ideaId: string }) {
             placeholder="Skript hier eingeben…&#10;&#10;Szene 1: Intro&#10;[Kamera: Frontal, Halbnah]&#10;Text: ..."
             autoFocus
           />
+          {/* AI Buttons */}
+          {user?.role === "admin" && (
+            <div className="flex items-center gap-2 mt-3 pb-3 border-b border-[var(--color-border-subtle)]">
+              <span className="text-[11px] text-[var(--color-text-tertiary)] uppercase tracking-wider font-medium">KI</span>
+              <button
+                onClick={() => handleAI("generate")}
+                disabled={aiLoading}
+                className="flex items-center gap-1.5 h-7 px-3 rounded-full text-[12px] font-medium bg-gradient-to-r from-violet-500/10 to-indigo-500/10 text-violet-700 dark:text-violet-300 hover:from-violet-500/20 hover:to-indigo-500/20 border border-violet-200/50 dark:border-violet-500/20 transition-all disabled:opacity-50"
+              >
+                <Sparkles className={`w-3 h-3 ${aiMode === "generate" ? "animate-spin" : ""}`} />
+                {aiMode === "generate" ? "Generiert…" : "Generieren"}
+              </button>
+              {content.trim() && (
+                <>
+                  <button
+                    onClick={() => handleAI("improve")}
+                    disabled={aiLoading}
+                    className="flex items-center gap-1.5 h-7 px-3 rounded-full text-[12px] font-medium bg-gradient-to-r from-amber-500/10 to-orange-500/10 text-amber-700 dark:text-amber-300 hover:from-amber-500/20 hover:to-orange-500/20 border border-amber-200/50 dark:border-amber-500/20 transition-all disabled:opacity-50"
+                  >
+                    <Wand2 className={`w-3 h-3 ${aiMode === "improve" ? "animate-spin" : ""}`} />
+                    {aiMode === "improve" ? "Verbessert…" : "Verbessern"}
+                  </button>
+                  <button
+                    onClick={() => handleAI("shorten")}
+                    disabled={aiLoading}
+                    className="flex items-center gap-1.5 h-7 px-3 rounded-full text-[12px] font-medium bg-gradient-to-r from-emerald-500/10 to-teal-500/10 text-emerald-700 dark:text-emerald-300 hover:from-emerald-500/20 hover:to-teal-500/20 border border-emerald-200/50 dark:border-emerald-500/20 transition-all disabled:opacity-50"
+                  >
+                    <Scissors className={`w-3 h-3 ${aiMode === "shorten" ? "animate-spin" : ""}`} />
+                    {aiMode === "shorten" ? "Kürzt…" : "Kürzen"}
+                  </button>
+                </>
+              )}
+            </div>
+          )}
           <div className="flex justify-end gap-2 mt-3">
             <button
               onClick={() => setEditing(false)}
@@ -148,6 +210,16 @@ function ScriptEditor({ ideaId }: { ideaId: string }) {
         <div className="px-4 py-8 text-center">
           <FileText className="w-6 h-6 mx-auto mb-2 text-[var(--color-text-tertiary)] opacity-40" />
           <p className="text-[13px] text-[var(--color-text-tertiary)]">Noch kein Skript vorhanden</p>
+          {user?.role === "admin" && (
+            <button
+              onClick={() => handleAI("generate")}
+              disabled={aiLoading}
+              className="mt-3 inline-flex items-center gap-1.5 h-8 px-4 rounded-full text-[13px] font-medium bg-gradient-to-r from-violet-500/10 to-indigo-500/10 text-violet-700 dark:text-violet-300 hover:from-violet-500/20 hover:to-indigo-500/20 border border-violet-200/50 dark:border-violet-500/20 transition-all disabled:opacity-50"
+            >
+              <Sparkles className={`w-3.5 h-3.5 ${aiLoading ? "animate-spin" : ""}`} />
+              {aiLoading ? "KI generiert Skript…" : "Mit KI generieren"}
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -407,7 +479,13 @@ export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onB
 
       {/* Script Editor */}
       <div className="animate-in stagger-3 mb-8">
-        <ScriptEditor ideaId={ideaId} />
+        <ScriptEditor
+          ideaId={ideaId}
+          ideaTitle={idea.title}
+          ideaDescription={idea.description}
+          clientName={client?.name || ""}
+          clientCompany={client?.company}
+        />
       </div>
 
       {/* Videos */}

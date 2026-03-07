@@ -1,7 +1,7 @@
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
-import { Lightbulb, ChevronRight, Search, Plus, X } from "lucide-react";
+import { Lightbulb, ChevronRight, Search, Plus, X, Sparkles, Check } from "lucide-react";
 import { useState } from "react";
 import { STATUS_LABELS } from "../lib/utils";
 import type { Id } from "../../convex/_generated/dataModel";
@@ -104,6 +104,107 @@ function NewIdeaModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+function AiSuggestModal({ onClose, onAccept }: { onClose: () => void; onAccept: (title: string, description: string, clientId: string) => void }) {
+  const clients = useQuery(api.clients.list);
+  const ideas = useQuery(api.ideas.list, {});
+  const suggestIdeas = useAction(api.ai.suggestIdeas);
+  const [clientId, setClientId] = useState("");
+  const [suggestions, setSuggestions] = useState<Array<{ title: string; description: string }>>([]);
+  const [loading, setLoading] = useState(false);
+
+  const selectedClient = (clients || []).find(c => c._id === clientId);
+
+  const handleGenerate = async () => {
+    if (!selectedClient) return;
+    setLoading(true);
+    try {
+      const existingIdeas = (ideas || [])
+        .filter(i => i.clientId === clientId)
+        .map(i => i.title);
+      const result = await suggestIdeas({
+        clientName: selectedClient.name,
+        clientCompany: selectedClient.company,
+        existingIdeas,
+      });
+      setSuggestions(result);
+    } catch (err) {
+      console.error(err);
+      alert("KI-Fehler: " + (err instanceof Error ? err.message : "Unbekannt"));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] w-full max-w-[520px] mx-4 max-h-[80vh] overflow-hidden flex flex-col">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border-subtle)]">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-violet-500" />
+            <h3 className="text-[17px] font-semibold">KI-Ideen Vorschläge</h3>
+          </div>
+          <button onClick={onClose} className="p-1 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors">
+            <X className="w-4 h-4 text-[var(--color-text-tertiary)]" />
+          </button>
+        </div>
+        <div className="p-6 overflow-y-auto flex-1">
+          <div className="mb-4">
+            <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Kunde wählen</label>
+            <div className="flex gap-2">
+              <select
+                value={clientId}
+                onChange={(e) => { setClientId(e.target.value); setSuggestions([]); }}
+                className="flex-1 h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none"
+              >
+                <option value="">Kunde wählen…</option>
+                {(clients || []).map((c) => (
+                  <option key={c._id} value={c._id}>{c.name}{c.company ? ` (${c.company})` : ""}</option>
+                ))}
+              </select>
+              <button
+                onClick={handleGenerate}
+                disabled={!clientId || loading}
+                className="flex items-center gap-1.5 h-10 px-4 rounded-[var(--radius-md)] bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-[13px] font-medium hover:from-violet-700 hover:to-indigo-700 disabled:opacity-50 transition-all"
+              >
+                <Sparkles className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+                {loading ? "Denkt nach…" : "Generieren"}
+              </button>
+            </div>
+          </div>
+
+          {suggestions.length > 0 && (
+            <div className="space-y-2">
+              {suggestions.map((s, i) => (
+                <div key={i} className="bg-[var(--color-surface-0)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-4 group hover:border-[var(--color-border)] transition-colors">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-[14px] font-medium">{s.title}</p>
+                      <p className="text-[13px] text-[var(--color-text-secondary)] mt-1 leading-relaxed">{s.description}</p>
+                    </div>
+                    <button
+                      onClick={() => onAccept(s.title, s.description, clientId)}
+                      className="flex-shrink-0 flex items-center gap-1 h-7 px-3 rounded-[var(--radius-sm)] text-[12px] font-medium bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] opacity-0 group-hover:opacity-100 transition-all"
+                    >
+                      <Check className="w-3 h-3" />
+                      Übernehmen
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {!loading && suggestions.length === 0 && clientId && (
+            <p className="text-center text-[13px] text-[var(--color-text-tertiary)] py-8">
+              Klicke auf "Generieren" für KI-Vorschläge
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: string) => void }) {
   const { user } = useAuth();
   const ideas = useQuery(api.ideas.list, user?.role === "client" && user.clientId ? { clientId: user.clientId as any } : {});
@@ -111,6 +212,8 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [showNewIdea, setShowNewIdea] = useState(false);
+  const [showAiSuggest, setShowAiSuggest] = useState(false);
+  const createIdea = useMutation(api.ideas.create);
 
   const clientMap = (clients || []).reduce(
     (acc, c) => ({ ...acc, [c._id]: c }),
@@ -136,13 +239,22 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
             </p>
           </div>
           {user?.role === "admin" && (
-            <button
-              onClick={() => setShowNewIdea(true)}
-              className="flex items-center gap-2 h-9 px-4 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[14px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Neue Idee</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowAiSuggest(true)}
+                className="flex items-center gap-1.5 h-9 px-4 rounded-[var(--radius-md)] bg-gradient-to-r from-violet-500/10 to-indigo-500/10 text-violet-700 dark:text-violet-300 border border-violet-200/50 dark:border-violet-500/20 text-[14px] font-medium hover:from-violet-500/20 hover:to-indigo-500/20 transition-all"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span className="hidden sm:inline">KI-Ideen</span>
+              </button>
+              <button
+                onClick={() => setShowNewIdea(true)}
+                className="flex items-center gap-2 h-9 px-4 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[14px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                <span className="hidden sm:inline">Neue Idee</span>
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -215,6 +327,21 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
       </div>
 
       {showNewIdea && <NewIdeaModal onClose={() => setShowNewIdea(false)} />}
+      {showAiSuggest && (
+        <AiSuggestModal
+          onClose={() => setShowAiSuggest(false)}
+          onAccept={async (title, description, clientId) => {
+            if (!user) return;
+            await createIdea({
+              clientId: clientId as Id<"clients">,
+              title,
+              description,
+              createdBy: user.userId as Id<"users">,
+            });
+            setShowAiSuggest(false);
+          }}
+        />
+      )}
     </div>
   );
 }
