@@ -55,7 +55,7 @@ function StatusSelector({ current, onChange }: { current: string; onChange: (s: 
 }
 
 function ScriptEditor({ ideaId, ideaTitle, ideaDescription, clientName, clientCompany, clientContext, clientPlatforms, clientMainPlatform }: { ideaId: string; ideaTitle: string; ideaDescription?: string; clientName: string; clientCompany?: string; clientContext?: string; clientPlatforms?: string[]; clientMainPlatform?: string }) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const scripts = useQuery(api.scripts.listByIdea, { ideaId: ideaId as Id<"ideas"> });
   const createScript = useMutation(api.scripts.create);
   const updateScript = useMutation(api.scripts.update);
@@ -76,15 +76,15 @@ function ScriptEditor({ ideaId, ideaTitle, ideaDescription, clientName, clientCo
   };
 
   const handleSave = async () => {
-    if (!user || !content.trim()) return;
+    if (!user || !content.trim() || !token) return;
     setSaving(true);
     if (latestScript) {
-      await updateScript({ id: latestScript._id, content: content.trim() });
+      await updateScript({ token, id: latestScript._id, content: content.trim() });
     } else {
       await createScript({
+        token,
         ideaId: ideaId as Id<"ideas">,
         content: content.trim(),
-        createdBy: user.userId as Id<"users">,
       });
     }
     setSaving(false);
@@ -227,7 +227,7 @@ function ScriptEditor({ ideaId, ideaTitle, ideaDescription, clientName, clientCo
 }
 
 function CommentSection({ ideaId }: { ideaId: string }) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const comments = useQuery(api.comments.list, { targetType: "idea", targetId: ideaId });
   const createComment = useMutation(api.comments.create);
   const resolveComment = useMutation(api.comments.resolve);
@@ -235,11 +235,11 @@ function CommentSection({ ideaId }: { ideaId: string }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newComment.trim() || !user) return;
+    if (!newComment.trim() || !user || !token) return;
     await createComment({
+      token,
       targetType: "idea",
       targetId: ideaId,
-      userId: user.userId as Id<"users">,
       content: newComment.trim(),
     });
     setNewComment("");
@@ -271,7 +271,7 @@ function CommentSection({ ideaId }: { ideaId: string }) {
               <p className="text-[14px] leading-relaxed">{comment.content}</p>
               {!comment.resolved && user?.role === "admin" && (
                 <button
-                  onClick={() => resolveComment({ commentId: comment._id })}
+                  onClick={() => { if (token) resolveComment({ token, commentId: comment._id }); }}
                   className="p-1 rounded hover:bg-[var(--color-surface-2)] text-[var(--color-text-tertiary)] hover:text-[var(--color-success)] transition-colors flex-shrink-0"
                   title="Erledigt"
                 >

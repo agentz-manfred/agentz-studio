@@ -1,14 +1,12 @@
 import { mutation, query, action } from "./_generated/server";
 import { v } from "convex/values";
+import { authenticate, requireEditor } from "./lib";
 
 export const list = query({
-  args: { ideaId: v.optional(v.id("ideas")) },
+  args: { ideaId: v.optional(v.id("ideas")), token: v.optional(v.string()) },
   handler: async (ctx, args) => {
     if (args.ideaId) {
-      return ctx.db
-        .query("videos")
-        .withIndex("by_idea", (q) => q.eq("ideaId", args.ideaId!))
-        .collect();
+      return ctx.db.query("videos").withIndex("by_idea", (q) => q.eq("ideaId", args.ideaId!)).collect();
     }
     return ctx.db.query("videos").collect();
   },
@@ -23,19 +21,20 @@ export const get = query({
 
 export const create = mutation({
   args: {
+    token: v.string(),
     ideaId: v.optional(v.id("ideas")),
     title: v.string(),
-    uploadedBy: v.id("users"),
     bunnyVideoId: v.optional(v.string()),
     bunnyUrl: v.optional(v.string()),
     thumbnailUrl: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    const user = await requireEditor(ctx, args.token);
     return ctx.db.insert("videos", {
       ideaId: args.ideaId,
       title: args.title,
       status: "hochgeladen",
-      uploadedBy: args.uploadedBy,
+      uploadedBy: user._id,
       bunnyVideoId: args.bunnyVideoId,
       bunnyUrl: args.bunnyUrl,
       thumbnailUrl: args.thumbnailUrl,
@@ -45,44 +44,33 @@ export const create = mutation({
 });
 
 export const updateStatus = mutation({
-  args: {
-    videoId: v.id("videos"),
-    status: v.string(),
-  },
+  args: { token: v.string(), videoId: v.id("videos"), status: v.string() },
   handler: async (ctx, args) => {
+    const user = await authenticate(ctx, args.token);
     const video = await ctx.db.get(args.videoId);
     if (!video) throw new Error("Video nicht gefunden");
-    
-    const oldStatus = video.status;
+
+    // Client can only approve/reject
+    if (user.role === "client") {
+      const allowed = ["freigegeben", "korrektur"];
+      if (!allowed.includes(args.status)) throw new Error("Nicht erlaubt");
+    }
+
     await ctx.db.patch(args.videoId, { status: args.status });
 
-    // Auto-notify the client when video status changes
+    // Auto-notify client on status change
     const idea = video.ideaId ? await ctx.db.get(video.ideaId) : null;
     if (idea) {
-      // Find client's user account
-      const clientUsers = await ctx.db
-        .query("users")
-        .filter((q) => q.eq(q.field("clientId"), idea.clientId))
-        .collect();
-      
+      const clientUsers = await ctx.db.query("users").filter((q) => q.eq(q.field("clientId"), idea.clientId)).collect();
       const statusLabels: Record<string, string> = {
-        hochgeladen: "Hochgeladen",
-        review: "Bereit zur Überprüfung",
-        korrektur: "Wird überarbeitet",
-        freigegeben: "Freigegeben",
-        final: "Fertiggestellt",
+        hochgeladen: "Hochgeladen", review: "Bereit zur Überprüfung",
+        korrektur: "Wird überarbeitet", freigegeben: "Freigegeben", final: "Fertiggestellt",
       };
-      
-      for (const clientUser of clientUsers) {
+      for (const cu of clientUsers) {
         await ctx.db.insert("notifications", {
-          userId: clientUser._id,
-          type: "video_status",
-          title: `Video: ${video.title}`,
+          userId: cu._id, type: "video_status", title: `Video: ${video.title}`,
           message: `Status geändert: ${statusLabels[args.status] || args.status}`,
-          targetType: "video",
-          targetId: args.videoId,
-          read: false,
-          createdAt: Date.now(),
+          targetType: "video", targetId: args.videoId, read: false, createdAt: Date.now(),
         });
       }
     }
@@ -90,46 +78,27 @@ export const updateStatus = mutation({
 });
 
 export const updateBunnyInfo = mutation({
-  args: {
-    videoId: v.id("videos"),
-    bunnyVideoId: v.string(),
-    bunnyUrl: v.string(),
-    thumbnailUrl: v.optional(v.string()),
-  },
+  args: { token: v.string(), videoId: v.id("videos"), bunnyVideoId: v.string(), bunnyUrl: v.string(), thumbnailUrl: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.videoId, {
-      bunnyVideoId: args.bunnyVideoId,
-      bunnyUrl: args.bunnyUrl,
-      thumbnailUrl: args.thumbnailUrl,
-    });
+    await requireEditor(ctx, args.token);
+    await ctx.db.patch(args.videoId, { bunnyVideoId: args.bunnyVideoId, bunnyUrl: args.bunnyUrl, thumbnailUrl: args.thumbnailUrl });
   },
 });
 
-// Create a video on Bunny Stream and return upload URL
 export const createBunnyVideo = action({
   args: { title: v.string() },
   handler: async (_ctx, args) => {
     const libraryId = process.env.BUNNY_LIBRARY_ID;
     const apiKey = process.env.BUNNY_API_KEY;
     if (!libraryId || !apiKey) throw new Error("Bunny credentials not configured");
-
-    const res = await fetch(
-      `https://video.bunnycdn.com/library/${libraryId}/videos`,
-      {
-        method: "POST",
-        headers: {
-          accept: "application/json",
-          "content-type": "application/json",
-          AccessKey: apiKey,
-        },
-        body: JSON.stringify({ title: args.title }),
-      }
-    );
+    const res = await fetch(`https://video.bunnycdn.com/library/${libraryId}/videos`, {
+      method: "POST",
+      headers: { accept: "application/json", "content-type": "application/json", AccessKey: apiKey },
+      body: JSON.stringify({ title: args.title }),
+    });
     if (!res.ok) throw new Error(`Bunny API error: ${res.status}`);
     const data = await res.json();
-
     const cdnHostname = process.env.BUNNY_CDN_HOSTNAME || process.env.VITE_BUNNY_CDN_HOSTNAME;
-
     return {
       videoId: data.guid as string,
       uploadUrl: `https://video.bunnycdn.com/library/${libraryId}/videos/${data.guid}`,
@@ -143,14 +112,10 @@ export const createBunnyVideo = action({
   },
 });
 
-// List videos for a specific client (via their ideas)
 export const listByClient = query({
   args: { clientId: v.id("clients") },
   handler: async (ctx, args) => {
-    const ideas = await ctx.db
-      .query("ideas")
-      .withIndex("by_client", (q) => q.eq("clientId", args.clientId))
-      .collect();
+    const ideas = await ctx.db.query("ideas").withIndex("by_client", (q) => q.eq("clientId", args.clientId)).collect();
     const ideaIds = new Set(ideas.map((i) => i._id));
     const allVideos = await ctx.db.query("videos").collect();
     return allVideos.filter((v) => v.ideaId && ideaIds.has(v.ideaId));
@@ -161,67 +126,51 @@ export const listByFolder = query({
   args: { folderId: v.optional(v.id("folders")) },
   handler: async (ctx, args) => {
     if (args.folderId) {
-      return ctx.db
-        .query("videos")
-        .withIndex("by_folder", (q) => q.eq("folderId", args.folderId))
-        .collect();
+      return ctx.db.query("videos").withIndex("by_folder", (q) => q.eq("folderId", args.folderId)).collect();
     }
-    // Root videos (no folder)
     const all = await ctx.db.query("videos").collect();
     return all.filter((v) => !v.folderId);
   },
 });
 
 export const moveToFolder = mutation({
-  args: {
-    videoId: v.id("videos"),
-    folderId: v.optional(v.id("folders")),
-  },
+  args: { token: v.string(), videoId: v.id("videos"), folderId: v.optional(v.id("folders")) },
   handler: async (ctx, args) => {
-    const video = await ctx.db.get(args.videoId);
-    if (!video) throw new Error("Video nicht gefunden");
+    await requireEditor(ctx, args.token);
     await ctx.db.patch(args.videoId, { folderId: args.folderId });
   },
 });
 
 export const rename = mutation({
-  args: { videoId: v.id("videos"), title: v.string() },
+  args: { token: v.string(), videoId: v.id("videos"), title: v.string() },
   handler: async (ctx, args) => {
+    await requireEditor(ctx, args.token);
     await ctx.db.patch(args.videoId, { title: args.title });
   },
 });
 
 export const linkIdea = mutation({
-  args: {
-    videoId: v.id("videos"),
-    ideaId: v.optional(v.id("ideas")),
-  },
+  args: { token: v.string(), videoId: v.id("videos"), ideaId: v.optional(v.id("ideas")) },
   handler: async (ctx, args) => {
-    const video = await ctx.db.get(args.videoId);
-    if (!video) throw new Error("Video nicht gefunden");
+    await requireEditor(ctx, args.token);
     await ctx.db.patch(args.videoId, { ideaId: args.ideaId });
   },
 });
 
 export const update = mutation({
-  args: {
-    videoId: v.id("videos"),
-    title: v.optional(v.string()),
-    clientId: v.optional(v.id("clients")),
-    clientVisible: v.optional(v.boolean()),
-  },
+  args: { token: v.string(), videoId: v.id("videos"), title: v.optional(v.string()), clientId: v.optional(v.id("clients")), clientVisible: v.optional(v.boolean()) },
   handler: async (ctx, args) => {
-    const { videoId, ...updates } = args;
+    await requireEditor(ctx, args.token);
+    const { videoId, token: _, ...updates } = args;
     const filtered = Object.fromEntries(Object.entries(updates).filter(([_, v]) => v !== undefined));
-    if (Object.keys(filtered).length > 0) {
-      await ctx.db.patch(videoId, filtered);
-    }
+    if (Object.keys(filtered).length > 0) await ctx.db.patch(videoId, filtered);
   },
 });
 
 export const remove = mutation({
-  args: { videoId: v.id("videos") },
+  args: { token: v.string(), videoId: v.id("videos") },
   handler: async (ctx, args) => {
+    await requireEditor(ctx, args.token);
     await ctx.db.delete(args.videoId);
   },
 });

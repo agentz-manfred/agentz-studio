@@ -1,8 +1,18 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { authenticate, requireEditor } from "./lib";
 
 export const list = query({
-  handler: async (ctx) => {
+  args: { token: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    if (args.token) {
+      const user = await authenticate(ctx, args.token);
+      // Client users only see their own client
+      if (user.role === "client" && user.clientId) {
+        const client = await ctx.db.get(user.clientId);
+        return client ? [client] : [];
+      }
+    }
     return ctx.db.query("clients").collect();
   },
 });
@@ -16,14 +26,17 @@ export const get = query({
 
 export const create = mutation({
   args: {
+    token: v.string(),
     name: v.string(),
     company: v.optional(v.string()),
     email: v.string(),
     phone: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireEditor(ctx, args.token);
+    const { token: _, ...data } = args;
     return ctx.db.insert("clients", {
-      ...args,
+      ...data,
       createdAt: Date.now(),
     });
   },
@@ -31,6 +44,7 @@ export const create = mutation({
 
 export const update = mutation({
   args: {
+    token: v.string(),
     id: v.id("clients"),
     name: v.optional(v.string()),
     company: v.optional(v.string()),
@@ -44,7 +58,8 @@ export const update = mutation({
     context: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const { id, ...updates } = args;
+    await requireEditor(ctx, args.token);
+    const { id, token: _, ...updates } = args;
     const existing = await ctx.db.get(id);
     if (!existing) throw new Error("Client not found");
     await ctx.db.patch(id, updates);

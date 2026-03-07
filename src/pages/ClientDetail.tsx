@@ -84,6 +84,7 @@ function ProfileEditor({
   client: any;
   onClose: () => void;
 }) {
+  const { token } = useAuth();
   const updateClient = useMutation(api.clients.update);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -118,7 +119,9 @@ function ProfileEditor({
   const handleSave = async () => {
     setSaving(true);
     try {
+      if (!token) return;
       await updateClient({
+        token,
         id: client._id as Id<"clients">,
         name: form.name,
         company: form.company || undefined,
@@ -340,6 +343,7 @@ function ProfileEditor({
 
 /* ─── Category Manager ─── */
 function CategoryManager({ clientId }: { clientId: string }) {
+  const { token } = useAuth();
   const categories = useQuery(api.categories.listByClient, {
     clientId: clientId as Id<"clients">,
   });
@@ -356,7 +360,9 @@ function CategoryManager({ clientId }: { clientId: string }) {
 
   const handleAdd = async () => {
     if (!newName.trim()) return;
+    if (!token) return;
     await createCategory({
+      token,
       clientId: clientId as Id<"clients">,
       name: newName.trim(),
       color: newColor,
@@ -367,7 +373,9 @@ function CategoryManager({ clientId }: { clientId: string }) {
 
   const handleUpdate = async (id: string) => {
     if (!editName.trim()) return;
+    if (!token) return;
     await updateCategory({
+      token,
       id: id as Id<"categories">,
       name: editName.trim(),
       color: editColor,
@@ -377,7 +385,7 @@ function CategoryManager({ clientId }: { clientId: string }) {
 
   const handleRemove = async (id: string) => {
     if (!confirm("Kategorie löschen?")) return;
-    await removeCategory({ id: id as Id<"categories"> });
+    if (token) await removeCategory({ token, id: id as Id<"categories"> });
   };
 
   const sorted = [...(categories || [])].sort((a, b) => a.order - b.order);

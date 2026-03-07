@@ -6,6 +6,7 @@ import { Plus, Users, Building2, Mail, Phone, X, Search, UserPlus, Check, Link2,
 import type { Id } from "../../convex/_generated/dataModel";
 
 function CreateClientModal({ onClose }: { onClose: () => void }) {
+  const { token } = useAuth();
   const createClient = useMutation(api.clients.create);
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
@@ -15,8 +16,10 @@ function CreateClientModal({ onClose }: { onClose: () => void }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!token) return;
     setSubmitting(true);
     await createClient({
+      token,
       name,
       company: company || undefined,
       email,

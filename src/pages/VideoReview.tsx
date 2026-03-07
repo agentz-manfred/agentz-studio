@@ -102,11 +102,11 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
   };
 
   const handleReply = async (parentId: string) => {
-    if (!replyText.trim() || !user) return;
+    if (!replyText.trim() || !user || !token) return;
     await createComment({
+      token,
       targetType: "video",
       targetId: videoId,
-      userId: user.userId as Id<"users">,
       content: replyText.trim(),
       parentId: parentId as Id<"comments">,
     });
@@ -116,11 +116,11 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newComment.trim() || !user) return;
+    if (!newComment.trim() || !user || !token) return;
     await createComment({
+      token,
       targetType: "video",
       targetId: videoId,
-      userId: user.userId as Id<"users">,
       content: newComment.trim(),
       timestamp: addTimestamp ? Math.floor(currentTime) : undefined,
     });
@@ -192,7 +192,7 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
                   <button
                     key={s}
                     onClick={() => {
-                      updateVideoStatus({ videoId: videoId as Id<"videos">, status: s });
+                      if (token) updateVideoStatus({ token, videoId: videoId as Id<"videos">, status: s });
                       setShowStatusMenu(false);
                     }}
                     className={`w-full text-left px-3 py-1.5 text-[13px] flex items-center gap-2 transition-colors hover:bg-[var(--color-accent-surface)] ${s === video.status ? "font-medium" : ""}`}
@@ -313,7 +313,7 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
                 userName: userMap[r.userId] || "Unbekannt",
               }))}
               onSeek={handleSeek}
-              onResolve={() => resolveComment({ commentId: comment._id })}
+              onResolve={() => { if (token) resolveComment({ token, commentId: comment._id }); }}
               canResolve={user?.role === "admin"}
               replyingTo={replyingTo}
               replyText={replyText}

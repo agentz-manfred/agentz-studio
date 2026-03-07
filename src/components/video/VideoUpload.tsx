@@ -32,7 +32,7 @@ function formatSize(bytes: number): string {
 let idCounter = 0;
 
 export function VideoUpload({ ideaId, folderId, onUploaded }: VideoUploadProps) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const createBunnyVideo = useAction(api.videos.createBunnyVideo);
   const createVideo = useMutation(api.videos.create);
   const updateBunnyInfo = useMutation(api.videos.updateBunnyInfo);
@@ -55,7 +55,7 @@ export function VideoUpload({ ideaId, folderId, onUploaded }: VideoUploadProps) 
   }, [hasActiveUploads]);
 
   const uploadFile = useCallback(async (item: UploadItem) => {
-    if (!user) return;
+    if (!user || !token) return;
 
     setQueue((prev) => prev.map((q) => q.id === item.id ? { ...q, status: "uploading" as const } : q));
 
@@ -64,9 +64,9 @@ export function VideoUpload({ ideaId, folderId, onUploaded }: VideoUploadProps) 
       const bunny = await createBunnyVideo({ title });
 
       const videoId = await createVideo({
+        token,
         ...(ideaId ? { ideaId: ideaId as Id<"ideas"> } : {}),
         title,
-        uploadedBy: user.userId as Id<"users">,
         bunnyVideoId: bunny.videoId,
       });
 
@@ -95,6 +95,7 @@ export function VideoUpload({ ideaId, folderId, onUploaded }: VideoUploadProps) 
       });
 
       await updateBunnyInfo({
+        token,
         videoId,
         bunnyVideoId: bunny.videoId,
         bunnyUrl: bunny.playUrl,

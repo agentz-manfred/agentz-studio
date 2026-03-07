@@ -61,7 +61,8 @@ function EventPopover({ event, client, onClose, onDelete, onNavigate, isAdmin }:
   const handleSave = async () => {
     setSaving(true);
     if (isShoot) {
-      await updateShootDate({
+      if (token) await updateShootDate({
+        token,
         id: event.data._id,
         date: editDate,
         time: editTime || undefined,
@@ -224,6 +225,7 @@ function EventPopover({ event, client, onClose, onDelete, onNavigate, isAdmin }:
 }
 
 function NewShootDateModal({ onClose, defaultDate }: { onClose: () => void; defaultDate?: string }) {
+  const { token } = useAuth();
   const clients = useQuery(api.clients.list);
   const ideas = useQuery(api.ideas.list, {});
   const createShootDate = useMutation(api.shootDates.create);
@@ -241,9 +243,10 @@ function NewShootDateModal({ onClose, defaultDate }: { onClose: () => void; defa
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!clientId || !date) return;
+    if (!clientId || !date || !token) return;
     setSubmitting(true);
     await createShootDate({
+      token,
       clientId: clientId as Id<"clients">,
       ideaIds: selectedIdeas as Id<"ideas">[],
       date,
@@ -457,7 +460,7 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
   const handleDeleteEvent = () => {
     if (!selectedEvent) return;
     if (selectedEvent.type === "shoot") {
-      removeShootDate({ id: selectedEvent.data._id });
+      if (token) removeShootDate({ token, id: selectedEvent.data._id });
     } else {
       if (token) updateIdea({ token, ideaId: selectedEvent.data._id, scheduledPublishDate: "" });
     }

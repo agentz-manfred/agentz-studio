@@ -299,7 +299,7 @@ function ClientAssignDialog({
 }
 
 export function LibraryPage({ onNavigate }: LibraryPageProps) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [currentFolderId, setCurrentFolderId] = useState<Id<"folders"> | undefined>(undefined);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [sortMode, setSortMode] = useState<SortMode>("name");
@@ -345,11 +345,11 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
     });
 
   const handleCreateFolder = async (name: string) => {
-    if (!user?.userId) return;
+    if (!user?.userId || !token) return;
     await createFolder({
+      token,
       name,
       parentId: currentFolderId,
-      createdBy: user.userId as Id<"users">,
     });
     setShowNewFolder(false);
   };
@@ -357,9 +357,9 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
   const handleRename = async (name: string) => {
     if (!renaming) return;
     if (renaming.type === "folder") {
-      await renameFolder({ folderId: renaming.id as Id<"folders">, name });
+      if (token) await renameFolder({ token, folderId: renaming.id as Id<"folders">, name });
     } else {
-      await renameVideo({ videoId: renaming.id as Id<"videos">, title: name });
+      if (token) await renameVideo({ token, videoId: renaming.id as Id<"videos">, title: name });
     }
     setRenaming(null);
   };
@@ -367,7 +367,7 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
   const handleDeleteFolder = async (folderId: string) => {
     if (!confirm("Ordner löschen?")) return;
     try {
-      await removeFolder({ folderId: folderId as Id<"folders"> });
+      if (token) await removeFolder({ token, folderId: folderId as Id<"folders"> });
     } catch (e: any) {
       alert(e.message || "Fehler beim Löschen");
     }
@@ -378,15 +378,15 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
     setDragOverFolder(null);
     const videoId = e.dataTransfer.getData("video-id");
     if (videoId) {
-      await moveVideo({ videoId: videoId as Id<"videos">, folderId: targetFolderId as Id<"folders"> });
+      if (token) await moveVideo({ token, videoId: videoId as Id<"videos">, folderId: targetFolderId as Id<"folders"> });
     }
   };
 
   const handleDropRoot = async (e: React.DragEvent) => {
     e.preventDefault();
     const videoId = e.dataTransfer.getData("video-id");
-    if (videoId) {
-      await moveVideo({ videoId: videoId as Id<"videos">, folderId: currentFolderId });
+    if (videoId && token) {
+      await moveVideo({ token, videoId: videoId as Id<"videos">, folderId: currentFolderId });
     }
   };
 
@@ -501,7 +501,7 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
                   onOpen={() => setCurrentFolderId(folder._id as Id<"folders">)}
                   onRename={() => setRenaming({ type: "folder", id: folder._id, name: folder.name })}
                   onDelete={() => handleDeleteFolder(folder._id)}
-                  onToggleVisibility={() => updateFolder({ folderId: folder._id as Id<"folders">, clientVisible: !folder.clientVisible })}
+                  onToggleVisibility={() => { if (token) updateFolder({ token, folderId: folder._id as Id<"folders">, clientVisible: !folder.clientVisible }); }}
                   onAssignClient={() => setAssigningClient({ type: "folder", id: folder._id, clientId: folder.clientId })}
                   onDragOver={(e) => { e.preventDefault(); setDragOverFolder(folder._id); }}
                   onDrop={(e) => handleDrop(e, folder._id)}
@@ -587,9 +587,9 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
           currentClientId={assigningClient.clientId}
           onSave={async (clientId) => {
             if (assigningClient.type === "folder") {
-              await updateFolder({ folderId: assigningClient.id as Id<"folders">, clientId: clientId as Id<"clients"> | undefined });
+              if (token) await updateFolder({ token, folderId: assigningClient.id as Id<"folders">, clientId: clientId as Id<"clients"> | undefined });
             } else {
-              await updateVideo({ videoId: assigningClient.id as Id<"videos">, clientId: clientId as Id<"clients"> | undefined });
+              if (token) await updateVideo({ token, videoId: assigningClient.id as Id<"videos">, clientId: clientId as Id<"clients"> | undefined });
             }
             setAssigningClient(null);
           }}
