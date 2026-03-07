@@ -14,7 +14,10 @@ import {
   X,
   Check,
   Settings,
+  Moon,
+  Sun,
 } from "lucide-react";
+import { useTheme } from "../../hooks/useTheme";
 import { cn } from "../../lib/utils";
 import type { Id } from "../../../convex/_generated/dataModel";
 
@@ -136,6 +139,29 @@ function NotificationPanel({
   );
 }
 
+function ThemeToggle() {
+  const { resolvedTheme, setTheme, theme } = useTheme();
+  const cycle = () => {
+    if (theme === "light") setTheme("dark");
+    else if (theme === "dark") setTheme("system");
+    else setTheme("light");
+  };
+  return (
+    <button
+      onClick={cycle}
+      className="w-full flex items-center gap-3 px-3 h-9 rounded-[var(--radius-sm)] text-[14px] text-[var(--color-text-secondary)] hover:bg-[var(--color-accent-surface)] hover:text-[var(--color-text-primary)] transition-all duration-150 ease-[var(--ease-out)]"
+      title={`Theme: ${theme === "system" ? "System" : theme === "dark" ? "Dunkel" : "Hell"}`}
+    >
+      {resolvedTheme === "dark" ? (
+        <Moon className="w-[18px] h-[18px]" strokeWidth={1.75} />
+      ) : (
+        <Sun className="w-[18px] h-[18px]" strokeWidth={1.75} />
+      )}
+      {theme === "system" ? "System" : resolvedTheme === "dark" ? "Dunkel" : "Hell"}
+    </button>
+  );
+}
+
 export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
   const { user, logout } = useAuth();
   const nav = user?.role === "admin" ? adminNav : clientNav;
@@ -186,6 +212,9 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
 
       {/* User + Notifications */}
       <div className="px-3 py-4 border-t border-[var(--color-border-subtle)]">
+        {/* Theme toggle */}
+        <ThemeToggle />
+
         {/* Notification button */}
         <button
           onClick={() => setShowNotifications(!showNotifications)}

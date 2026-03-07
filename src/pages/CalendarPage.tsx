@@ -274,7 +274,8 @@ export function CalendarPage() {
                 {dayShoots.map((sd) => (
                   <div
                     key={sd._id}
-                    className="mt-0.5 px-1 py-0.5 rounded text-[10px] sm:text-[11px] truncate bg-violet-50 text-violet-700 border border-violet-100"
+                    className="mt-0.5 px-1 py-0.5 rounded text-[10px] sm:text-[11px] truncate border"
+                    style={{ background: "rgba(139,92,246,0.1)", color: "#8b5cf6", borderColor: "rgba(139,92,246,0.15)" }}
                     title={`${clientMap[sd.clientId]?.name || "Kunde"} ${sd.time ? `· ${sd.time}` : ""} ${sd.location ? `· ${sd.location}` : ""}`}
                   >
                     🎬 {clientMap[sd.clientId]?.name || "Dreh"}
@@ -294,8 +295,8 @@ export function CalendarPage() {
             {upcoming.map((sd) => (
               <div key={sd._id} className="bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] px-4 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-[var(--radius-md)] bg-violet-50 flex items-center justify-center flex-shrink-0">
-                    <Calendar className="w-[18px] h-[18px] text-violet-600" />
+                  <div className="w-10 h-10 rounded-[var(--radius-md)] flex items-center justify-center flex-shrink-0" style={{ background: "rgba(139,92,246,0.1)" }}>
+                    <Calendar className="w-[18px] h-[18px]" style={{ color: "#8b5cf6" }} />
                   </div>
                   <div>
                     <p className="text-[14px] font-medium">
@@ -322,7 +323,7 @@ export function CalendarPage() {
                 {user?.role === "admin" && (
                   <button
                     onClick={() => removeShootDate({ id: sd._id })}
-                    className="p-1.5 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-error)] hover:bg-red-50 transition-colors"
+                    className="p-1.5 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-error)] hover:bg-[var(--color-accent-surface)] transition-colors"
                     title="Löschen"
                   >
                     <Trash2 className="w-3.5 h-3.5" />

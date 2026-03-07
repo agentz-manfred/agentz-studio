@@ -1,6 +1,7 @@
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Film, Play, Clock } from "lucide-react";
+import { STATUS_BADGE_STYLES, VIDEO_STATUS_LABELS } from "../lib/utils";
 
 interface VideosPageProps {
   onNavigate: (page: string, id?: string) => void;
@@ -14,13 +15,7 @@ export function VideosPage({ onNavigate }: VideosPageProps) {
   const ideaMap = new Map((ideas || []).map(i => [i._id, i]));
   const clientMap = new Map((clients || []).map(c => [c._id, c]));
 
-  const statusColors: Record<string, string> = {
-    hochgeladen: "bg-blue-50 text-blue-600",
-    review: "bg-amber-50 text-amber-600",
-    freigegeben: "bg-emerald-50 text-emerald-600",
-    korrektur: "bg-orange-50 text-orange-600",
-    final: "bg-green-50 text-green-700",
-  };
+  // Status colors now handled via STATUS_BADGE_STYLES
 
   return (
     <div className="max-w-[960px] mx-auto px-6 lg:px-8 py-6">
@@ -52,7 +47,7 @@ export function VideosPage({ onNavigate }: VideosPageProps) {
                 className="group text-left bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] overflow-hidden hover:shadow-[var(--shadow-md)] hover:border-[var(--color-border)] transition-all duration-200"
               >
                 {/* Thumbnail */}
-                <div className="relative aspect-video bg-neutral-900">
+                <div className="relative aspect-video bg-black">
                   {thumb ? (
                     <img src={thumb} alt="" className="w-full h-full object-cover" />
                   ) : (
@@ -71,8 +66,14 @@ export function VideosPage({ onNavigate }: VideosPageProps) {
                 <div className="p-3">
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="text-[14px] font-medium truncate">{video.title}</h3>
-                    <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0 ${statusColors[video.status] || "bg-neutral-100 text-neutral-600"}`}>
-                      {video.status}
+                    <span
+                      className="text-[11px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0"
+                      style={{
+                        background: (STATUS_BADGE_STYLES[video.status] || STATUS_BADGE_STYLES.idee).bg,
+                        color: (STATUS_BADGE_STYLES[video.status] || STATUS_BADGE_STYLES.idee).color,
+                      }}
+                    >
+                      {VIDEO_STATUS_LABELS[video.status] || video.status}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 mt-1.5">

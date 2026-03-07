@@ -1,6 +1,7 @@
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
+import { STATUS_BADGE_STYLES } from "../lib/utils";
 import {
   Users,
   Film,
@@ -300,21 +301,17 @@ function RecentActivity({
                 </p>
               </div>
               <div className="flex items-center gap-2.5 flex-shrink-0 ml-3">
-                <span
-                  className="text-[11px] font-medium px-2 py-0.5 rounded-full"
-                  style={{
-                    background:
-                      idea.status === "veröffentlicht"
-                        ? "rgba(22, 163, 74, 0.1)"
-                        : "var(--color-surface-2)",
-                    color:
-                      idea.status === "veröffentlicht"
-                        ? "var(--color-success)"
-                        : "var(--color-text-secondary)",
-                  }}
-                >
-                  {STATUS_LABELS[idea.status] || idea.status}
-                </span>
+                {(() => {
+                  const s = STATUS_BADGE_STYLES[idea.status] || { bg: "rgba(163,163,163,0.12)", color: "#737373" };
+                  return (
+                    <span
+                      className="text-[11px] font-medium px-2 py-0.5 rounded-full"
+                      style={{ background: s.bg, color: s.color }}
+                    >
+                      {STATUS_LABELS[idea.status] || idea.status}
+                    </span>
+                  );
+                })()}
                 <span className="text-[11px] text-[var(--color-text-tertiary)] tabular-nums">
                   {new Date(idea.updatedAt).toLocaleDateString("de-DE", {
                     day: "2-digit",

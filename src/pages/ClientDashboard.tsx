@@ -2,23 +2,15 @@ import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
 import { Film, Calendar, CheckCircle2, ChevronRight } from "lucide-react";
-import { STATUS_LABELS } from "../lib/utils";
+import { STATUS_LABELS, STATUS_BADGE_STYLES } from "../lib/utils";
 
 function StatusBadge({ status }: { status: string }) {
-  const colors: Record<string, string> = {
-    idee: "bg-neutral-100 text-neutral-600",
-    skript: "bg-blue-50 text-blue-600",
-    freigabe: "bg-amber-50 text-amber-600",
-    korrektur: "bg-orange-50 text-orange-600",
-    freigegeben: "bg-emerald-50 text-emerald-600",
-    gedreht: "bg-violet-50 text-violet-600",
-    geschnitten: "bg-indigo-50 text-indigo-600",
-    review: "bg-rose-50 text-rose-600",
-    "veröffentlicht": "bg-green-50 text-green-700",
-  };
-
+  const s = STATUS_BADGE_STYLES[status] || { bg: "rgba(163,163,163,0.12)", color: "#737373" };
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[12px] font-medium ${colors[status] || "bg-neutral-100 text-neutral-600"}`}>
+    <span
+      className="inline-flex items-center px-2 py-0.5 rounded-full text-[12px] font-medium"
+      style={{ background: s.bg, color: s.color }}
+    >
       {STATUS_LABELS[status] || status}
     </span>
   );
@@ -48,8 +40,10 @@ export function ClientDashboard({ onNavigate }: { onNavigate: (page: string, id?
     <div className="max-w-[960px] mx-auto">
       {/* Header */}
       <div className="px-6 lg:px-8 py-6 border-b border-[var(--color-border-subtle)]">
-        <h1 className="text-[22px] font-semibold tracking-[-0.02em]">Meine Videos</h1>
-        <p className="text-[14px] text-[var(--color-text-tertiary)] mt-0.5">Übersicht aller Projekte</p>
+        <h1 className="text-[22px] font-semibold tracking-[-0.02em]">Willkommen, {user?.name?.split(" ")[0] || "zurück"}</h1>
+        <p className="text-[14px] text-[var(--color-text-tertiary)] mt-0.5">
+          Hier sehen Sie den aktuellen Stand aller Ihrer Video-Projekte.
+        </p>
       </div>
 
       {/* Stats */}
@@ -106,10 +100,12 @@ export function ClientDashboard({ onNavigate }: { onNavigate: (page: string, id?
             </button>
           ))}
           {(ideas || []).length === 0 && (
-            <div className="text-center py-12 text-[var(--color-text-tertiary)]">
-              <Film className="w-8 h-8 mx-auto mb-2 opacity-40" />
-              <p className="text-[14px]">Noch keine Projekte</p>
-              <p className="text-[13px] mt-1">Ihr Produktionsteam arbeitet daran!</p>
+            <div className="text-center py-16 text-[var(--color-text-tertiary)]">
+              <Film className="w-10 h-10 mx-auto mb-3 opacity-30" />
+              <p className="text-[15px] font-medium text-[var(--color-text-secondary)]">Noch keine Projekte angelegt</p>
+              <p className="text-[13px] mt-1.5 max-w-sm mx-auto">
+                Sobald Ihr Produktionsteam ein Video-Projekt für Sie startet, erscheint es hier. Sie können dann den Fortschritt verfolgen und Feedback geben.
+              </p>
             </div>
           )}
         </div>

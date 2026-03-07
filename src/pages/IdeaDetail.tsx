@@ -1,26 +1,19 @@
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
-import { STATUS_LABELS, STATUS_ORDER } from "../lib/utils";
+import { STATUS_LABELS, STATUS_ORDER, STATUS_BADGE_STYLES } from "../lib/utils";
 import { useState } from "react";
 import { ArrowLeft, MessageSquare, Send, Check, ChevronDown, FileText, Plus, Save, Clock, Film, Play } from "lucide-react";
 import { VideoUpload } from "../components/video/VideoUpload";
 import type { Id } from "../../convex/_generated/dataModel";
 
 function StatusBadge({ status }: { status: string }) {
-  const colors: Record<string, string> = {
-    idee: "bg-neutral-100 text-neutral-600",
-    skript: "bg-blue-50 text-blue-600",
-    freigabe: "bg-amber-50 text-amber-600",
-    korrektur: "bg-orange-50 text-orange-600",
-    freigegeben: "bg-emerald-50 text-emerald-600",
-    gedreht: "bg-violet-50 text-violet-600",
-    geschnitten: "bg-indigo-50 text-indigo-600",
-    review: "bg-rose-50 text-rose-600",
-    "veröffentlicht": "bg-green-50 text-green-700",
-  };
+  const s = STATUS_BADGE_STYLES[status] || { bg: "rgba(163,163,163,0.12)", color: "#737373" };
   return (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-medium ${colors[status] || "bg-neutral-100"}`}>
+    <span
+      className="inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-medium"
+      style={{ background: s.bg, color: s.color }}
+    >
       {STATUS_LABELS[status] || status}
     </span>
   );
@@ -269,7 +262,7 @@ function VideoSection({ ideaId, onNavigate }: { ideaId: string; onNavigate?: (pa
                 onClick={() => onNavigate?.("video", video._id)}
                 className="w-full flex items-center gap-3 p-3 rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] hover:border-[var(--color-border)] hover:shadow-[var(--shadow-xs)] transition-all text-left group"
               >
-                <div className="relative w-20 h-12 rounded-[var(--radius-sm)] overflow-hidden bg-neutral-900 flex-shrink-0">
+                <div className="relative w-20 h-12 rounded-[var(--radius-sm)] overflow-hidden bg-black flex-shrink-0">
                   {thumb ? (
                     <img src={thumb} alt="" className="w-full h-full object-cover" />
                   ) : (

@@ -128,8 +128,8 @@ function CreateLoginModal({ client, onClose }: { client: any; onClose: () => voi
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
         <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] w-full max-w-[400px] mx-4 p-6 text-center">
-          <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-4">
-            <Check className="w-6 h-6 text-emerald-600" />
+          <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: "rgba(22,163,74,0.1)" }}>
+            <Check className="w-6 h-6" style={{ color: "#16a34a" }} />
           </div>
           <h3 className="text-[17px] font-semibold mb-2">Zugang erstellt</h3>
           <p className="text-[14px] text-[var(--color-text-secondary)] mb-1">{client.email}</p>
@@ -267,7 +267,7 @@ export function ClientsPage() {
                     <div className="flex items-center gap-2">
                       <p className="text-[15px] font-medium truncate">{client.name}</p>
                       {hasLogin && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-50 text-emerald-600">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ background: "rgba(22,163,74,0.1)", color: "#16a34a" }}>
                           Login aktiv
                         </span>
                       )}

@@ -3,7 +3,8 @@ import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
 import { VideoPlayer } from "../components/video/VideoPlayer";
 import { useState, useMemo } from "react";
-import { ArrowLeft, Send, Check, Clock, MessageSquare, Film, ChevronDown, ChevronUp, Share2, Link2, Copy, CheckCheck, Reply } from "lucide-react";
+import { ArrowLeft, Send, Check, Clock, MessageSquare, Film, ChevronDown, ChevronUp, Share2, Link2, Copy, CheckCheck, Reply, ChevronRight } from "lucide-react";
+import { STATUS_BADGE_STYLES, VIDEO_STATUS_LABELS } from "../lib/utils";
 import type { Id } from "../../convex/_generated/dataModel";
 
 function formatTimestamp(seconds: number): string {
@@ -32,6 +33,7 @@ export function VideoReview({ videoId, onBack }: { videoId: string; onBack: () =
   const createComment = useMutation(api.comments.create);
   const resolveComment = useMutation(api.comments.resolve);
 
+  const updateVideoStatus = useMutation(api.videos.updateStatus);
   const shareLinks = useQuery(api.shareLinks.listByVideo, { videoId: videoId as Id<"videos"> });
   const createShareLink = useMutation(api.shareLinks.create);
   const deactivateShareLink = useMutation(api.shareLinks.deactivate);
@@ -45,6 +47,7 @@ export function VideoReview({ videoId, onBack }: { videoId: string; onBack: () =
   const [copiedLink, setCopiedLink] = useState(false);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
+  const [showStatusMenu, setShowStatusMenu] = useState(false);
 
   const userMap = useMemo(() => {
     const map: Record<string, string> = {};
@@ -160,13 +163,38 @@ export function VideoReview({ videoId, onBack }: { videoId: string; onBack: () =
             <Film className="w-4 h-4 text-[var(--color-text-tertiary)] flex-shrink-0" />
             <h1 className="text-[16px] font-semibold tracking-[-0.01em] truncate">{video.title}</h1>
           </div>
-          <span className={`ml-auto text-[12px] font-medium px-2 py-0.5 rounded-full ${
-            video.status === "freigegeben" ? "bg-emerald-50 text-emerald-600" :
-            video.status === "review" ? "bg-amber-50 text-amber-600" :
-            "bg-neutral-100 text-neutral-600"
-          }`}>
-            {video.status}
-          </span>
+          {/* Video Status - clickable for admin */}
+          <div className="ml-auto relative">
+            <button
+              onClick={() => user?.role === "admin" && setShowStatusMenu(!showStatusMenu)}
+              className={`text-[12px] font-medium px-2.5 py-1 rounded-full inline-flex items-center gap-1 transition-colors ${user?.role === "admin" ? "cursor-pointer hover:opacity-80" : "cursor-default"}`}
+              style={{
+                background: (STATUS_BADGE_STYLES[video.status] || STATUS_BADGE_STYLES.hochgeladen).bg,
+                color: (STATUS_BADGE_STYLES[video.status] || STATUS_BADGE_STYLES.hochgeladen).color,
+              }}
+            >
+              {VIDEO_STATUS_LABELS[video.status] || video.status}
+              {user?.role === "admin" && <ChevronDown className="w-3 h-3" />}
+            </button>
+            {showStatusMenu && user?.role === "admin" && (
+              <div className="absolute right-0 top-full mt-1 w-40 bg-[var(--color-surface-1)] border border-[var(--color-border)] rounded-[var(--radius-md)] shadow-[var(--shadow-lg)] z-50 py-1">
+                {["hochgeladen", "review", "korrektur", "freigegeben", "final"].map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => {
+                      updateVideoStatus({ videoId: videoId as Id<"videos">, status: s });
+                      setShowStatusMenu(false);
+                    }}
+                    className={`w-full text-left px-3 py-1.5 text-[13px] flex items-center gap-2 transition-colors hover:bg-[var(--color-accent-surface)] ${s === video.status ? "font-medium" : ""}`}
+                  >
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: STATUS_BADGE_STYLES[s]?.color || "#737373" }} />
+                    {VIDEO_STATUS_LABELS[s] || s}
+                    {s === video.status && <Check className="w-3.5 h-3.5 ml-auto" />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           {user?.role === "admin" && (
             <div className="relative ml-2">
               <button
@@ -392,7 +420,7 @@ function CommentCard({
     <div className={`rounded-[var(--radius-md)] border p-3 transition-colors ${
       resolved
         ? "border-[var(--color-border-subtle)] bg-[var(--color-surface-0)]"
-        : "border-[var(--color-border-subtle)] bg-white"
+        : "border-[var(--color-border-subtle)] bg-[var(--color-surface-1)]"
     }`}>
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
