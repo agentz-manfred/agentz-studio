@@ -176,9 +176,11 @@ export function LoginPage() {
             </form>
           </div>
 
-          <p className="mt-8 text-center text-[12px] text-[var(--color-text-tertiary)]">
-            © {new Date().getFullYear()} AgentZ Media
-          </p>
+          <div className="mt-8 text-center text-[12px] text-[var(--color-text-tertiary)] space-x-3">
+            <span>© {new Date().getFullYear()} AgentZ Media</span>
+            <a href="#/impressum" className="hover:text-[var(--color-text-secondary)] transition-colors">Impressum</a>
+            <a href="#/datenschutz" className="hover:text-[var(--color-text-secondary)] transition-colors">Datenschutz</a>
+          </div>
         </div>
       </div>
     </div>

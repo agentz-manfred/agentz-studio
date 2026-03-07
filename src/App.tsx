@@ -14,6 +14,8 @@ import { SharePage } from "./pages/SharePage";
 import { InvitePage } from "./pages/InvitePage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { ClientDetail } from "./pages/ClientDetail";
+import { ImpressumPage, DatenschutzPage } from "./pages/LegalPages";
+import { CookieBanner } from "./components/CookieBanner";
 import { Sidebar } from "./components/layout/Sidebar";
 import { MobileHeader } from "./components/layout/MobileHeader";
 import { useState, useEffect } from "react";
@@ -84,7 +86,7 @@ function AppContent() {
     );
   }
 
-  if (!user) return <LoginPage />;
+  if (!user) return <><LoginPage /><CookieBanner /></>;
 
   return (
     <div className="flex h-dvh bg-[var(--color-surface-0)]">
@@ -184,6 +186,8 @@ function AppRouter() {
     const h = window.location.hash;
     if (h.startsWith("#/share/")) return "share";
     if (h.startsWith("#/invite/")) return "invite";
+    if (h === "#/impressum") return "impressum";
+    if (h === "#/datenschutz") return "datenschutz";
     return "app";
   });
 
@@ -192,14 +196,20 @@ function AppRouter() {
       const h = window.location.hash;
       if (h.startsWith("#/share/")) setRoute("share");
       else if (h.startsWith("#/invite/")) setRoute("invite");
+      else if (h === "#/impressum") setRoute("impressum");
+      else if (h === "#/datenschutz") setRoute("datenschutz");
       else setRoute("app");
     };
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
 
-  if (route === "share") return <ShareRoute />;
-  if (route === "invite") return <InviteRoute />;
+  const goBack = () => { window.location.hash = "#/"; };
+
+  if (route === "share") return <><ShareRoute /><CookieBanner /></>;
+  if (route === "invite") return <><InviteRoute /><CookieBanner /></>;
+  if (route === "impressum") return <><ImpressumPage onBack={goBack} /><CookieBanner /></>;
+  if (route === "datenschutz") return <><DatenschutzPage onBack={goBack} /><CookieBanner /></>;
   return <AuthProvider><AppContent /></AuthProvider>;
 }
 
