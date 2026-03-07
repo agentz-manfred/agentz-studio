@@ -61,3 +61,35 @@ Alle Features aus der Liste abgearbeitet.
 
 ### Nächster Run:
 TODO ist leer → Security Review, Funktionalitätstests, visueller Tiefencheck, Edge Cases
+
+---
+
+## Run 3/9 — 00:02 — Security Deep Dive, 6 Runs verbleibend
+
+### ✅ Erledigt in diesem Run:
+
+#### 🔒 KRITISCHE Security-Fixes:
+1. **Auth-Helper `convex/lib.ts`** — Zentrales `authenticate()`, `requireAdmin()`, `requireEditor()` für alle Convex-Dateien
+2. **auth.ts abgesichert** — `listUsers` (admin-only), `updateUser` (admin-only), `deleteUser` (admin-only + can't delete self), `resetPassword` (admin-only) — alle mit Token-Validierung
+3. **settings.ts abgesichert** — `settings.set` nur noch für Admins (Token required)
+4. **ideas.ts komplett mit Auth** — Alle Queries/Mutations token-basiert, Client-User sehen nur eigene Ideen, `create` leitet `createdBy` vom Token ab (nicht mehr Client-seitig fälschbar), `updateStatus` für Clients auf freigegeben/korrektur beschränkt
+5. **notifications.ts abgesichert** — `list`, `unreadCount`, `markRead`, `markAllRead` alle token-basiert + User-scoped, `create` → `internalMutation` (nicht mehr von extern aufrufbar)
+6. **Frontend vollständig angepasst** — `useAuth()` gibt jetzt `token` mit, alle 8+ Seiten (TeamPage, SettingsPage, VideoReview, ClientsPage, ClientDetail, IdeasPage, PipelinePage, CalendarPage, IdeaDetail, Sidebar) an neue API-Signaturen angepasst
+
+#### 🐛 Bug-Fix:
+7. **Kalender "Heute"-Markierung** — `toISOString()` (UTC) → lokales Datum. Fix für Zeitzone-Bug um Mitternacht.
+
+### 📋 Noch offen:
+- Backend Data Isolation für: videos.ts, clients.ts, folders.ts, shootDates.ts, comments.ts, scripts.ts, categories.ts
+- Weitere Edge Cases & Funktionalitätstests
+
+### Commits:
+- `968cbfa` — Auth checks on admin endpoints
+- `cdd346b` — Calendar today highlighting fix
+- `57824c9` — Auth + data isolation for ideas
+- `7c80504` — Auth on notifications + internalMutation
+
+### Geschätzte verbleibende Arbeit:
+- 1-2 Runs für restliche Backend-Isolation (videos, clients, folders, etc.)
+- 1 Run für Funktionalitätstests + Edge Cases
+- 1 Run für visuellen Feinschliff
