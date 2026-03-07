@@ -48,6 +48,7 @@ export const create = mutation({
     clientId: v.id("clients"),
     title: v.string(),
     description: v.optional(v.string()),
+    categoryId: v.optional(v.id("categories")),
     createdBy: v.id("users"),
   },
   handler: async (ctx, args) => {
@@ -60,6 +61,7 @@ export const create = mutation({
       clientId: args.clientId,
       title: args.title,
       description: args.description,
+      categoryId: args.categoryId,
       status: "idee",
       order: existing.length,
       createdBy: args.createdBy,

@@ -16,6 +16,11 @@ export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: 
   const [newTitle, setNewTitle] = useState("");
   const [newDesc, setNewDesc] = useState("");
   const [selectedClient, setSelectedClient] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const pipelineCategories = useQuery(
+    api.categories.listByClient,
+    selectedClient ? { clientId: selectedClient as Id<"clients"> } : "skip"
+  );
 
   const clientNames = (clients || []).reduce(
     (acc, c) => ({ ...acc, [c._id]: c.name }),
@@ -38,11 +43,13 @@ export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: 
       clientId: selectedClient as Id<"clients">,
       title: newTitle,
       description: newDesc || undefined,
+      categoryId: selectedCategory ? (selectedCategory as Id<"categories">) : undefined,
       createdBy: user.userId as Id<"users">,
     });
     setNewTitle("");
     setNewDesc("");
     setSelectedClient("");
+    setSelectedCategory("");
     setShowNewIdea(false);
   };
 
@@ -95,6 +102,25 @@ export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: 
                   ))}
                 </select>
               </div>
+              {selectedClient && pipelineCategories && pipelineCategories.length > 0 && (
+                <div>
+                  <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Kategorie</label>
+                  <div className="flex flex-wrap gap-1.5">
+                    <button type="button" onClick={() => setSelectedCategory("")}
+                      className={`h-7 px-3 rounded-full text-[12px] font-medium border transition-colors ${!selectedCategory ? "bg-[var(--color-surface-3)] border-[var(--color-border)] text-[var(--color-text-primary)]" : "border-[var(--color-border-subtle)] text-[var(--color-text-tertiary)] hover:border-[var(--color-border)]"}`}>
+                      Keine
+                    </button>
+                    {pipelineCategories.map((cat) => (
+                      <button key={cat._id} type="button" onClick={() => setSelectedCategory(cat._id)}
+                        className={`h-7 px-3 rounded-full text-[12px] font-medium border transition-colors flex items-center gap-1.5 ${selectedCategory === cat._id ? "border-current" : "border-[var(--color-border-subtle)] hover:border-[var(--color-border)]"}`}
+                        style={{ color: cat.color }}>
+                        <span className="w-2 h-2 rounded-full" style={{ background: cat.color }} />
+                        {cat.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div>
                 <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Titel</label>
                 <input

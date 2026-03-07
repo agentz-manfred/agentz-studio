@@ -28,7 +28,12 @@ function NewIdeaModal({ onClose }: { onClose: () => void }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [clientId, setClientId] = useState("");
+  const [categoryId, setCategoryId] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const categories = useQuery(
+    api.categories.listByClient,
+    clientId ? { clientId: clientId as Id<"clients"> } : "skip"
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +43,7 @@ function NewIdeaModal({ onClose }: { onClose: () => void }) {
       clientId: clientId as Id<"clients">,
       title,
       description: description || undefined,
+      categoryId: categoryId ? (categoryId as Id<"categories">) : undefined,
       createdBy: user.userId as Id<"users">,
     });
     onClose();
@@ -67,6 +73,40 @@ function NewIdeaModal({ onClose }: { onClose: () => void }) {
               ))}
             </select>
           </div>
+          {clientId && categories && categories.length > 0 && (
+            <div>
+              <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Kategorie</label>
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setCategoryId("")}
+                  className={`h-7 px-3 rounded-full text-[12px] font-medium border transition-colors ${
+                    !categoryId
+                      ? "bg-[var(--color-surface-3)] border-[var(--color-border)] text-[var(--color-text-primary)]"
+                      : "border-[var(--color-border-subtle)] text-[var(--color-text-tertiary)] hover:border-[var(--color-border)]"
+                  }`}
+                >
+                  Keine
+                </button>
+                {categories.map((cat) => (
+                  <button
+                    key={cat._id}
+                    type="button"
+                    onClick={() => setCategoryId(cat._id)}
+                    className={`h-7 px-3 rounded-full text-[12px] font-medium border transition-colors flex items-center gap-1.5 ${
+                      categoryId === cat._id
+                        ? "border-current"
+                        : "border-[var(--color-border-subtle)] hover:border-[var(--color-border)]"
+                    }`}
+                    style={{ color: cat.color }}
+                  >
+                    <span className="w-2 h-2 rounded-full" style={{ background: cat.color }} />
+                    {cat.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <div>
             <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Titel *</label>
             <input

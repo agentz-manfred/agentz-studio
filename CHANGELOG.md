@@ -1,5 +1,11 @@
 # AgentZ Studio — CHANGELOG
 
+## v1.9.0 (07.03.2026)
+- **Fix: Kanban Drag & Drop** — TouchSensor für Mobile, MeasuringStrategy.Always für korrekte Desktop-Positionierung, KeyboardSensor für Accessibility
+- **TipTap WYSIWYG-Editor** — Kundenkontext + Skript-Editor nutzen jetzt TipTap (Headings, Listen, Bold, Code, Zitate, Trennlinien)
+- **WYSIWYG überall** — Skript-Anzeige + Ideen-Beschreibungen rendern jetzt Rich-HTML statt Raw-Text
+- **Markdown-Paste** — TipTap erkennt eingefügten Markdown automatisch
+
 ## v1.8.0 (07.03.2026)
 - Erweitertes Kundenprofil (Vertragslaufzeit, Plattformen, Videos/Monat)
 - Kundenkontext-Editor (Textarea, wird bei KI-Generierung mitgegeben)

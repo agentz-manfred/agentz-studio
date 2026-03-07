@@ -3,14 +3,7 @@
 Items werden von oben nach unten abgearbeitet. Erledigtes kommt ins CHANGELOG.md.
 Neue Wünsche werden unten angehängt oder an der richtigen Prio-Stelle eingefügt.
 
-## Bugs (PRIO!)
-
-- [ ] **Kanban Drag & Drop kaputt:** Mobile: Items lassen sich nicht per Touch verschieben (kurz klicken und langes Drücken funktionieren beide nicht). Desktop: Gegrabte Items sind um hunderte Pixel nach rechts versetzt statt an der Mausposition. Webrecherche machen nach besserer Lösung — jemand hat mit chart.js/einer kostenlosen Library ein perfekt funktionierendes Kanban mit DnD gebaut. Aktuelle dnd-kit Implementation prüfen/ersetzen wenn nötig.
-
 ## Features
-
-- [ ] **TipTap WYSIWYG-Editor:** Kundenkontext-Editor von Textarea auf TipTap/ProseMirror upgraden. Notion-Style. Markdown-Paste muss funktionieren (Copy-Paste aus .md → korrekt formatiert). Headings, Listen, Bold, Code. Package: @tiptap/react, @tiptap/starter-kit, @tiptap/extension-placeholder
-- [ ] **WYSIWYG überall einsetzen:** Skript-Ausgabe, Ideen-Beschreibungen, Kommentare — überall wo Text angezeigt/editiert wird, den gleichen Editor nutzen. Einheitliches Text-System.
 - [ ] **Kategorie-Zuweisung bei Ideen-Erstellung:** Beim Erstellen einer Idee Kategorie auswählen können
 - [ ] **KI-Modell-Auswahl (Admin Settings):** OpenRouter API (/api/v1/models) abfragen, suchbares Dropdown mit Modellname + Preise pro Token. Seitenübergreifend speichern. Key: scripts/.openrouter_key
 - [ ] **KI Ideen-Generierung:** Button "Ideen generieren" pro Kunde. Monat auswählen, Anzahl = Videos/Monat aus Kundenprofil. Kundenkontext + Plattformen werden mitgegeben. NUR Admin sichtbar!
