@@ -5,7 +5,8 @@ Neue Wünsche werden unten angehängt oder an der richtigen Prio-Stelle eingefü
 
 ## Features
 
-- [ ] **Filesystem/Video-Library:** Ordner erstellen, verschachtelte Ordner, Dateien verschieben (Drag & Drop), umbenennen, Previews. À la Google Drive + Frame.io
+- [ ] **🔴 PRIO 1 — Kanban DnD komplett ersetzen mit Dice UI Kanban:** Unsere jetzige DnD-Implementierung ist auf Mobile verbuggt. KOMPLETTER NEUAUFBAU — alte Kanban-Komponente LÖSCHEN und von Grund auf neu mit `@diceui/kanban` aufsetzen. KEINE Anpassung der bestehenden Version, sondern komplett ersetzen (https://www.diceui.com/docs/components/radix/kanban). Installation: `npx shadcn@latest add @diceui/kanban` ODER manuell `npm install @dnd-kit/core @dnd-kit/modifiers @dnd-kit/sortable @dnd-kit/utilities @radix-ui/react-slot`. Komponente nutzt MouseSensor + TouchSensor + KeyboardSensor, saubere Collision-Detection, `asHandle`-Pattern für Touch vs Scroll. Unsere Status-Pipeline (Idee→Skript→Freigabe→...→Veröffentlicht) als Columns mappen. Demo-Code: siehe https://www.diceui.com/docs/components/radix/kanban. Wichtig: `compose-refs.ts` Utility wird auch gebraucht (lib/compose-refs.ts). TESTEN AUF MOBILE nach Umbau!
+
 - [ ] **Video Upload + Review (Frame.io Style):** Timestamp-Kommentare auf Timeline, Marker, abhaken, antworten, Share-Links
 - [ ] **Video ↔ Idee Verknüpfung testen:** Beim Upload optional Idee auswählen. Bidirektionale Navigation prüfen.
 - [ ] **Share-Links mit OG-Tags:** Für Videos, korrekte Thumbnail-Preview in WhatsApp etc.

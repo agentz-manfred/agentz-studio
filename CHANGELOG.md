@@ -1,5 +1,17 @@
 # AgentZ Studio — CHANGELOG
 
+## v2.2.0 (07.03.2026)
+- **Mediathek (Filesystem/Video-Library)** — Google Drive-Style Dateimanager
+  - Ordner erstellen, verschachteln, umbenennen, löschen
+  - Videos per Drag & Drop zwischen Ordnern verschieben
+  - Breadcrumb-Navigation (Mediathek > Ordner > Unterordner)
+  - Grid/List-View Toggle
+  - Suche über Ordner und Videos
+  - Video-Thumbnails mit Status-Badges
+  - Kontextmenü (Umbenennen, Löschen) pro Ordner
+  - Schema: `folders` Tabelle + `videos.folderId` + Indexes
+  - Sidebar: Neuer "Mediathek" Nav-Eintrag mit FolderOpen Icon
+
 ## v2.1.0 (07.03.2026)
 - **Kanban Touch-DnD Fix** — Ganze Karte als Drag-Handle, Scroll-Lock während Drag, Long-Press 300ms
 - **KI Ideen-Generierung** — Monat auswählen, Anzahl = Videos/Monat aus Kundenprofil, Kundenkontext/Plattformen/Kategorien mitgegeben
