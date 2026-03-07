@@ -1,12 +1,14 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
+import { authenticate } from "./lib";
 
 export const list = query({
-  args: { userId: v.id("users"), limit: v.optional(v.number()) },
+  args: { token: v.string(), limit: v.optional(v.number()) },
   handler: async (ctx, args) => {
+    const user = await authenticate(ctx, args.token);
     const all = await ctx.db
       .query("notifications")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
       .order("desc")
       .take(args.limit || 20);
     return all;
@@ -14,29 +16,34 @@ export const list = query({
 });
 
 export const unreadCount = query({
-  args: { userId: v.id("users") },
+  args: { token: v.string() },
   handler: async (ctx, args) => {
+    const user = await authenticate(ctx, args.token);
     const unread = await ctx.db
       .query("notifications")
-      .withIndex("by_user_read", (q) => q.eq("userId", args.userId).eq("read", false))
+      .withIndex("by_user_read", (q) => q.eq("userId", user._id).eq("read", false))
       .collect();
     return unread.length;
   },
 });
 
 export const markRead = mutation({
-  args: { notificationId: v.id("notifications") },
+  args: { token: v.string(), notificationId: v.id("notifications") },
   handler: async (ctx, args) => {
+    const user = await authenticate(ctx, args.token);
+    const notif = await ctx.db.get(args.notificationId);
+    if (!notif || notif.userId.toString() !== user._id.toString()) throw new Error("Kein Zugriff");
     await ctx.db.patch(args.notificationId, { read: true });
   },
 });
 
 export const markAllRead = mutation({
-  args: { userId: v.id("users") },
+  args: { token: v.string() },
   handler: async (ctx, args) => {
+    const user = await authenticate(ctx, args.token);
     const unread = await ctx.db
       .query("notifications")
-      .withIndex("by_user_read", (q) => q.eq("userId", args.userId).eq("read", false))
+      .withIndex("by_user_read", (q) => q.eq("userId", user._id).eq("read", false))
       .collect();
     for (const n of unread) {
       await ctx.db.patch(n._id, { read: true });
@@ -44,7 +51,8 @@ export const markAllRead = mutation({
   },
 });
 
-export const create = mutation({
+// Internal only — cannot be called from the client
+export const create = internalMutation({
   args: {
     userId: v.id("users"),
     type: v.string(),

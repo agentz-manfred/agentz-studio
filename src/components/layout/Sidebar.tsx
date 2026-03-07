@@ -49,15 +49,15 @@ const clientNav = [
 ];
 
 function NotificationPanel({
-  userId,
+  token,
   onClose,
   onNavigate,
 }: {
-  userId: Id<"users">;
+  token: string;
   onClose: () => void;
   onNavigate?: (page: string, id?: string) => void;
 }) {
-  const notifications = useQuery(api.notifications.list, { userId, limit: 15 });
+  const notifications = useQuery(api.notifications.list, { token, limit: 15 });
   const markRead = useMutation(api.notifications.markRead);
   const markAllRead = useMutation(api.notifications.markAllRead);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -84,7 +84,7 @@ function NotificationPanel({
         <div className="flex items-center gap-1">
           {hasUnread && (
             <button
-              onClick={() => markAllRead({ userId })}
+              onClick={() => markAllRead({ token })}
               className="p-1.5 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-accent-surface)] transition-colors"
               title="Alle als gelesen markieren"
             >
@@ -112,7 +112,7 @@ function NotificationPanel({
               <button
                 key={n._id}
                 onClick={() => {
-                  if (!n.read) markRead({ notificationId: n._id });
+                  if (!n.read) markRead({ token, notificationId: n._id });
                   if (n.targetType && n.targetId && onNavigate) {
                     onNavigate(n.targetType, n.targetId);
                     onClose();
@@ -237,12 +237,12 @@ function ClientFilterDropdown() {
 }
 
 export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
-  const { user, logout } = useAuth();
+  const { user, token, logout } = useAuth();
   const nav = user?.role === "admin" ? adminNav : clientNav;
   const [showNotifications, setShowNotifications] = useState(false);
   const unreadCount = useQuery(
     api.notifications.unreadCount,
-    user?.userId ? { userId: user.userId as Id<"users"> } : "skip"
+    token ? { token } : "skip"
   );
 
   return (
@@ -354,9 +354,9 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
       </div>
 
       {/* Notification Panel */}
-      {showNotifications && user?.userId && (
+      {showNotifications && token && (
         <NotificationPanel
-          userId={user.userId as Id<"users">}
+          token={token}
           onClose={() => setShowNotifications(false)}
           onNavigate={onNavigate}
         />
