@@ -5,7 +5,6 @@ Neue Wünsche werden unten angehängt oder an der richtigen Prio-Stelle eingefü
 
 ## Features
 
-- [ ] **KI Ideen-Generierung:** Button "Ideen generieren" pro Kunde. Monat auswählen, Anzahl = Videos/Monat aus Kundenprofil. Kundenkontext + Plattformen werden mitgegeben. NUR Admin sichtbar!
 - [ ] **KI Skript-Generierung erweitern:** Kundenkontext automatisch mitgeben bei Generierung
 - [ ] **Filesystem/Video-Library:** Ordner erstellen, verschachtelte Ordner, Dateien verschieben (Drag & Drop), umbenennen, Previews. À la Google Drive + Frame.io
 - [ ] **Video Upload + Review (Frame.io Style):** Timestamp-Kommentare auf Timeline, Marker, abhaken, antworten, Share-Links

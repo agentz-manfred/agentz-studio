@@ -54,7 +54,7 @@ function StatusSelector({ current, onChange }: { current: string; onChange: (s: 
   );
 }
 
-function ScriptEditor({ ideaId, ideaTitle, ideaDescription, clientName, clientCompany }: { ideaId: string; ideaTitle: string; ideaDescription?: string; clientName: string; clientCompany?: string }) {
+function ScriptEditor({ ideaId, ideaTitle, ideaDescription, clientName, clientCompany, clientContext, clientPlatforms, clientMainPlatform }: { ideaId: string; ideaTitle: string; ideaDescription?: string; clientName: string; clientCompany?: string; clientContext?: string; clientPlatforms?: string[]; clientMainPlatform?: string }) {
   const { user } = useAuth();
   const scripts = useQuery(api.scripts.listByIdea, { ideaId: ideaId as Id<"ideas"> });
   const createScript = useMutation(api.scripts.create);
@@ -100,6 +100,9 @@ function ScriptEditor({ ideaId, ideaTitle, ideaDescription, clientName, clientCo
         ideaDescription,
         clientName,
         clientCompany,
+        clientContext,
+        clientPlatforms,
+        clientMainPlatform,
         existingScript: content || latestScript?.content || undefined,
         mode,
       });
@@ -480,6 +483,9 @@ export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onB
           ideaDescription={idea.description}
           clientName={client?.name || ""}
           clientCompany={client?.company}
+          clientContext={(client as any)?.context}
+          clientPlatforms={(client as any)?.platforms}
+          clientMainPlatform={(client as any)?.mainPlatform}
         />
       </div>
 
