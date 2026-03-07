@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
-import { Calendar, ChevronLeft, ChevronRight, Plus, X, MapPin, Clock, Trash2, FileText } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight, Plus, X, MapPin, Clock, Trash2, FileText, Pencil } from "lucide-react";
 import { useState, useMemo, useRef, useEffect } from "react";
 import type { Id } from "../../convex/_generated/dataModel";
 
@@ -17,14 +17,22 @@ function getFirstDayOfMonth(year: number, month: number) {
   return d === 0 ? 6 : d - 1;
 }
 
-function ShootPopover({ shoot, client, onClose, onDelete, onNavigate }: {
+function ShootPopover({ shoot, client, onClose, onDelete, onNavigate, isAdmin }: {
   shoot: any;
   client: any;
   onClose: () => void;
   onDelete?: () => void;
   onNavigate?: (page: string, id?: string) => void;
+  isAdmin?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [editing, setEditing] = useState(false);
+  const [editDate, setEditDate] = useState(shoot.date);
+  const [editTime, setEditTime] = useState(shoot.time || "");
+  const [editLocation, setEditLocation] = useState(shoot.location || "");
+  const [editNotes, setEditNotes] = useState(shoot.notes || "");
+  const [saving, setSaving] = useState(false);
+  const updateShootDate = useMutation(api.shootDates.update);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -34,12 +42,26 @@ function ShootPopover({ shoot, client, onClose, onDelete, onNavigate }: {
     return () => document.removeEventListener("mousedown", handler);
   }, [onClose]);
 
+  const handleSave = async () => {
+    setSaving(true);
+    await updateShootDate({
+      id: shoot._id,
+      date: editDate,
+      time: editTime || undefined,
+      location: editLocation || undefined,
+      notes: editNotes || undefined,
+    });
+    setSaving(false);
+    setEditing(false);
+    onClose();
+  };
+
   const dateObj = new Date(shoot.date + "T00:00:00");
   const dateStr = dateObj.toLocaleDateString("de-DE", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
-      <div ref={ref} className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] border border-[var(--color-border-subtle)] w-full max-w-[380px] mx-4">
+      <div ref={ref} className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] border border-[var(--color-border-subtle)] w-full max-w-[420px] mx-4">
         <div className="flex items-start justify-between p-4 pb-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-[var(--radius-md)] flex items-center justify-center flex-shrink-0" style={{ background: "rgba(139,92,246,0.1)" }}>
@@ -52,50 +74,98 @@ function ShootPopover({ shoot, client, onClose, onDelete, onNavigate }: {
               )}
             </div>
           </div>
-          <button onClick={onClose} className="p-1 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors">
-            <X className="w-4 h-4 text-[var(--color-text-tertiary)]" />
-          </button>
-        </div>
-
-        <div className="p-4 space-y-2.5">
-          <div className="flex items-center gap-2.5 text-[13px]">
-            <Clock className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
-            <span>{dateStr}{shoot.time ? ` · ${shoot.time} Uhr` : ""}</span>
+          <div className="flex items-center gap-1">
+            {isAdmin && !editing && (
+              <button onClick={() => setEditing(true)} className="p-1.5 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors">
+                <Pencil className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
+              </button>
+            )}
+            <button onClick={onClose} className="p-1.5 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors">
+              <X className="w-4 h-4 text-[var(--color-text-tertiary)]" />
+            </button>
           </div>
-          {shoot.location && (
-            <div className="flex items-center gap-2.5 text-[13px]">
-              <MapPin className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
-              <span className="text-[var(--color-text-secondary)]">{shoot.location}</span>
-            </div>
-          )}
-          {shoot.notes && (
-            <div className="flex items-start gap-2.5 text-[13px]">
-              <FileText className="w-3.5 h-3.5 text-[var(--color-text-tertiary)] mt-0.5" />
-              <span className="text-[var(--color-text-secondary)]">{shoot.notes}</span>
-            </div>
-          )}
         </div>
 
-        <div className="flex items-center gap-2 p-4 pt-2 border-t border-[var(--color-border-subtle)]">
-          {client && onNavigate && (
-            <button
-              onClick={() => { onClose(); onNavigate("client", client._id); }}
-              className="flex-1 h-8 rounded-[var(--radius-md)] text-[12px] font-medium bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] transition-colors"
-            >
-              Zum Kunden
-            </button>
-          )}
-          {onDelete && (
-            <button
-              onClick={() => { onDelete(); onClose(); }}
-              className="h-8 px-3 rounded-[var(--radius-md)] text-[12px] font-medium hover:bg-[var(--color-surface-2)] transition-colors flex items-center gap-1.5"
-              style={{ color: "#ef4444" }}
-            >
-              <Trash2 className="w-3 h-3" />
-              Löschen
-            </button>
-          )}
-        </div>
+        {editing ? (
+          <div className="p-4 space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[12px] font-medium text-[var(--color-text-tertiary)] mb-1">Datum</label>
+                <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)}
+                  className="w-full h-9 px-2.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none" />
+              </div>
+              <div>
+                <label className="block text-[12px] font-medium text-[var(--color-text-tertiary)] mb-1">Uhrzeit</label>
+                <input type="time" value={editTime} onChange={(e) => setEditTime(e.target.value)}
+                  className="w-full h-9 px-2.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-[12px] font-medium text-[var(--color-text-tertiary)] mb-1">Ort</label>
+              <input value={editLocation} onChange={(e) => setEditLocation(e.target.value)}
+                className="w-full h-9 px-2.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none"
+                placeholder="z.B. Pflegedienst Kolbe" />
+            </div>
+            <div>
+              <label className="block text-[12px] font-medium text-[var(--color-text-tertiary)] mb-1">Notizen</label>
+              <textarea value={editNotes} onChange={(e) => setEditNotes(e.target.value)}
+                className="w-full h-16 px-2.5 py-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none resize-none"
+                placeholder="Equipment, Ansprechpartner..." />
+            </div>
+            <div className="flex gap-2 pt-1">
+              <button onClick={() => setEditing(false)}
+                className="flex-1 h-8 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[12px] font-medium hover:bg-[var(--color-surface-2)] transition-colors">
+                Abbrechen
+              </button>
+              <button onClick={handleSave} disabled={saving || !editDate}
+                className="flex-1 h-8 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[12px] font-medium hover:bg-[var(--color-accent-hover)] disabled:opacity-50 transition-colors">
+                {saving ? "Speichern…" : "Speichern"}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="p-4 space-y-2.5">
+              <div className="flex items-center gap-2.5 text-[13px]">
+                <Clock className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
+                <span>{dateStr}{shoot.time ? ` · ${shoot.time} Uhr` : ""}</span>
+              </div>
+              {shoot.location && (
+                <div className="flex items-center gap-2.5 text-[13px]">
+                  <MapPin className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
+                  <span className="text-[var(--color-text-secondary)]">{shoot.location}</span>
+                </div>
+              )}
+              {shoot.notes && (
+                <div className="flex items-start gap-2.5 text-[13px]">
+                  <FileText className="w-3.5 h-3.5 text-[var(--color-text-tertiary)] mt-0.5" />
+                  <span className="text-[var(--color-text-secondary)]">{shoot.notes}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 p-4 pt-2 border-t border-[var(--color-border-subtle)]">
+              {client && onNavigate && (
+                <button
+                  onClick={() => { onClose(); onNavigate("client", client._id); }}
+                  className="flex-1 h-8 rounded-[var(--radius-md)] text-[12px] font-medium bg-[var(--color-surface-2)] hover:bg-[var(--color-surface-3)] transition-colors"
+                >
+                  Zum Kunden
+                </button>
+              )}
+              {onDelete && (
+                <button
+                  onClick={() => { onDelete(); onClose(); }}
+                  className="h-8 px-3 rounded-[var(--radius-md)] text-[12px] font-medium hover:bg-[var(--color-surface-2)] transition-colors flex items-center gap-1.5"
+                  style={{ color: "#ef4444" }}
+                >
+                  <Trash2 className="w-3 h-3" />
+                  Löschen
+                </button>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -432,6 +502,7 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
           onClose={() => setSelectedShoot(null)}
           onDelete={user?.role === "admin" ? () => removeShootDate({ id: selectedShoot._id }) : undefined}
           onNavigate={onNavigate}
+          isAdmin={user?.role === "admin"}
         />
       )}
     </div>

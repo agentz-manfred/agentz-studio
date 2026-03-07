@@ -28,27 +28,33 @@ export const generateScript = action({
     }
     const model = await getAiModel(ctx);
 
-    const systemPrompt = `Du bist ein erfahrener Social-Media-Skriptautor für TikTok und Instagram Reels. 
+    const systemPrompt = `Du bist ein erfahrener Social-Media-Skriptautor für TikTok und Instagram Reels.
 Du schreibst Skripte für Unternehmen, die kurze, authentische Videos für Social Media produzieren.
+
+WICHTIG — AUSGABEREGELN:
+- Gib AUSSCHLIESSLICH das Skript aus. Keine Einleitung, kein Kommentar, keine Erklärung, kein "Hier ist dein Skript", kein "Ich habe...".
+- Deine Ausgabe wird 1:1 in einen Editor eingefügt. Jedes Wort, das kein Skript ist, stört.
+- Formatiere als HTML (NICHT Markdown). Nutze: <h3>, <p>, <strong>, <em>, <hr>
+- Kein \`\`\`, keine #-Headlines, kein Markdown.
 
 Deine Skripte sind:
 - Kurz und prägnant (30-60 Sekunden Sprechzeit)
 - Authentisch und nahbar (kein Corporate-Sprech)
-- Mit klaren Szenenanweisungen [Kamera: ...] und Textpassagen
+- Mit klaren Szenenanweisungen und Textpassagen
 - Hook in den ersten 3 Sekunden
 - Call-to-Action am Ende
 - Auf Deutsch
 
-Format:
-HOOK: (Die ersten 3 Sekunden)
----
-Szene 1: [Beschreibung]
-[Kamera: Einstellung]
-Text: "..."
----
-Szene 2: ...
----
-CTA: (Abschluss + Handlungsaufforderung)`;
+HTML-Format:
+<h3>HOOK</h3>
+<p><em>(Die ersten 3 Sekunden)</em></p>
+<hr>
+<h3>Szene 1</h3>
+<p><strong>Kamera:</strong> Einstellung</p>
+<p>"Sprechtext..."</p>
+<hr>
+<h3>CTA</h3>
+<p>"Abschluss + Handlungsaufforderung"</p>`;
 
     let userPrompt = "";
 
@@ -108,11 +114,32 @@ Gib nur das gekürzte Skript zurück.`;
     }
 
     const data = await response.json();
-    const script = data.choices?.[0]?.message?.content;
+    let script = data.choices?.[0]?.message?.content;
     if (!script) {
       throw new Error("Keine Antwort von der KI erhalten");
     }
-    return script.trim();
+    script = script.trim();
+
+    // Post-processing: Strip preamble before actual script content
+    // Remove common LLM filler like "Hier ist...", "Natürlich!", "Gerne!", markdown fences
+    script = script.replace(/^```html?\s*/i, "").replace(/\s*```$/i, "");
+    // If response starts with non-HTML text before the first tag, strip it
+    const firstTagIndex = script.indexOf("<");
+    if (firstTagIndex > 0 && firstTagIndex < 200) {
+      script = script.substring(firstTagIndex);
+    }
+    // Convert markdown to HTML if model ignored instructions
+    if (!script.includes("<h3") && !script.includes("<p")) {
+      script = script
+        .replace(/^### (.+)$/gm, "<h3>$1</h3>")
+        .replace(/^## (.+)$/gm, "<h3>$1</h3>")
+        .replace(/^# (.+)$/gm, "<h3>$1</h3>")
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\*(.+?)\*/g, "<em>$1</em>")
+        .replace(/^---$/gm, "<hr>")
+        .replace(/^(?!<)(.*\S.*)$/gm, "<p>$1</p>");
+    }
+    return script;
   },
 });
 
