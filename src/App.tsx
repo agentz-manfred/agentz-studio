@@ -17,6 +17,7 @@ import { MobileHeader } from "./components/layout/MobileHeader";
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { KeyboardShortcutsDialog } from "./components/layout/KeyboardShortcuts";
+import { CommandPalette } from "./components/layout/CommandPalette";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 
@@ -83,6 +84,7 @@ function AppContent() {
   return (
     <div className="flex h-screen bg-[var(--color-surface-0)]">
       <KeyboardShortcutsDialog />
+      <CommandPalette onNavigate={handleNavigate} />
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div

@@ -1,4 +1,4 @@
-import { Menu } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 
 export function MobileHeader({ onMenuClick }: { onMenuClick: () => void }) {
   return (
@@ -9,9 +9,17 @@ export function MobileHeader({ onMenuClick }: { onMenuClick: () => void }) {
       >
         <Menu className="w-5 h-5 text-[var(--color-text-secondary)]" />
       </button>
-      <span className="ml-3 text-[15px] font-semibold tracking-[-0.01em]">
+      <span className="ml-3 flex-1 text-[15px] font-semibold tracking-[-0.01em]">
         AgentZ Studio
       </span>
+      <button
+        onClick={() => {
+          document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true }));
+        }}
+        className="p-2 -mr-2 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors"
+      >
+        <Search className="w-5 h-5 text-[var(--color-text-secondary)]" />
+      </button>
     </div>
   );
 }

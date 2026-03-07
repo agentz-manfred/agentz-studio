@@ -3,7 +3,7 @@ import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
 import { STATUS_LABELS, STATUS_ORDER, STATUS_BADGE_STYLES } from "../lib/utils";
 import { useState } from "react";
-import { ArrowLeft, MessageSquare, Send, Check, ChevronDown, FileText, Plus, Save, Clock, Film, Play } from "lucide-react";
+import { ArrowLeft, MessageSquare, Send, Check, ChevronDown, FileText, Plus, Save, Clock, Film, Play, ChevronRight } from "lucide-react";
 import { VideoUpload } from "../components/video/VideoUpload";
 import type { Id } from "../../convex/_generated/dataModel";
 
@@ -330,14 +330,26 @@ export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onB
 
   return (
     <div className="max-w-[720px] mx-auto px-6 lg:px-8 py-6">
-      {/* Back */}
-      <button
-        onClick={onBack}
-        className="flex items-center gap-1.5 text-[13px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors mb-6"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Zurück
-      </button>
+      {/* Breadcrumb */}
+      <nav className="flex items-center gap-1 text-[13px] mb-6 animate-in">
+        <button
+          onClick={() => onNavigate?.("dashboard")}
+          className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors"
+        >
+          Dashboard
+        </button>
+        <ChevronRight className="w-3 h-3 text-[var(--color-text-tertiary)]" />
+        <button
+          onClick={onBack}
+          className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors"
+        >
+          Ideen
+        </button>
+        <ChevronRight className="w-3 h-3 text-[var(--color-text-tertiary)]" />
+        <span className="text-[var(--color-text-primary)] font-medium truncate max-w-[200px]">
+          {idea.title}
+        </span>
+      </nav>
 
       {/* Header */}
       <div className="animate-in flex items-start justify-between gap-4 mb-6">

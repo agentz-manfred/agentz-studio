@@ -20,6 +20,7 @@ import {
 import { useTheme } from "../../hooks/useTheme";
 import { cn } from "../../lib/utils";
 import type { Id } from "../../../convex/_generated/dataModel";
+import { Search, Command } from "lucide-react";
 
 interface SidebarProps {
   currentPage: string;
@@ -183,6 +184,23 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
             AgentZ Studio
           </span>
         </div>
+      </div>
+
+      {/* Search trigger */}
+      <div className="px-3 pt-3 pb-1">
+        <button
+          onClick={() => {
+            const e = new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true });
+            document.dispatchEvent(e);
+          }}
+          className="w-full flex items-center gap-3 px-3 h-9 rounded-[var(--radius-sm)] text-[14px] text-[var(--color-text-tertiary)] hover:bg-[var(--color-accent-surface)] hover:text-[var(--color-text-secondary)] transition-all duration-150 ease-[var(--ease-out)] group border border-[var(--color-border-subtle)] bg-[var(--color-surface-2)]/50"
+        >
+          <Search className="w-[16px] h-[16px]" strokeWidth={1.75} />
+          <span className="flex-1 text-left text-[13px]">Suchen…</span>
+          <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 h-5 rounded bg-[var(--color-surface-0)] text-[10px] font-medium border border-[var(--color-border-subtle)]">
+            ⌘K
+          </kbd>
+        </button>
       </div>
 
       {/* Navigation */}

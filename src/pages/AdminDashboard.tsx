@@ -395,6 +395,7 @@ export function AdminDashboard({
             value={(clients || []).length}
             delay="stagger-1"
             onClick={() => onNavigate("clients")}
+            accent="#6366f1"
           />
           <StatCard
             icon={Lightbulb}
@@ -402,6 +403,7 @@ export function AdminDashboard({
             value={(ideas || []).length}
             delay="stagger-2"
             onClick={() => onNavigate("ideas")}
+            accent="#f59e0b"
           />
           <StatCard
             icon={TrendingUp}
@@ -409,6 +411,7 @@ export function AdminDashboard({
             value={inProgress}
             delay="stagger-3"
             onClick={() => onNavigate("pipeline")}
+            accent="#3b82f6"
           />
           <StatCard
             icon={Film}
@@ -416,7 +419,7 @@ export function AdminDashboard({
             value={published}
             delay="stagger-4"
             onClick={() => onNavigate("pipeline")}
-            accent={published > 0 ? "var(--color-success)" : undefined}
+            accent="var(--color-success)"
           />
         </div>
       </div>
