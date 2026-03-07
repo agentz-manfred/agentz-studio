@@ -157,6 +157,40 @@ export const listByClient = query({
   },
 });
 
+export const listByFolder = query({
+  args: { folderId: v.optional(v.id("folders")) },
+  handler: async (ctx, args) => {
+    if (args.folderId) {
+      return ctx.db
+        .query("videos")
+        .withIndex("by_folder", (q) => q.eq("folderId", args.folderId))
+        .collect();
+    }
+    // Root videos (no folder)
+    const all = await ctx.db.query("videos").collect();
+    return all.filter((v) => !v.folderId);
+  },
+});
+
+export const moveToFolder = mutation({
+  args: {
+    videoId: v.id("videos"),
+    folderId: v.optional(v.id("folders")),
+  },
+  handler: async (ctx, args) => {
+    const video = await ctx.db.get(args.videoId);
+    if (!video) throw new Error("Video nicht gefunden");
+    await ctx.db.patch(args.videoId, { folderId: args.folderId });
+  },
+});
+
+export const rename = mutation({
+  args: { videoId: v.id("videos"), title: v.string() },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.videoId, { title: args.title });
+  },
+});
+
 export const linkIdea = mutation({
   args: {
     videoId: v.id("videos"),

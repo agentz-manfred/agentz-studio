@@ -2,6 +2,18 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  folders: defineTable({
+    name: v.string(),
+    parentId: v.optional(v.id("folders")),
+    clientId: v.optional(v.id("clients")),
+    color: v.optional(v.string()),
+    createdBy: v.id("users"),
+    createdAt: v.number(),
+  })
+    .index("by_parent", ["parentId"])
+    .index("by_client", ["clientId"]),
+
+
   users: defineTable({
     email: v.string(),
     passwordHash: v.string(),
@@ -68,6 +80,7 @@ export default defineSchema({
 
   videos: defineTable({
     ideaId: v.optional(v.id("ideas")),
+    folderId: v.optional(v.id("folders")),
     bunnyVideoId: v.optional(v.string()),
     bunnyUrl: v.optional(v.string()),
     thumbnailUrl: v.optional(v.string()),
@@ -75,7 +88,9 @@ export default defineSchema({
     status: v.string(),
     uploadedBy: v.id("users"),
     createdAt: v.number(),
-  }).index("by_idea", ["ideaId"]),
+  })
+    .index("by_idea", ["ideaId"])
+    .index("by_folder", ["folderId"]),
 
   comments: defineTable({
     targetType: v.union(

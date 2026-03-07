@@ -16,6 +16,7 @@ import {
   Settings,
   Moon,
   Sun,
+  FolderOpen,
 } from "lucide-react";
 import { useTheme } from "../../hooks/useTheme";
 import { cn } from "../../lib/utils";
@@ -33,6 +34,7 @@ const adminNav = [
   { id: "clients", label: "Kunden", icon: Users },
   { id: "ideas", label: "Ideen", icon: Lightbulb },
   { id: "videos", label: "Videos", icon: Play },
+  { id: "library", label: "Mediathek", icon: FolderOpen },
   { id: "calendar", label: "Kalender", icon: Calendar },
   { id: "settings", label: "Einstellungen", icon: Settings },
 ];

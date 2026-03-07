@@ -13,6 +13,7 @@ import { VideoReview } from "./pages/VideoReview";
 import { SharePage } from "./pages/SharePage";
 import { InvitePage } from "./pages/InvitePage";
 import { SettingsPage } from "./pages/SettingsPage";
+import { LibraryPage } from "./pages/LibraryPage";
 import { ClientDetail } from "./pages/ClientDetail";
 import { ImpressumPage, DatenschutzPage } from "./pages/LegalPages";
 import { CookieBanner } from "./components/CookieBanner";
@@ -33,6 +34,7 @@ function AdminRoutes({ currentPage, onNavigate }: { currentPage: string; onNavig
   if (currentPage.startsWith("idea:")) return <IdeaDetail ideaId={currentPage.split(":")[1]} onBack={() => onNavigate("ideas")} onNavigate={onNavigate} />;
   if (currentPage === "pipeline") return <PipelinePage onNavigate={onNavigate} />;
   if (currentPage === "videos") return <VideosPage onNavigate={onNavigate} />;
+  if (currentPage === "library") return <LibraryPage onNavigate={onNavigate} />;
   if (currentPage.startsWith("video:")) return <VideoReview videoId={currentPage.split(":")[1]} onBack={() => onNavigate("videos")} onNavigate={onNavigate} />;
   if (currentPage === "calendar") return <CalendarPage onNavigate={onNavigate} />;
   if (currentPage === "settings") return <SettingsPage />;
