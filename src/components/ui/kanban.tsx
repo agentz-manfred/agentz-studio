@@ -223,8 +223,8 @@ function Kanban<T>(props: KanbanProps<T>) {
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 150,
-        tolerance: 8,
+        delay: 250,
+        tolerance: 5,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -797,7 +797,7 @@ function KanbanColumn(props: KanbanColumnProps) {
           className={cn(
             "flex size-full flex-col gap-2 rounded-lg border bg-zinc-100 p-2.5 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:bg-zinc-900",
             {
-              "touch-none select-none": asHandle,
+              "select-none": asHandle,
               "cursor-default": context.flatCursor,
               "data-dragging:cursor-grabbing": !context.flatCursor,
               "cursor-grab": !isDragging && asHandle && !context.flatCursor,
@@ -959,7 +959,7 @@ function KanbanItem(props: KanbanItemProps) {
         className={cn(
           "focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1",
           {
-            "touch-none select-none": asHandle,
+            "select-none": asHandle,
             "cursor-default": context.flatCursor,
             "data-dragging:cursor-grabbing": !context.flatCursor,
             "cursor-grab": !isDragging && asHandle && !context.flatCursor,

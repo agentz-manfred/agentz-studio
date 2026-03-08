@@ -4,6 +4,7 @@ Items werden von oben nach unten abgearbeitet. Erledigtes kommt ins CHANGELOG.md
 
 ## Features
 
+- [ ] **🔴 BUG: Kanban horizontal Swipen geht nicht auf Mobile!** Timo (Z Fold Querformat): Karten draggen funktioniert, aber Board lässt sich nicht nach links/rechts wischen um andere Spalten zu sehen. Ursache: `touch-none` in kanban.tsx (Zeile 800 + 962) blockiert ALLE Touch-Events wenn `asHandle`. Fix: 1) TouchSensor mit `activationConstraint: { delay: 250, tolerance: 5 }` konfigurieren (Zeile ~225 in kanban.tsx), 2) `touch-none` aus className-Bedingungen für asHandle entfernen (Zeile 800 + 962), 3) TESTEN: Board horizontal swipebar UND Karten per Long-Press draggbar.
 - [x] **Generelles Styling-Audit:** ✅ Alle 11 Seiten Desktop + Mobile geprüft. Design konsistent, professionell, eigene Identität.
 
 ## Vom Nacht-Sprint als erledigt markiert (VERIFIZIERT ✅):
