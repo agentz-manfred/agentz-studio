@@ -165,5 +165,18 @@ Beim Prüfen stellte sich heraus, dass 3 von 6 Items bereits implementiert waren
 ### 📋 TODO.md ist LEER! 🎉
 Alle 6 TODO-Items abgearbeitet (3 implementiert, 3 waren schon fertig).
 
+### Bonus (nach TODO-Abschluss):
+7. **Toast Notification System** — Lightweight Toasts (success/error/info), integriert auf Bulk-Ops
+8. **Skeleton Loading States** — Dashboard + Ideas Shimmer-Skeletons statt Spinner
+9. **Email Notification System** — convex/email.ts Template, Status-Change triggert Email + In-App Notifications
+10. **In-App Notifications** — Client-User bekommen Notification bei Status-Änderungen (freigabe, korrektur, geschnitten, veröffentlicht)
+
+### Commits:
+- `35c7edb` — Keyboard accessibility, optimistic comments, bulk video ops
+- `ca4d999` — Security: require auth token on folders.listAll
+- `006ea0c` — Toast notification system
+- `6b7346a` — Skeleton loading states
+- `2d29124` — Email + in-app notifications on status change
+
 ### Nächster Run:
-TODO ist leer → Weitere Edge Cases, Design-Polierung, neue sinnvolle Features
+TODO hat neue Roadmap-Items. Empfehlung: Skeleton Loading für weitere Pages, dann Archive-Funktion.
