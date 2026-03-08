@@ -17,6 +17,7 @@ import {
   Moon,
   Sun,
   FolderOpen,
+  Shield,
 } from "lucide-react";
 import { useTheme } from "../../hooks/useTheme";
 import { useClientFilter } from "../../lib/clientFilter";
@@ -38,6 +39,7 @@ const adminNav = [
   { id: "library", label: "Mediathek", icon: FolderOpen },
   { id: "calendar", label: "Kalender", icon: Calendar },
   { id: "team", label: "Team", icon: Users },
+  { id: "audit", label: "Audit Log", icon: Shield },
   { id: "settings", label: "Einstellungen", icon: Settings },
 ];
 

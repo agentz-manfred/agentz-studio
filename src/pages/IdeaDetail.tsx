@@ -4,7 +4,7 @@ import { useAuth } from "../lib/auth";
 import { STATUS_LABELS, STATUS_ORDER, STATUS_BADGE_STYLES } from "../lib/utils";
 import { useState } from "react";
 import { RichTextEditor, RichTextDisplay } from "../components/ui/RichTextEditor";
-import { ArrowLeft, MessageSquare, Send, Check, ChevronDown, FileText, Plus, Save, Clock, Film, Play, ChevronRight, Sparkles, Wand2, Scissors } from "lucide-react";
+import { ArrowLeft, MessageSquare, Send, Check, ChevronDown, FileText, Plus, Save, Clock, Film, Play, ChevronRight, Sparkles, Wand2, Scissors, Archive, ArchiveRestore } from "lucide-react";
 import { VideoUpload } from "../components/video/VideoUpload";
 import type { Id } from "../../convex/_generated/dataModel";
 
@@ -390,6 +390,7 @@ export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onB
   const shootDates = useQuery(api.shootDates.list, {});
   const updateStatus = useMutation(api.ideas.updateStatus);
   const updateIdea = useMutation(api.ideas.update);
+  const archiveIdea = useMutation(api.ideas.archive);
 
   const idea = (ideas || []).find((i) => i._id === ideaId);
   const client = idea && clients ? clients.find((c) => c._id === idea.clientId) : null;
@@ -480,6 +481,19 @@ export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onB
               className="h-7 px-2 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[12px] focus:border-[var(--color-accent)] focus:outline-none"
               title="Geplante Veröffentlichung"
             />
+            <button
+              onClick={async () => {
+                if (!token) return;
+                const newState = !idea.archived;
+                await archiveIdea({ token, ideaId: idea._id as Id<"ideas">, archived: newState });
+                if (newState) onBack();
+              }}
+              className="h-7 px-2.5 rounded-[var(--radius-sm)] border border-[var(--color-border)] text-[12px] hover:bg-[var(--color-surface-2)] transition-colors flex items-center gap-1 text-[var(--color-text-tertiary)]"
+              title={idea.archived ? "Wiederherstellen" : "Archivieren"}
+            >
+              {idea.archived ? <ArchiveRestore className="w-3 h-3" /> : <Archive className="w-3 h-3" />}
+              {idea.archived ? "Wiederherstellen" : "Archivieren"}
+            </button>
           </div>
         </div>
       )}

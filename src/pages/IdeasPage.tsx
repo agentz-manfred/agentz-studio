@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
-import { Lightbulb, ChevronRight, Search, Plus, X, Sparkles, Check, CheckSquare, Square, Download } from "lucide-react";
+import { Lightbulb, ChevronRight, Search, Plus, X, Sparkles, Check, CheckSquare, Square, Download, Archive, ArchiveRestore } from "lucide-react";
 import { exportIdeasCSV } from "../lib/export";
 import { useState } from "react";
 import { STATUS_LABELS } from "../lib/utils";
@@ -301,10 +301,13 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [showNewIdea, setShowNewIdea] = useState(false);
   const [showAiSuggest, setShowAiSuggest] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkStatus, setBulkStatus] = useState("");
   const createIdea = useMutation(api.ideas.create);
   const updateStatus = useMutation(api.ideas.updateStatus);
+  const archiveIdea = useMutation(api.ideas.archive);
+  const archivedIdeas = useQuery(api.ideas.listArchived, showArchived ? (clientFilter ? { clientId: clientFilter as any } : {}) : "skip");
   const { toast } = useToast();
 
   const toggleSelect = (id: string) => {
@@ -340,7 +343,10 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
 
   const filtered = (ideas || []).filter((idea) => {
     if (statusFilter !== "all" && idea.status !== statusFilter) return false;
-    if (search && !idea.title.toLowerCase().includes(search.toLowerCase())) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      if (!idea.title.toLowerCase().includes(q) && !(idea.description || "").toLowerCase().includes(q)) return false;
+    }
     return true;
   });
 
@@ -418,6 +424,20 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
             <span className="hidden sm:inline">CSV</span>
           </button>
         )}
+        {user?.role === "admin" && (
+          <button
+            onClick={() => setShowArchived(!showArchived)}
+            className={`h-9 px-3 rounded-[var(--radius-md)] border text-[13px] transition-colors flex items-center gap-1.5 ${
+              showArchived
+                ? "border-[var(--color-accent)] bg-[var(--color-accent-surface)] text-[var(--color-accent)]"
+                : "border-[var(--color-border)] bg-[var(--color-surface-1)] hover:bg-[var(--color-surface-2)]"
+            }`}
+            title="Archiv anzeigen"
+          >
+            <Archive className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Archiv</span>
+          </button>
+        )}
       </div>
 
       {/* Bulk action bar */}
@@ -443,6 +463,19 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
               className="h-7 px-3 rounded-[var(--radius-sm)] bg-[var(--color-accent)] text-white text-[12px] font-medium disabled:opacity-40 hover:bg-[var(--color-accent-hover)] transition-colors"
             >
               Anwenden
+            </button>
+            <button
+              onClick={async () => {
+                if (!token) return;
+                const count = selectedIds.size;
+                await Promise.all([...selectedIds].map((id) => archiveIdea({ token, ideaId: id as Id<"ideas">, archived: true })));
+                toast(`${count} Idee${count > 1 ? "n" : ""} archiviert`);
+                setSelectedIds(new Set());
+              }}
+              className="h-7 px-3 rounded-[var(--radius-sm)] border border-[var(--color-border)] text-[12px] font-medium hover:bg-[var(--color-surface-2)] transition-colors flex items-center gap-1"
+            >
+              <Archive className="w-3 h-3" />
+              Archivieren
             </button>
             <button
               onClick={() => setSelectedIds(new Set())}
@@ -530,6 +563,62 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
           </div>
         )}
       </div>
+
+      {/* Archived ideas */}
+      {showArchived && archivedIdeas && archivedIdeas.length > 0 && (
+        <div className="px-6 lg:px-8 pb-8">
+          <div className="border-t border-[var(--color-border-subtle)] pt-6 mt-2">
+            <p className="text-[11px] font-medium text-[var(--color-text-tertiary)] uppercase tracking-wider mb-3 flex items-center gap-1.5">
+              <Archive className="w-3 h-3" />
+              Archiv ({archivedIdeas.length})
+            </p>
+            <div className="space-y-1.5">
+              {archivedIdeas.map((idea) => (
+                <div key={idea._id} className="flex items-center gap-2">
+                  <button
+                    onClick={() => onNavigate("idea", idea._id)}
+                    className="flex-1 text-left bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-4 hover:shadow-[var(--shadow-sm)] transition-all group opacity-60 hover:opacity-100"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <StatusDot status={idea.status} />
+                        <div className="min-w-0">
+                          <p className="text-[14px] font-medium truncate">{idea.title}</p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-[12px] text-[var(--color-text-tertiary)]">
+                              {STATUS_LABELS[idea.status]}
+                            </span>
+                            {idea.archivedAt && (
+                              <>
+                                <span className="text-[var(--color-text-tertiary)]">·</span>
+                                <span className="text-[12px] text-[var(--color-text-tertiary)]">
+                                  Archiviert {new Date(idea.archivedAt).toLocaleDateString("de-DE")}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          if (!token) return;
+                          await archiveIdea({ token, ideaId: idea._id as Id<"ideas">, archived: false });
+                          toast("Idee wiederhergestellt");
+                        }}
+                        className="flex-shrink-0 p-2 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-accent)] hover:bg-[var(--color-accent-surface)] transition-colors"
+                        title="Wiederherstellen"
+                      >
+                        <ArchiveRestore className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {showNewIdea && <NewIdeaModal onClose={() => setShowNewIdea(false)} />}
       {showAiSuggest && (

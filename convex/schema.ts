@@ -55,6 +55,8 @@ export default defineSchema({
     categoryId: v.optional(v.id("categories")),
     order: v.number(),
     scheduledPublishDate: v.optional(v.string()), // ISO date YYYY-MM-DD
+    archived: v.optional(v.boolean()),
+    archivedAt: v.optional(v.number()),
     createdBy: v.id("users"),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -90,6 +92,8 @@ export default defineSchema({
     thumbnailUrl: v.optional(v.string()),
     title: v.string(),
     status: v.string(),
+    archived: v.optional(v.boolean()),
+    archivedAt: v.optional(v.number()),
     uploadedBy: v.id("users"),
     createdAt: v.number(),
   })
@@ -167,6 +171,20 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_user_read", ["userId", "read"]),
+
+  auditLogs: defineTable({
+    userId: v.id("users"),
+    userName: v.string(),
+    action: v.string(), // "create" | "update" | "delete" | "archive" | "status_change"
+    entityType: v.string(), // "idea" | "video" | "folder" | "client" | "user" | "settings"
+    entityId: v.optional(v.string()),
+    entityName: v.optional(v.string()),
+    details: v.optional(v.string()), // JSON or short description
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_entity", ["entityType", "entityId"])
+    .index("by_time", ["createdAt"]),
 
   settings: defineTable({
     key: v.string(),

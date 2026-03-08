@@ -6,6 +6,7 @@ import {
   Users, Plus, X, Pencil, Trash2, Shield, Eye, KeyRound,
   UserCheck, UserX, Mail, Search,
 } from "lucide-react";
+import { TeamSkeleton } from "../components/ui/Skeleton";
 import type { Id } from "../../convex/_generated/dataModel";
 
 const ROLE_LABELS: Record<string, string> = {
@@ -257,6 +258,8 @@ export function TeamPage() {
     acc[u.role] = (acc[u.role] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
+
+  if (users === undefined) return <TeamSkeleton />;
 
   return (
     <div className="max-w-[960px] mx-auto">

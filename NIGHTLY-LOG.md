@@ -180,3 +180,9 @@ Alle 6 TODO-Items abgearbeitet (3 implementiert, 3 waren schon fertig).
 
 ### Nächster Run:
 TODO hat neue Roadmap-Items. Empfehlung: Skeleton Loading für weitere Pages, dann Archive-Funktion.
+
+---
+
+## Run 7/9 — 04:02 — 6 Items offen, 3 Runs verbleibend (04, 05, 06)
+
+Plan: Skeleton Loading für restliche Pages, Archiv-Funktion, Drag & Drop Ordner, Suche verbessern

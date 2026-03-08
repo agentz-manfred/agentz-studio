@@ -28,6 +28,7 @@ import {
 import { VIDEO_STATUS_LABELS, STATUS_BADGE_STYLES } from "../lib/utils";
 import { useClientFilter } from "../lib/clientFilter";
 import { useToast } from "../components/ui/Toast";
+import { LibrarySkeleton } from "../components/ui/Skeleton";
 import type { Id } from "../../convex/_generated/dataModel";
 
 interface LibraryPageProps {
@@ -57,8 +58,10 @@ function FolderCard({
   onDelete: () => void;
   onToggleVisibility?: () => void;
   onAssignClient?: () => void;
+  onDragStart: (e: React.DragEvent) => void;
   onDragOver: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent) => void;
+  isDragOver?: boolean;
 }) {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -76,10 +79,17 @@ function FolderCard({
 
   return (
     <div
-      className="group relative bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] hover:border-[var(--color-border)] hover:shadow-[var(--shadow-md)] transition-all duration-200 cursor-pointer"
+      className={`group relative bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border hover:shadow-[var(--shadow-md)] transition-all duration-200 cursor-pointer ${
+        isDragOver
+          ? "border-[var(--color-accent)] bg-[var(--color-accent-surface)] ring-2 ring-[var(--color-accent)]/20"
+          : "border-[var(--color-border-subtle)] hover:border-[var(--color-border)]"
+      }`}
+      draggable
       onClick={onOpen}
+      onDragStart={onDragStart}
       onDragOver={onDragOver}
       onDrop={onDrop}
+      onDragLeave={() => {}}
     >
       <div className="p-4 flex items-center gap-3">
         <div
@@ -333,6 +343,7 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
   const renameVideo = useMutation(api.videos.rename);
   const updateVideo = useMutation(api.videos.update);
   const moveVideo = useMutation(api.videos.moveToFolder);
+  const moveFolder = useMutation(api.folders.move);
 
   const filteredFolders = (folders || [])
     .filter((f) => !searchQuery || f.name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -384,16 +395,34 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
     e.preventDefault();
     setDragOverFolder(null);
     const videoId = e.dataTransfer.getData("video-id");
-    if (videoId) {
-      if (token) await moveVideo({ token, videoId: videoId as Id<"videos">, folderId: targetFolderId as Id<"folders"> });
+    const folderId = e.dataTransfer.getData("folder-id");
+    if (videoId && token) {
+      await moveVideo({ token, videoId: videoId as Id<"videos">, folderId: targetFolderId as Id<"folders"> });
+      toast("Video verschoben");
+    } else if (folderId && folderId !== targetFolderId && token) {
+      try {
+        await moveFolder({ token, folderId: folderId as Id<"folders">, parentId: targetFolderId as Id<"folders"> });
+        toast("Ordner verschoben");
+      } catch (e: any) {
+        toast(e.message || "Fehler beim Verschieben");
+      }
     }
   };
 
   const handleDropRoot = async (e: React.DragEvent) => {
     e.preventDefault();
+    setDragOverFolder(null);
     const videoId = e.dataTransfer.getData("video-id");
+    const folderId = e.dataTransfer.getData("folder-id");
     if (videoId && token) {
       await moveVideo({ token, videoId: videoId as Id<"videos">, folderId: currentFolderId });
+    } else if (folderId && token) {
+      try {
+        await moveFolder({ token, folderId: folderId as Id<"folders">, parentId: currentFolderId });
+        toast("Ordner verschoben");
+      } catch (e: any) {
+        toast(e.message || "Fehler beim Verschieben");
+      }
     }
   };
 
@@ -424,6 +453,8 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
   };
 
   const isEmpty = filteredFolders.length === 0 && filteredVideos.length === 0;
+
+  if (folders === undefined && videos === undefined) return <LibrarySkeleton />;
 
   return (
     <div className="max-w-[960px] mx-auto px-6 lg:px-8 py-6">
@@ -536,8 +567,10 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
                   onDelete={() => handleDeleteFolder(folder._id)}
                   onToggleVisibility={() => { if (token) updateFolder({ token, folderId: folder._id as Id<"folders">, clientVisible: !folder.clientVisible }); }}
                   onAssignClient={() => setAssigningClient({ type: "folder", id: folder._id, clientId: folder.clientId })}
-                  onDragOver={(e) => { e.preventDefault(); setDragOverFolder(folder._id); }}
-                  onDrop={(e) => handleDrop(e, folder._id)}
+                  onDragStart={(e) => { e.dataTransfer.setData("folder-id", folder._id); e.dataTransfer.effectAllowed = "move"; }}
+                  onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDragOverFolder(folder._id); }}
+                  onDrop={(e) => { e.stopPropagation(); handleDrop(e, folder._id); }}
+                  isDragOver={dragOverFolder === folder._id}
                 />
               ))}
             </div>

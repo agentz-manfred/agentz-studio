@@ -3,6 +3,18 @@ import { v } from "convex/values";
 import { authenticate, requireEditor } from "./lib";
 import { internal } from "./_generated/api";
 
+async function auditLog(ctx: any, user: any, action: string, entityType: string, entityId?: string, entityName?: string, details?: string) {
+  await ctx.scheduler.runAfter(0, internal.auditLog.log, {
+    userId: user._id,
+    userName: user.name,
+    action,
+    entityType,
+    entityId,
+    entityName,
+    details,
+  });
+}
+
 export const STATUSES = [
   "idee",
   "skript",
@@ -22,15 +34,18 @@ export const list = query({
     if (args.token) {
       const user = await authenticate(ctx, args.token);
       if (user.role === "client" && user.clientId) {
-        // Client users ONLY see their own ideas
-        return ctx.db.query("ideas").withIndex("by_client", (q) => q.eq("clientId", user.clientId!)).collect();
+        // Client users ONLY see their own ideas (exclude archived)
+        const clientIdeas = await ctx.db.query("ideas").withIndex("by_client", (q) => q.eq("clientId", user.clientId!)).collect();
+        return clientIdeas.filter((i) => !i.archived);
       }
     }
     // Admin/editor: filter by clientId if provided, otherwise all
     if (args.clientId) {
-      return ctx.db.query("ideas").withIndex("by_client", (q) => q.eq("clientId", args.clientId!)).collect();
+      const all = await ctx.db.query("ideas").withIndex("by_client", (q) => q.eq("clientId", args.clientId!)).collect();
+      return all.filter((i) => !i.archived);
     }
-    return ctx.db.query("ideas").collect();
+    const all = await ctx.db.query("ideas").collect();
+    return all.filter((i) => !i.archived);
   },
 });
 
@@ -82,7 +97,7 @@ export const create = mutation({
       .withIndex("by_status", (q) => q.eq("status", "idee"))
       .collect();
 
-    return ctx.db.insert("ideas", {
+    const id = await ctx.db.insert("ideas", {
       clientId: args.clientId,
       title,
       description: args.description,
@@ -93,6 +108,8 @@ export const create = mutation({
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
+    await auditLog(ctx, user, "create", "idea", id, title);
+    return id;
   },
 });
 
@@ -129,6 +146,7 @@ export const updateStatus = mutation({
       status: args.status,
       updatedAt: Date.now(),
     });
+    await auditLog(ctx, user, "status_change", "idea", args.ideaId, idea.title, `${idea.status} → ${args.status}`);
 
     // In-app notification for client users
     const STATUS_LABELS: Record<string, string> = {
@@ -185,6 +203,59 @@ export const update = mutation({
     await requireEditor(ctx, args.token);
     const { ideaId, token: _, ...updates } = args;
     await ctx.db.patch(ideaId, { ...updates, updatedAt: Date.now() });
+  },
+});
+
+export const archive = mutation({
+  args: { token: v.string(), ideaId: v.id("ideas"), archived: v.boolean() },
+  handler: async (ctx, args) => {
+    const user = await requireEditor(ctx, args.token);
+    const idea = await ctx.db.get(args.ideaId);
+    await ctx.db.patch(args.ideaId, {
+      archived: args.archived,
+      archivedAt: args.archived ? Date.now() : undefined,
+      updatedAt: Date.now(),
+    });
+    await auditLog(ctx, user, args.archived ? "archive" : "unarchive", "idea", args.ideaId, idea?.title);
+  },
+});
+
+export const listArchived = query({
+  args: { token: v.optional(v.string()), clientId: v.optional(v.id("clients")) },
+  handler: async (ctx, args) => {
+    if (args.token) {
+      const user = await authenticate(ctx, args.token);
+      if (user.role === "client" && user.clientId) {
+        const all = await ctx.db.query("ideas").withIndex("by_client", (q) => q.eq("clientId", user.clientId!)).collect();
+        return all.filter((i) => i.archived);
+      }
+    }
+    const all = args.clientId
+      ? await ctx.db.query("ideas").withIndex("by_client", (q) => q.eq("clientId", args.clientId!)).collect()
+      : await ctx.db.query("ideas").collect();
+    return all.filter((i) => i.archived);
+  },
+});
+
+export const search = query({
+  args: { token: v.optional(v.string()), query: v.string() },
+  handler: async (ctx, args) => {
+    const q = args.query.toLowerCase().trim();
+    if (!q) return [];
+    const all = await ctx.db.query("ideas").collect();
+    let filtered = all.filter((i) => !i.archived);
+
+    if (args.token) {
+      const user = await authenticate(ctx, args.token);
+      if (user.role === "client" && user.clientId) {
+        filtered = filtered.filter((i) => i.clientId.toString() === user.clientId!.toString());
+      }
+    }
+
+    return filtered.filter((i) =>
+      i.title.toLowerCase().includes(q) ||
+      (i.description || "").toLowerCase().includes(q)
+    );
   },
 });
 

@@ -6,9 +6,11 @@ export const list = query({
   args: { ideaId: v.optional(v.id("ideas")), token: v.optional(v.string()) },
   handler: async (ctx, args) => {
     if (args.ideaId) {
-      return ctx.db.query("videos").withIndex("by_idea", (q) => q.eq("ideaId", args.ideaId!)).collect();
+      const vids = await ctx.db.query("videos").withIndex("by_idea", (q) => q.eq("ideaId", args.ideaId!)).collect();
+      return vids.filter((v) => !v.archived);
     }
-    return ctx.db.query("videos").collect();
+    const all = await ctx.db.query("videos").collect();
+    return all.filter((v) => !v.archived);
   },
 });
 
@@ -139,10 +141,11 @@ export const listByFolder = query({
   args: { folderId: v.optional(v.id("folders")) },
   handler: async (ctx, args) => {
     if (args.folderId) {
-      return ctx.db.query("videos").withIndex("by_folder", (q) => q.eq("folderId", args.folderId)).collect();
+      const vids = await ctx.db.query("videos").withIndex("by_folder", (q) => q.eq("folderId", args.folderId)).collect();
+      return vids.filter((v) => !v.archived);
     }
     const all = await ctx.db.query("videos").collect();
-    return all.filter((v) => !v.folderId);
+    return all.filter((v) => !v.folderId && !v.archived);
   },
 });
 
@@ -179,6 +182,25 @@ export const update = mutation({
     const { videoId, token: _, ...updates } = args;
     const filtered = Object.fromEntries(Object.entries(updates).filter(([_, v]) => v !== undefined));
     if (Object.keys(filtered).length > 0) await ctx.db.patch(videoId, filtered);
+  },
+});
+
+export const archive = mutation({
+  args: { token: v.string(), videoId: v.id("videos"), archived: v.boolean() },
+  handler: async (ctx, args) => {
+    await requireEditor(ctx, args.token);
+    await ctx.db.patch(args.videoId, {
+      archived: args.archived,
+      archivedAt: args.archived ? Date.now() : undefined,
+    });
+  },
+});
+
+export const listArchived = query({
+  args: { token: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    const all = await ctx.db.query("videos").collect();
+    return all.filter((v) => v.archived);
   },
 });
 

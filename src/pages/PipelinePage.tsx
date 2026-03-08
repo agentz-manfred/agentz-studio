@@ -5,6 +5,7 @@ import { useClientFilter } from "../lib/clientFilter";
 import { KanbanBoard } from "../components/kanban/KanbanBoard";
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import { PipelineSkeleton } from "../components/ui/Skeleton";
 import type { Id } from "../../convex/_generated/dataModel";
 
 export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: string) => void }) {
@@ -55,6 +56,8 @@ export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: 
     setSelectedCategory("");
     setShowNewIdea(false);
   };
+
+  if (ideas === undefined) return <PipelineSkeleton />;
 
   return (
     <div>

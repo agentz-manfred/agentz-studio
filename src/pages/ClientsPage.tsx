@@ -3,6 +3,7 @@ import { api } from "../../convex/_generated/api";
 import { useState } from "react";
 import { useAuth } from "../lib/auth";
 import { Plus, Users, Building2, Mail, Phone, X, Search, UserPlus, Check, Link2, Copy, CheckCheck, Lightbulb, Film } from "lucide-react";
+import { ClientsSkeleton } from "../components/ui/Skeleton";
 import type { Id } from "../../convex/_generated/dataModel";
 
 function CreateClientModal({ onClose }: { onClose: () => void }) {
@@ -348,6 +349,8 @@ export function ClientsPage({ onNavigate }: { onNavigate?: (page: string, id?: s
       c.name.toLowerCase().includes(search.toLowerCase()) ||
       (c.company || "").toLowerCase().includes(search.toLowerCase())
   );
+
+  if (clients === undefined) return <ClientsSkeleton />;
 
   return (
     <div className="max-w-[960px] mx-auto">

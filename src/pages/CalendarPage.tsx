@@ -4,6 +4,7 @@ import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
 import { Calendar, ChevronLeft, ChevronRight, Plus, X, MapPin, Clock, Trash2, FileText, Pencil, Video, Send } from "lucide-react";
 import { useState, useMemo, useRef, useEffect } from "react";
+import { CalendarSkeleton } from "../components/ui/Skeleton";
 import type { Id } from "../../convex/_generated/dataModel";
 
 const WEEKDAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
@@ -465,6 +466,8 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
       if (token) updateIdea({ token, ideaId: selectedEvent.data._id, scheduledPublishDate: "" });
     }
   };
+
+  if (allShootDates === undefined && allIdeasWithPublishDates === undefined) return <CalendarSkeleton />;
 
   return (
     <div className="max-w-[960px] mx-auto">

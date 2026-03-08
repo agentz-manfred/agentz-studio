@@ -12,6 +12,7 @@ import {
   Settings,
   ArrowRight,
   Command,
+  Shield,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 
@@ -80,6 +81,7 @@ export function CommandPalette({
       { id: "nav-videos", label: "Videos", icon: Play, page: "videos" },
       { id: "nav-calendar", label: "Kalender", icon: Calendar, page: "calendar" },
       { id: "nav-team", label: "Team", icon: Users, page: "team" },
+      { id: "nav-audit", label: "Audit Log", icon: Shield, page: "audit" },
       { id: "nav-settings", label: "Einstellungen", icon: Settings, page: "settings" },
     ];
     navItems.forEach((n) =>

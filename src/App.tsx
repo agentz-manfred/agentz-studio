@@ -29,6 +29,7 @@ const SettingsPage = lazy(() => import("./pages/SettingsPage").then(m => ({ defa
 const TeamPage = lazy(() => import("./pages/TeamPage").then(m => ({ default: m.TeamPage })));
 const LibraryPage = lazy(() => import("./pages/LibraryPage").then(m => ({ default: m.LibraryPage })));
 const ClientDetail = lazy(() => import("./pages/ClientDetail").then(m => ({ default: m.ClientDetail })));
+const AuditLogPage = lazy(() => import("./pages/AuditLogPage").then(m => ({ default: m.AuditLogPage })));
 import { ImpressumPage, DatenschutzPage } from "./pages/LegalPages";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
@@ -53,6 +54,7 @@ function AdminRoutes({ currentPage, onNavigate }: { currentPage: string; onNavig
   if (currentPage === "calendar") return <CalendarPage onNavigate={onNavigate} />;
   if (currentPage === "team") return <TeamPage />;
   if (currentPage === "settings") return <SettingsPage />;
+  if (currentPage === "audit") return <AuditLogPage />;
   return <AdminDashboard onNavigate={onNavigate} />;
 }
 
