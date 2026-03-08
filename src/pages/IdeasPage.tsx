@@ -28,7 +28,7 @@ function StatusDot({ status }: { status: string }) {
 
 function NewIdeaModal({ onClose }: { onClose: () => void }) {
   const { user, token } = useAuth();
-  const clients = useQuery(api.clients.list);
+  const clients = useQuery(api.clients.list, token ? { token } : "skip");
   const createIdea = useMutation(api.ideas.create);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -153,8 +153,9 @@ function NewIdeaModal({ onClose }: { onClose: () => void }) {
 const MONTH_NAMES = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
 
 export function AiSuggestModal({ onClose, onAccept, preselectedClientId }: { onClose: () => void; onAccept: (title: string, description: string, clientId: string, category?: string) => void; preselectedClientId?: string }) {
-  const clients = useQuery(api.clients.list);
-  const ideas = useQuery(api.ideas.list, {});
+  const { token } = useAuth();
+  const clients = useQuery(api.clients.list, token ? { token } : "skip");
+  const ideas = useQuery(api.ideas.list, token ? { token } : "skip");
   const suggestIdeas = useAction(api.ai.suggestIdeas);
   const [clientId, setClientId] = useState(preselectedClientId || "");
   const trapRef = useFocusTrap<HTMLDivElement>(true, onClose);
@@ -295,8 +296,8 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
   const { user, token } = useAuth();
   const { selectedClientId } = useClientFilter();
   const clientFilter = user?.role === "client" && user.clientId ? user.clientId : selectedClientId;
-  const ideas = useQuery(api.ideas.list, clientFilter ? { clientId: clientFilter as any } : {});
-  const clients = useQuery(api.clients.list);
+  const ideas = useQuery(api.ideas.list, token ? (clientFilter ? { clientId: clientFilter as any, token } : { token }) : "skip");
+  const clients = useQuery(api.clients.list, token ? { token } : "skip");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [showNewIdea, setShowNewIdea] = useState(false);
@@ -307,7 +308,7 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
   const createIdea = useMutation(api.ideas.create);
   const updateStatus = useMutation(api.ideas.updateStatus);
   const archiveIdea = useMutation(api.ideas.archive);
-  const archivedIdeas = useQuery(api.ideas.listArchived, showArchived ? (clientFilter ? { clientId: clientFilter as any } : {}) : "skip");
+  const archivedIdeas = useQuery(api.ideas.listArchived, showArchived && token ? (clientFilter ? { clientId: clientFilter as any, token } : { token }) : "skip");
   const { toast } = useToast();
 
   const toggleSelect = (id: string) => {

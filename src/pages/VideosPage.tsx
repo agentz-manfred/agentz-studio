@@ -22,8 +22,8 @@ export function VideosPage({ onNavigate }: VideosPageProps) {
       ? { clientId: clientFilter as Id<"clients">, token: token ?? undefined } 
       : (token ? { token } : "skip")
   );
-  const ideas = useQuery(api.ideas.list, clientFilter ? { clientId: clientFilter as Id<"clients"> } : {});
-  const clients = useQuery(api.clients.list);
+  const ideas = useQuery(api.ideas.list, token ? (clientFilter ? { clientId: clientFilter as Id<"clients">, token } : { token }) : "skip");
+  const clients = useQuery(api.clients.list, token ? { token } : "skip");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 

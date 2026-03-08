@@ -41,7 +41,8 @@ function UserModal({
   onClose: () => void;
   onSave: (data: any) => Promise<void>;
 }) {
-  const clients = useQuery(api.clients.list);
+  const { token } = useAuth();
+  const clients = useQuery(api.clients.list, token ? { token } : "skip");
   const [name, setName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
   const [password, setPassword] = useState("");
@@ -186,7 +187,7 @@ function ResetPasswordModal({ user, onClose }: { user: any; onClose: () => void 
 export function TeamPage() {
   const { user: currentUser, token } = useAuth();
   const users = useQuery(api.auth.listUsers, token ? { token } : "skip");
-  const clients = useQuery(api.clients.list);
+  const clients = useQuery(api.clients.list, token ? { token } : "skip");
   const registerUser = useMutation(api.auth.register);
   const updateUser = useMutation(api.auth.updateUser);
   const deleteUser = useMutation(api.auth.deleteUser);

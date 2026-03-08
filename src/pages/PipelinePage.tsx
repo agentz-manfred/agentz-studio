@@ -12,8 +12,8 @@ export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: 
   const { user, token } = useAuth();
   const { selectedClientId } = useClientFilter();
   const clientFilter = user?.role === "client" && user.clientId ? user.clientId : selectedClientId;
-  const ideas = useQuery(api.ideas.list, clientFilter ? { clientId: clientFilter as any } : {});
-  const clients = useQuery(api.clients.list);
+  const ideas = useQuery(api.ideas.list, token ? (clientFilter ? { clientId: clientFilter as any, token } : { token }) : "skip");
+  const clients = useQuery(api.clients.list, token ? { token } : "skip");
   const updateStatus = useMutation(api.ideas.updateStatus);
   const createIdea = useMutation(api.ideas.create);
   const [showNewIdea, setShowNewIdea] = useState(false);

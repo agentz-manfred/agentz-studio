@@ -34,29 +34,18 @@ import {
 } from "lucide-react";
 import { RichTextEditor, RichTextDisplay } from "../components/ui/RichTextEditor";
 import { openMonthlyReport } from "../lib/export";
-
-const STATUS_LABELS: Record<string, string> = {
-  idea: "Idee",
-  script: "Skript",
-  review: "Zur Freigabe",
-  correction: "Korrektur",
-  approved: "Freigegeben",
-  filmed: "Gedreht",
-  editing: "Geschnitten",
-  edit_correction: "Korrektur",
-  published: "Veröffentlicht",
-};
+import { STATUS_LABELS } from "../lib/utils";
 
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
-  idea: { bg: "rgba(107,114,128,0.1)", text: "#6b7280" },
-  script: { bg: "rgba(139,92,246,0.1)", text: "#8b5cf6" },
-  review: { bg: "rgba(245,158,11,0.1)", text: "#f59e0b" },
-  correction: { bg: "rgba(239,68,68,0.1)", text: "#ef4444" },
-  approved: { bg: "rgba(34,197,94,0.1)", text: "#22c55e" },
-  filmed: { bg: "rgba(59,130,246,0.1)", text: "#3b82f6" },
-  editing: { bg: "rgba(99,102,241,0.1)", text: "#6366f1" },
-  edit_correction: { bg: "rgba(239,68,68,0.1)", text: "#ef4444" },
-  published: { bg: "rgba(16,185,129,0.1)", text: "#10b981" },
+  idee: { bg: "rgba(107,114,128,0.1)", text: "#6b7280" },
+  skript: { bg: "rgba(139,92,246,0.1)", text: "#8b5cf6" },
+  freigabe: { bg: "rgba(245,158,11,0.1)", text: "#f59e0b" },
+  korrektur: { bg: "rgba(239,68,68,0.1)", text: "#ef4444" },
+  freigegeben: { bg: "rgba(34,197,94,0.1)", text: "#22c55e" },
+  gedreht: { bg: "rgba(59,130,246,0.1)", text: "#3b82f6" },
+  geschnitten: { bg: "rgba(99,102,241,0.1)", text: "#6366f1" },
+  review: { bg: "rgba(239,68,68,0.1)", text: "#ef4444" },
+  "veröffentlicht": { bg: "rgba(16,185,129,0.1)", text: "#10b981" },
 };
 
 const PLATFORM_OPTIONS = [

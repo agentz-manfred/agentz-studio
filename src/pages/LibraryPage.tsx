@@ -287,7 +287,8 @@ function ClientAssignDialog({
   onSave: (clientId: string | undefined) => void;
   onCancel: () => void;
 }) {
-  const clients = useQuery(api.clients.list);
+  const { token } = useAuth();
+  const clients = useQuery(api.clients.list, token ? { token } : "skip");
   const [selected, setSelected] = useState(currentClientId || "");
 
   return (
@@ -329,12 +330,13 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
   const { toast } = useToast();
 
   const { selectedClientId } = useClientFilter();
-  const clients = useQuery(api.clients.list);
+  const clients = useQuery(api.clients.list, token ? { token } : "skip");
   const clientMap = (clients || []).reduce((acc, c) => ({ ...acc, [c._id]: c }), {} as Record<string, any>);
-  const folders = useQuery(api.folders.list, {
+  const folders = useQuery(api.folders.list, token ? {
     parentId: currentFolderId,
+    token,
     ...(selectedClientId ? { clientId: selectedClientId as Id<"clients"> } : {}),
-  });
+  } : "skip");
   const videos = useQuery(api.videos.listByFolder, token ? { folderId: currentFolderId, token } : "skip");
   const breadcrumbs = useQuery(api.folders.getBreadcrumbs, token ? { folderId: currentFolderId, token } : "skip");
 

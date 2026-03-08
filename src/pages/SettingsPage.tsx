@@ -481,8 +481,8 @@ function AiPromptsSection() {
 
 export function SettingsPage() {
   const { user, token } = useAuth();
-  const clients = useQuery(api.clients.list);
-  const ideas = useQuery(api.ideas.list, {});
+  const clients = useQuery(api.clients.list, token ? { token } : "skip");
+  const ideas = useQuery(api.ideas.list, token ? { token } : "skip");
   const users = useQuery(api.auth.listUsers, token ? { token } : "skip");
   const videos = useQuery(api.videos.list, token ? { token } : "skip");
 

@@ -227,8 +227,8 @@ function EventPopover({ event, client, onClose, onDelete, onNavigate, isAdmin }:
 
 function NewShootDateModal({ onClose, defaultDate }: { onClose: () => void; defaultDate?: string }) {
   const { token } = useAuth();
-  const clients = useQuery(api.clients.list);
-  const ideas = useQuery(api.ideas.list, {});
+  const clients = useQuery(api.clients.list, token ? { token } : "skip");
+  const ideas = useQuery(api.ideas.list, token ? { token } : "skip");
   const createShootDate = useMutation(api.shootDates.create);
   const [clientId, setClientId] = useState("");
   const [selectedIdeas, setSelectedIdeas] = useState<string[]>([]);
@@ -364,7 +364,7 @@ function Legend() {
 export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: string) => void } = {}) {
   const { user, token } = useAuth();
   const { selectedClientId } = useClientFilter();
-  const clients = useQuery(api.clients.list);
+  const clients = useQuery(api.clients.list, token ? { token } : "skip");
   const allShootDates = useQuery(api.shootDates.list, token ? { token } : "skip");
   const allIdeasWithPublishDates = useQuery(api.ideas.withPublishDates);
   const shootDates = selectedClientId

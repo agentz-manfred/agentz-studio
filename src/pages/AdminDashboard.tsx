@@ -501,8 +501,8 @@ export function AdminDashboard({
   onNavigate: (page: string, id?: string) => void;
 }) {
   const { user, token } = useAuth();
-  const ideas = useQuery(api.ideas.list, {});
-  const clients = useQuery(api.clients.list);
+  const ideas = useQuery(api.ideas.list, token ? { token } : "skip");
+  const clients = useQuery(api.clients.list, token ? { token } : "skip");
   const shoots = useQuery(api.shootDates.list, token ? { token } : "skip");
   const [widgetConfig, setWidgetConfig] = useState<WidgetConfig>(getWidgetConfig);
   const [showWidgetConfig, setShowWidgetConfig] = useState(false);

@@ -12,13 +12,11 @@ async function auditLog(ctx: any, user: any, action: string, entityType: string,
 export const list = query({
   args: { token: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    if (args.token) {
-      const user = await authenticate(ctx, args.token);
-      // Client users only see their own client
-      if (user.role === "client" && user.clientId) {
-        const client = await ctx.db.get(user.clientId);
-        return client ? [client] : [];
-      }
+    if (!args.token) return [];
+    const user = await authenticate(ctx, args.token);
+    if (user.role === "client" && user.clientId) {
+      const client = await ctx.db.get(user.clientId);
+      return client ? [client] : [];
     }
     return ctx.db.query("clients").collect();
   },
@@ -27,13 +25,12 @@ export const list = query({
 export const get = query({
   args: { id: v.id("clients"), token: v.optional(v.string()) },
   handler: async (ctx, args) => {
+    if (!args.token) return null;
     const client = await ctx.db.get(args.id);
     if (!client) return null;
-    if (args.token) {
-      const user = await authenticate(ctx, args.token);
-      if (user.role === "client" && user.clientId) {
-        if (client._id.toString() !== user.clientId.toString()) return null;
-      }
+    const user = await authenticate(ctx, args.token);
+    if (user.role === "client" && user.clientId) {
+      if (client._id.toString() !== user.clientId.toString()) return null;
     }
     return client;
   },

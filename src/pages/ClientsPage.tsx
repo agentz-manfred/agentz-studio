@@ -319,9 +319,9 @@ function InviteLinkModal({ client, onClose }: { client: any; onClose: () => void
 
 export function ClientsPage({ onNavigate }: { onNavigate?: (page: string, id?: string) => void }) {
   const { token } = useAuth();
-  const clients = useQuery(api.clients.list);
+  const clients = useQuery(api.clients.list, token ? { token } : "skip");
   const users = useQuery(api.auth.listUsers, token ? { token } : "skip");
-  const ideas = useQuery(api.ideas.list, {});
+  const ideas = useQuery(api.ideas.list, token ? { token } : "skip");
   const videos = useQuery(api.videos.list, token ? { token } : "skip");
   const [showCreate, setShowCreate] = useState(false);
   const [search, setSearch] = useState("");

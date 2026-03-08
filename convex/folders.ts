@@ -12,11 +12,10 @@ async function auditLog(ctx: any, user: any, action: string, entityType: string,
 export const list = query({
   args: { parentId: v.optional(v.id("folders")), clientId: v.optional(v.id("clients")), token: v.optional(v.string()) },
   handler: async (ctx, args) => {
+    if (!args.token) return [];
+    const user = await authenticate(ctx, args.token);
     let clientFilter = args.clientId;
-    if (args.token) {
-      const user = await authenticate(ctx, args.token);
-      if (user.role === "client" && user.clientId) clientFilter = user.clientId;
-    }
+    if (user.role === "client" && user.clientId) clientFilter = user.clientId;
 
     if (args.parentId) {
       const folders = await ctx.db.query("folders").withIndex("by_parent", (q) => q.eq("parentId", args.parentId)).collect();
@@ -42,13 +41,12 @@ export const listAll = query({
 export const get = query({
   args: { folderId: v.id("folders"), token: v.optional(v.string()) },
   handler: async (ctx, args) => {
+    if (!args.token) return null;
     const folder = await ctx.db.get(args.folderId);
     if (!folder) return null;
-    if (args.token) {
-      const user = await authenticate(ctx, args.token);
-      if (user.role === "client" && user.clientId && folder.clientId) {
-        if (folder.clientId.toString() !== user.clientId.toString()) return null;
-      }
+    const user = await authenticate(ctx, args.token);
+    if (user.role === "client" && user.clientId && folder.clientId) {
+      if (folder.clientId.toString() !== user.clientId.toString()) return null;
     }
     return folder;
   },

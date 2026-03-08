@@ -30,14 +30,12 @@ export const STATUSES = [
 export const list = query({
   args: { token: v.optional(v.string()), clientId: v.optional(v.id("clients")) },
   handler: async (ctx, args) => {
-    // If token provided, enforce data isolation
-    if (args.token) {
-      const user = await authenticate(ctx, args.token);
-      if (user.role === "client" && user.clientId) {
-        // Client users ONLY see their own ideas (exclude archived)
-        const clientIdeas = await ctx.db.query("ideas").withIndex("by_client", (q) => q.eq("clientId", user.clientId!)).collect();
-        return clientIdeas.filter((i) => !i.archived);
-      }
+    // No token = no data (prevent unauthenticated access)
+    if (!args.token) return [];
+    const user = await authenticate(ctx, args.token);
+    if (user.role === "client" && user.clientId) {
+      const clientIdeas = await ctx.db.query("ideas").withIndex("by_client", (q) => q.eq("clientId", user.clientId!)).collect();
+      return clientIdeas.filter((i) => !i.archived);
     }
     // Admin/editor: filter by clientId if provided, otherwise all
     if (args.clientId) {
@@ -52,14 +50,12 @@ export const list = query({
 export const get = query({
   args: { ideaId: v.id("ideas"), token: v.optional(v.string()) },
   handler: async (ctx, args) => {
+    if (!args.token) return null;
     const idea = await ctx.db.get(args.ideaId);
     if (!idea) return null;
-    // If token provided, enforce access
-    if (args.token) {
-      const user = await authenticate(ctx, args.token);
-      if (user.role === "client" && user.clientId) {
-        if (idea.clientId.toString() !== user.clientId.toString()) return null;
-      }
+    const user = await authenticate(ctx, args.token);
+    if (user.role === "client" && user.clientId) {
+      if (idea.clientId.toString() !== user.clientId.toString()) return null;
     }
     return idea;
   },
@@ -68,12 +64,11 @@ export const get = query({
 export const byStatus = query({
   args: { status: v.string(), token: v.optional(v.string()) },
   handler: async (ctx, args) => {
+    if (!args.token) return [];
+    const user = await authenticate(ctx, args.token);
     const ideas = await ctx.db.query("ideas").withIndex("by_status", (q) => q.eq("status", args.status)).collect();
-    if (args.token) {
-      const user = await authenticate(ctx, args.token);
-      if (user.role === "client" && user.clientId) {
-        return ideas.filter((i) => i.clientId.toString() === user.clientId!.toString());
-      }
+    if (user.role === "client" && user.clientId) {
+      return ideas.filter((i) => i.clientId.toString() === user.clientId!.toString());
     }
     return ideas;
   },
@@ -223,12 +218,11 @@ export const archive = mutation({
 export const listArchived = query({
   args: { token: v.optional(v.string()), clientId: v.optional(v.id("clients")) },
   handler: async (ctx, args) => {
-    if (args.token) {
-      const user = await authenticate(ctx, args.token);
-      if (user.role === "client" && user.clientId) {
-        const all = await ctx.db.query("ideas").withIndex("by_client", (q) => q.eq("clientId", user.clientId!)).collect();
-        return all.filter((i) => i.archived);
-      }
+    if (!args.token) return [];
+    const user = await authenticate(ctx, args.token);
+    if (user.role === "client" && user.clientId) {
+      const all = await ctx.db.query("ideas").withIndex("by_client", (q) => q.eq("clientId", user.clientId!)).collect();
+      return all.filter((i) => i.archived);
     }
     const all = args.clientId
       ? await ctx.db.query("ideas").withIndex("by_client", (q) => q.eq("clientId", args.clientId!)).collect()
@@ -240,16 +234,15 @@ export const listArchived = query({
 export const search = query({
   args: { token: v.optional(v.string()), query: v.string() },
   handler: async (ctx, args) => {
+    if (!args.token) return [];
     const q = args.query.toLowerCase().trim();
     if (!q) return [];
+    const user = await authenticate(ctx, args.token);
     const all = await ctx.db.query("ideas").collect();
     let filtered = all.filter((i) => !i.archived);
 
-    if (args.token) {
-      const user = await authenticate(ctx, args.token);
-      if (user.role === "client" && user.clientId) {
-        filtered = filtered.filter((i) => i.clientId.toString() === user.clientId!.toString());
-      }
+    if (user.role === "client" && user.clientId) {
+      filtered = filtered.filter((i) => i.clientId.toString() === user.clientId!.toString());
     }
 
     return filtered.filter((i) =>
@@ -262,13 +255,12 @@ export const search = query({
 export const withPublishDates = query({
   args: { token: v.optional(v.string()) },
   handler: async (ctx, args) => {
+    if (!args.token) return [];
+    const user = await authenticate(ctx, args.token);
     const all = await ctx.db.query("ideas").collect();
     let filtered = all.filter((i) => i.scheduledPublishDate);
-    if (args.token) {
-      const user = await authenticate(ctx, args.token);
-      if (user.role === "client" && user.clientId) {
-        filtered = filtered.filter((i) => i.clientId.toString() === user.clientId!.toString());
-      }
+    if (user.role === "client" && user.clientId) {
+      filtered = filtered.filter((i) => i.clientId.toString() === user.clientId!.toString());
     }
     return filtered;
   },

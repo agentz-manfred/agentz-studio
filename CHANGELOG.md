@@ -1,5 +1,11 @@
 # AgentZ Studio — CHANGELOG
 
+## v2.11.2 (08.03.2026) — Bug Fix Sprint
+- **BUG FIX: AiSuggestModal token undefined** — `useAuth()` fehlte in der Komponente, Kategorien wurden nie geladen. Gefixt.
+- **BUG FIX: ClientDetail englische Status-Keys** — Lokale STATUS_LABELS nutzten englische Keys (`idea`, `script`...) statt deutsche (`idee`, `skript`...). Jetzt wird `STATUS_LABELS` aus `utils.ts` importiert + STATUS_COLORS auf deutsche Keys umgestellt.
+- **SECURITY FIX: ideas.list/clients.list Data Leak** — Alle Queries mit optionalem Token (`ideas.list`, `ideas.get`, `ideas.byStatus`, `ideas.search`, `ideas.listArchived`, `ideas.withPublishDates`, `clients.list`, `clients.get`) geben jetzt leere Ergebnisse bei fehlendem Token zurück. Alle Frontend-Aufrufe übergeben Token.
+- **SECURITY FIX: folders.list/get kein Auth** — `folders.list` und `folders.get` erfordern jetzt Token. Ohne Token: leere Liste / null.
+
 ## v2.11.1 (08.03.2026) — TODO Cleanup Sprint
 - **Kanban DnD Mobile Fix:** TouchSensor mit Activation Constraints (150ms delay, 8px tolerance), MouseSensor mit 3px distance, snap-x scrolling für mobile Columns, touch-action: pan-y auf Board-Container
 - **Kunden-Avatar Fix:** Neues `avatarColor` Feld in Schema, automatische Farbzuweisung bei Erstellung, Color Picker im Kundenprofil (12 Presets + Custom), konsistente Darstellung überall (Kanban, Kunden-Liste, Kunden-Detail)

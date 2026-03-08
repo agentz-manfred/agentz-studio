@@ -184,7 +184,8 @@ function ThemeToggle() {
 }
 
 function ClientFilterDropdown() {
-  const clients = useQuery(api.clients.list);
+  const { token } = useAuth();
+  const clients = useQuery(api.clients.list, token ? { token } : "skip");
   const { selectedClientId, setSelectedClientId } = useClientFilter();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
