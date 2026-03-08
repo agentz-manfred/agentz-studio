@@ -1,6 +1,13 @@
 import { mutation, query, action } from "./_generated/server";
 import { v } from "convex/values";
 import { authenticate, requireEditor } from "./lib";
+import { internal } from "./_generated/api";
+
+async function auditLog(ctx: any, user: any, action: string, entityType: string, entityId?: string, entityName?: string, details?: string) {
+  await ctx.scheduler.runAfter(0, internal.auditLog.log, {
+    userId: user._id, userName: user.name, action, entityType, entityId, entityName, details,
+  });
+}
 
 export const list = query({
   args: { ideaId: v.optional(v.id("ideas")), token: v.optional(v.string()) },
@@ -43,7 +50,7 @@ export const create = mutation({
     const user = await requireEditor(ctx, args.token);
     const title = args.title.trim();
     if (!title) throw new Error("Titel darf nicht leer sein");
-    return ctx.db.insert("videos", {
+    const id = await ctx.db.insert("videos", {
       ideaId: args.ideaId,
       title,
       status: "hochgeladen",
@@ -53,6 +60,8 @@ export const create = mutation({
       thumbnailUrl: args.thumbnailUrl,
       createdAt: Date.now(),
     });
+    await auditLog(ctx, user, "create", "video", id, title);
+    return id;
   },
 });
 
@@ -72,6 +81,7 @@ export const updateStatus = mutation({
     }
 
     await ctx.db.patch(args.videoId, { status: args.status });
+    await auditLog(ctx, user, "status_change", "video", args.videoId, video.title, `${video.status} → ${args.status}`);
 
     // Auto-notify client on status change
     const idea = video.ideaId ? await ctx.db.get(video.ideaId) : null;
@@ -188,11 +198,13 @@ export const update = mutation({
 export const archive = mutation({
   args: { token: v.string(), videoId: v.id("videos"), archived: v.boolean() },
   handler: async (ctx, args) => {
-    await requireEditor(ctx, args.token);
+    const user = await requireEditor(ctx, args.token);
+    const video = await ctx.db.get(args.videoId);
     await ctx.db.patch(args.videoId, {
       archived: args.archived,
       archivedAt: args.archived ? Date.now() : undefined,
     });
+    await auditLog(ctx, user, args.archived ? "archive" : "unarchive", "video", args.videoId, video?.title);
   },
 });
 
@@ -207,7 +219,9 @@ export const listArchived = query({
 export const remove = mutation({
   args: { token: v.string(), videoId: v.id("videos") },
   handler: async (ctx, args) => {
-    await requireEditor(ctx, args.token);
+    const user = await requireEditor(ctx, args.token);
+    const video = await ctx.db.get(args.videoId);
     await ctx.db.delete(args.videoId);
+    await auditLog(ctx, user, "delete", "video", args.videoId, video?.title);
   },
 });

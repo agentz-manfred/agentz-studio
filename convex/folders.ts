@@ -1,6 +1,13 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { authenticate, requireEditor } from "./lib";
+import { internal } from "./_generated/api";
+
+async function auditLog(ctx: any, user: any, action: string, entityType: string, entityId?: string, entityName?: string, details?: string) {
+  await ctx.scheduler.runAfter(0, internal.auditLog.log, {
+    userId: user._id, userName: user.name, action, entityType, entityId, entityName, details,
+  });
+}
 
 export const list = query({
   args: { parentId: v.optional(v.id("folders")), clientId: v.optional(v.id("clients")), token: v.optional(v.string()) },
@@ -73,7 +80,7 @@ export const create = mutation({
     const user = await requireEditor(ctx, args.token);
     const name = args.name.trim();
     if (!name) throw new Error("Ordnername darf nicht leer sein");
-    return ctx.db.insert("folders", {
+    const id = await ctx.db.insert("folders", {
       name,
       parentId: args.parentId,
       clientId: args.clientId,
@@ -81,6 +88,8 @@ export const create = mutation({
       createdBy: user._id,
       createdAt: Date.now(),
     });
+    await auditLog(ctx, user, "create", "folder", id, name);
+    return id;
   },
 });
 
@@ -129,12 +138,14 @@ export const move = mutation({
 export const remove = mutation({
   args: { token: v.string(), folderId: v.id("folders") },
   handler: async (ctx, args) => {
-    await requireEditor(ctx, args.token);
+    const user = await requireEditor(ctx, args.token);
+    const folder = await ctx.db.get(args.folderId);
     const childFolders = await ctx.db.query("folders").withIndex("by_parent", (q) => q.eq("parentId", args.folderId)).collect();
     if (childFolders.length > 0) throw new Error("Ordner enthält Unterordner");
     const childVideos = await ctx.db.query("videos").withIndex("by_folder", (q) => q.eq("folderId", args.folderId)).collect();
     if (childVideos.length > 0) throw new Error("Ordner enthält Videos");
     await ctx.db.delete(args.folderId);
+    await auditLog(ctx, user, "delete", "folder", args.folderId, folder?.name);
   },
 });
 

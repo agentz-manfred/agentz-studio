@@ -186,3 +186,21 @@ TODO hat neue Roadmap-Items. Empfehlung: Skeleton Loading für weitere Pages, da
 ## Run 7/9 — 04:02 — 6 Items offen, 3 Runs verbleibend (04, 05, 06)
 
 Plan: Skeleton Loading für restliche Pages, Archiv-Funktion, Drag & Drop Ordner, Suche verbessern
+
+### ✅ Erledigt in diesem Run:
+1. **Archiv-Funktion** — `archived`/`archivedAt` Felder auf Ideas + Videos Schema, Backend archive/unarchive/listArchived Mutations, Ideas aus Hauptliste gefiltert, Archiv-Tab mit Toggle-Button, Restore-Button pro Item, Bulk-Archivierung, Archive-Button in IdeaDetail
+2. **Skeleton Loading States** — Neue Skeletons für Pipeline, Calendar, Library, Clients, Team Pages. Alle 7 Hauptseiten haben jetzt Shimmer-Skeletons statt Spinner
+3. **Drag & Drop Ordner-Verschachtelung** — Ordner sind jetzt draggable, Drop-auf-Ordner verschachtelt sie, visuelles Highlight (Ring + Accent-Border) beim Hover, Circular-Reference-Check im Backend
+4. **Suche verbessern** — Volltextsuche über Titel UND Beschreibungen in Ideas, Backend search Query
+5. **Audit Log (Admin)** — Neues Schema `auditLogs` mit Indexes, Backend `auditLog.ts` (internalMutation + query), AuditLogPage mit Typ-Filter + Limit, Sidebar + Command Palette Integration, Audit-Logging auf ideas.create, ideas.updateStatus, ideas.archive/unarchive
+
+### 📋 TODO.md:
+- Email SMTP-Integration (aktuell nur geloggt)
+- Audit Log in weitere Mutations (videos, clients, folders) einbauen
+
+### Commits:
+- `1b1b034` — Archive, skeleton loading, D&D folders, search, audit log
+
+### Geschätzte verbleibende Arbeit:
+- 1 Run: Audit-Logging in restliche Mutations + Email SMTP
+- Die 6 TODO-Items von vorher sind alle abgearbeitet!

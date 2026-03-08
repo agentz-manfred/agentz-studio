@@ -1,6 +1,13 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { authenticate, requireEditor } from "./lib";
+import { internal } from "./_generated/api";
+
+async function auditLog(ctx: any, user: any, action: string, entityType: string, entityId?: string, entityName?: string, details?: string) {
+  await ctx.scheduler.runAfter(0, internal.auditLog.log, {
+    userId: user._id, userName: user.name, action, entityType, entityId, entityName, details,
+  });
+}
 
 export const list = query({
   args: { token: v.optional(v.string()) },
@@ -41,18 +48,20 @@ export const create = mutation({
     phone: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await requireEditor(ctx, args.token);
+    const user = await requireEditor(ctx, args.token);
     const name = args.name.trim();
     const email = args.email.trim();
     if (!name) throw new Error("Name darf nicht leer sein");
     if (!email) throw new Error("E-Mail darf nicht leer sein");
-    return ctx.db.insert("clients", {
+    const id = await ctx.db.insert("clients", {
       name,
       company: args.company?.trim(),
       email,
       phone: args.phone?.trim(),
       createdAt: Date.now(),
     });
+    await auditLog(ctx, user, "create", "client", id, name);
+    return id;
   },
 });
 
@@ -72,11 +81,12 @@ export const update = mutation({
     context: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await requireEditor(ctx, args.token);
+    const user = await requireEditor(ctx, args.token);
     const { id, token: _, ...updates } = args;
     const existing = await ctx.db.get(id);
     if (!existing) throw new Error("Client not found");
     await ctx.db.patch(id, updates);
+    await auditLog(ctx, user, "update", "client", id, existing.name);
     return id;
   },
 });
