@@ -24,12 +24,10 @@ export const list = query({
 });
 
 export const listAll = query({
-  args: { token: v.optional(v.string()) },
+  args: { token: v.string() },
   handler: async (ctx, args) => {
-    if (args.token) {
-      const user = await authenticate(ctx, args.token);
-      if (user.role === "client") return [];
-    }
+    const user = await authenticate(ctx, args.token);
+    if (user.role === "client") return [];
     return await ctx.db.query("folders").collect();
   },
 });

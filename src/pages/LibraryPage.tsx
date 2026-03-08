@@ -711,7 +711,8 @@ function BulkMoveDialog({
   onCancel: () => void;
   currentFolderId?: Id<"folders">;
 }) {
-  const allFolders = useQuery(api.folders.listAll, {});
+  const { token } = useAuth();
+  const allFolders = useQuery(api.folders.listAll, token ? { token } : "skip");
   const [selected, setSelected] = useState<string>("");
 
   return (

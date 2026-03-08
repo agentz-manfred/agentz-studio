@@ -1,5 +1,12 @@
 # AgentZ Studio — CHANGELOG
 
+## v2.8.0 (08.03.2026) — Nacht-Sprint Run 6: Accessibility + Bulk Ops
+- **Keyboard Accessibility** — Focus-Trap (useFocusTrap) auf NewIdeaModal + AiSuggestModal, erweiterte Keyboard-Shortcuts (⌘K, ↑↓, Esc)
+- **Optimistic Comments** — VideoReview zeigt Kommentare sofort an (pending state), kein Warten auf Server
+- **Bulk Video Operations** — Multi-Select in Mediathek, "Alle auswählen", Bulk-Verschieben in Ordner
+- **BulkMoveDialog** — Ordner-Picker für Bulk-Move mit folders.listAll Query
+- **Focus-Ring** — Global :focus-visible war bereits implementiert (2px accent outline)
+
 ## v2.7.0 (08.03.2026) — Nacht-Sprint Run 4: Security Deep Dive + Performance
 - **Security: Auth auf alle GET-Queries** — clients.get, folders.get, videos.get mit token-basierter Data Isolation
 - **Security: shareLinks** — create/deactivate mit Auth, createdBy vom Server statt Client
