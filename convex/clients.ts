@@ -78,7 +78,7 @@ export const update = mutation({
     contractEnd: v.optional(v.string()),
     platforms: v.optional(v.array(v.string())),
     mainPlatform: v.optional(v.string()),
-    videosPerMonth: v.optional(v.number()),
+    videosPerWeek: v.optional(v.number()),
     context: v.optional(v.string()),
     avatarColor: v.optional(v.string()),
     avatarImageId: v.optional(v.id("_storage")),

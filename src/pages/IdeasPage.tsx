@@ -167,7 +167,8 @@ export function AiSuggestModal({ onClose, onAccept, preselectedClientId }: { onC
   const selectedClient = (clients || []).find(c => c._id === clientId);
   const categories = useQuery(api.categories.listByClient, clientId && token ? { clientId: clientId as Id<"clients">, token } : "skip");
 
-  const videosPerMonth = selectedClient?.videosPerMonth || 5;
+  const videosPerWeek = selectedClient?.videosPerWeek || 5;
+  const videosPerMonth = Math.round(videosPerWeek * 4.33);
 
   const monthLabel = (() => {
     const [y, m] = selectedMonth.split("-");
@@ -244,6 +245,7 @@ export function AiSuggestModal({ onClose, onAccept, preselectedClientId }: { onC
                 <div className="h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] flex items-center text-[var(--color-text-secondary)]">
                   {videosPerMonth}
                 </div>
+                <p className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5">{videosPerWeek}/Woche × ~4,33</p>
               </div>
             </div>
             <button

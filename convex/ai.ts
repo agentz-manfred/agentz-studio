@@ -172,7 +172,7 @@ export const suggestIdeas = action({
     const categoryInfo = args.categoryNames?.length ? `\nVerfügbare Kategorien: ${args.categoryNames.join(", ")}` : "";
     const monthInfo = args.month ? `\nZielmonat: ${args.month} (berücksichtige saisonale Themen, Feiertage, Trends für diesen Monat)` : "";
 
-    const prompt = `Du bist ein kreativer Social-Media-Stratege. Schlage ${ideaCount} TikTok/Reels Video-Ideen vor für:
+    const prompt = `Du bist ein kreativer Social-Media-Stratege. Schlage ${ideaCount} TikTok/Reels Video-Ideen für den gesamten Monat vor (verteilt auf ca. 4 Wochen) für:
 
 Kunde: ${args.clientName}${args.clientCompany ? ` (${args.clientCompany})` : ""}${platformInfo}${contextBlock}${categoryInfo}${monthInfo}
 ${args.existingIdeas.length > 0 ? `\nBereits existierende Ideen (NICHT wiederholen):\n${args.existingIdeas.map(i => `- ${i}`).join("\n")}` : ""}

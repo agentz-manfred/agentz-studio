@@ -91,7 +91,7 @@ function ProfileEditor({
     contractEnd: client.contractEnd || "",
     platforms: client.platforms || [],
     mainPlatform: client.mainPlatform || "",
-    videosPerMonth: client.videosPerMonth ?? "",
+    videosPerWeek: client.videosPerWeek ?? "",
     context: client.context || "",
     avatarColor: client.avatarColor || "#4F46E5",
   });
@@ -127,8 +127,8 @@ function ProfileEditor({
         contractEnd: form.contractEnd || undefined,
         platforms: form.platforms.length ? form.platforms : undefined,
         mainPlatform: form.mainPlatform || undefined,
-        videosPerMonth: form.videosPerMonth
-          ? Number(form.videosPerMonth)
+        videosPerWeek: form.videosPerWeek
+          ? Number(form.videosPerWeek)
           : undefined,
         context: form.context || undefined,
         avatarColor: form.avatarColor || undefined,
@@ -310,22 +310,27 @@ function ProfileEditor({
           </p>
         </div>
 
-        {/* Videos per month */}
+        {/* Videos per week */}
         <div>
           <label className={labelClass}>
             <Hash className="w-3.5 h-3.5 inline mr-1" />
-            Videos pro Monat
+            Videos pro Woche
           </label>
           <input
             type="number"
             min="1"
-            value={form.videosPerMonth}
+            value={form.videosPerWeek}
             onChange={(e) =>
-              setForm({ ...form, videosPerMonth: e.target.value })
+              setForm({ ...form, videosPerWeek: e.target.value })
             }
-            placeholder="z.B. 30"
+            placeholder="z.B. 7"
             className={inputClass + " max-w-[160px]"}
           />
+          {form.videosPerWeek && Number(form.videosPerWeek) > 0 && (
+            <p className="text-[11px] text-[var(--color-text-tertiary)] mt-1">
+              ≈ {Math.round(Number(form.videosPerWeek) * 4.33)} Videos/Monat
+            </p>
+          )}
         </div>
 
         {/* Context / WYSIWYG */}
@@ -566,7 +571,7 @@ function ProfileInfo({ client }: { client: any }) {
   if (
     !client.contractStart &&
     !client.platforms?.length &&
-    !client.videosPerMonth &&
+    !client.videosPerWeek &&
     !client.context
   ) {
     return null;
@@ -624,14 +629,17 @@ function ProfileInfo({ client }: { client: any }) {
           </div>
         )}
 
-        {/* Videos/month */}
-        {client.videosPerMonth && (
+        {/* Videos/week */}
+        {client.videosPerWeek && (
           <div>
             <span className="text-[11px] text-[var(--color-text-tertiary)] uppercase tracking-wider font-medium">
-              Videos / Monat
+              Videos / Woche
             </span>
             <p className="mt-0.5 font-semibold text-[16px]">
-              {client.videosPerMonth}
+              {client.videosPerWeek}
+              <span className="text-[11px] font-normal text-[var(--color-text-tertiary)] ml-1.5">
+                ≈ {Math.round(client.videosPerWeek * 4.33)}/Monat
+              </span>
             </p>
           </div>
         )}
