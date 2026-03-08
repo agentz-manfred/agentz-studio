@@ -1,5 +1,34 @@
 # AgentZ Studio — Nightly Sprint Log
 
+## Run 8/9 — 05:02 — 2 Items offen (1 erledigt, 1 implementiert), 1 Run verbleibend
+
+### ✅ Erledigt in diesem Run:
+1. **Email SMTP via Resend** — `convex/email.ts` komplett neu: Resend API (fetch-basiert), kontextbezogene Email-Texte (Freigabe, Korrektur, Geschnitten, Veröffentlicht), branded HTML Template. Graceful fallback (DRY RUN log) wenn kein RESEND_API_KEY gesetzt.
+2. **Comments Data Isolation** — Client-User sehen jetzt nur Kommentare zu eigenen Ideas/Videos (check via clientId).
+3. **shootDates Auth** — Backend gibt ohne Token leere Liste zurück (vorher: alles offen!). Frontend auf `"skip"` umgestellt.
+4. **invites.listByClient Auth** — Jetzt Admin-only mit Token-Validierung (vorher: optional/offen).
+5. **Session Cleanup Cron** — `convex/crons.ts` + `convex/maintenance.ts`: Tägliches Aufräumen abgelaufener Sessions um 3:00 UTC.
+6. **Lazy Load Retry** — `lazyRetry()` Wrapper: Auto-Reload bei "Failed to fetch dynamically imported module" nach Vercel-Deployments.
+7. **🐛 KRITISCHER BUG FIX: Mediathek Crash** — `FolderCard` fehlte `isDragOver` + `onDragStart` im Destructuring → `ReferenceError: isDragOver is not defined`. Mediathek war komplett unbenutzbar!
+8. **Audit Log Item 2 verifiziert** — War bereits in Run 7 implementiert (videos, clients, folders).
+9. **Visueller Test** — Dashboard, Pipeline, Ideen, Kalender, Mediathek, Audit Log, Mobile (375px) — alle funktional und konsistent.
+
+### 📋 TODO.md:
+Alle Items abgearbeitet! Nur noch Backlog-Items (Resend API Key einrichten, Bunny CDN, TikTok API, etc.)
+
+### Commits:
+- `af8d48a` — Security: email SMTP via Resend, comments data isolation, shootDates auth, invites auth
+- `0bdf341` — Fix: shootDates queries use skip, session cleanup cron
+- `0f25950` — Feat: lazy load retry, changelog v2.10
+- `def15ea` — Fix: FolderCard missing isDragOver + onDragStart destructuring (CRITICAL)
+
+### Geschätzte verbleibende Arbeit:
+- TODO.md ist leer (nur Backlog)
+- Alle Seiten funktional getestet
+- Nächster Run (06:00): Weiterer Feinschliff, evtl. Light Mode check, Performance-Optimierung
+
+---
+
 ## Run 1/9 — 22:02 — 14 Items offen, 9 Runs verbleibend
 
 ### ✅ Erledigt in diesem Run:
