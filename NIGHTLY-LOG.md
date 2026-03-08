@@ -111,3 +111,24 @@ Commits:
 
 ### Zusammenfassung Run 3:
 **Security-Sprint abgeschlossen.** Alle 10 Convex-Dateien haben jetzt token-basierte Auth. Jede Mutation prüft Berechtigung. Client-User sehen nur eigene Daten. Notifications.create ist intern. Keine offenen Endpoints mehr.
+
+## Run 4/9 — 01:02 — 0 Items offen, 5 Runs verbleibend
+
+TODO war leer. Fokus: Security Deep Dive, Performance, Edge Cases.
+
+### ✅ Erledigt in diesem Run:
+1. **Auth auf GET-Queries** — clients.get, folders.get, videos.get mit token-basierter Data Isolation für Client-Rolle
+2. **Input Validation** — Trim + Empty-Checks auf allen create/rename Mutations (Clients, Folders, Videos, Ideas, Comments)
+3. **Status Validation** — ideas.updateStatus + videos.updateStatus validieren jetzt gegen Whitelist
+4. **shareLinks Security** — create braucht jetzt Auth-Token, createdBy wird serverseitig gesetzt; deactivate braucht Editor-Token
+5. **Invite Password Validation** — Min 6 Zeichen bei redeem
+6. **Code Splitting** — React.lazy() für alle Pages, Main Bundle 1035KB → 353KB (-66%!)
+7. **Not-Found States** — Ideas + Videos zeigen "Nicht gefunden" statt ewigem Loading bei ungültigen IDs
+8. **Light/Dark Mode Test** — Alle Seiten visuell geprüft in beiden Modi
+9. **Mobile Test** — Dashboard, Pipeline, Ideas auf 375px getestet
+10. **Visueller Check** — Dashboard, Pipeline, Kunden, Ideen, Kalender, Mediathek, Team, Settings — alles konsistent
+
+### Noch offen:
+- TODO.md ist leer
+- Keine kritischen Bugs gefunden
+- Mögliche nächste Steps: Session Cleanup (expired sessions), Error Boundaries, E2E Tests, weitere Design-Polierung

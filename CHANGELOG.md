@@ -1,5 +1,14 @@
 # AgentZ Studio — CHANGELOG
 
+## v2.7.0 (08.03.2026) — Nacht-Sprint Run 4: Security Deep Dive + Performance
+- **Security: Auth auf alle GET-Queries** — clients.get, folders.get, videos.get mit token-basierter Data Isolation
+- **Security: shareLinks** — create/deactivate mit Auth, createdBy vom Server statt Client
+- **Input Validation** — Trim + Empty-Checks auf create/rename (Clients, Folders, Videos, Ideas, Comments)
+- **Status Validation** — ideas.updateStatus + videos.updateStatus lehnen ungültige Status-Strings ab
+- **Invite Password** — Min 6 Zeichen Validierung bei redeem
+- **Code Splitting** — Lazy-loaded Pages, Main Bundle 1035KB → 353KB (66% kleiner!)
+- **UX: Not-Found States** — Ideas + Videos zeigen "Nicht gefunden" statt ewigem Laden bei ungültigen IDs
+
 ## v2.6.0 (08.03.2026) — Nacht-Sprint Run 2
 - **Kalender-View** — Veröffentlichungsdaten (grün) neben Drehterminen (lila), Filter-Buttons, Legende
 - **scheduledPublishDate** auf Ideas + Kalender + IdeaDetail Datepicker
