@@ -112,7 +112,7 @@ export function VideosPage({ onNavigate }: VideosPageProps) {
           </div>
           <p className="text-[16px] font-semibold text-[var(--color-text-primary)]">Noch keine Videos</p>
           <p className="text-[13px] text-[var(--color-text-tertiary)] mt-1.5 max-w-[300px] mx-auto">
-            Laden Sie Videos über die Ideen-Detailseite hoch, um den Review-Prozess zu starten.
+            Lade Videos über die Ideen-Detailseite hoch, um den Review-Prozess zu starten.
           </p>
           {user?.role === "admin" && (
             <button

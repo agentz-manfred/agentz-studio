@@ -180,7 +180,7 @@ function CreateLoginModal({ client, onClose }: { client: any; onClose: () => voi
               required
               minLength={6}
             />
-            <p className="text-[11px] text-[var(--color-text-tertiary)] mt-1">Mindestens 6 Zeichen. Sichtbar, damit Sie es dem Kunden mitteilen können.</p>
+            <p className="text-[11px] text-[var(--color-text-tertiary)] mt-1">Mindestens 6 Zeichen. Sichtbar, damit du es dem Kunden mitteilen kannst.</p>
           </div>
           {error && <p className="text-[13px] text-[var(--color-error)]">{error}</p>}
           <div className="flex gap-3 pt-2">
@@ -257,7 +257,7 @@ function InviteLinkModal({ client, onClose }: { client: any; onClose: () => void
           {!inviteUrl ? (
             <>
               <p className="text-[14px] text-[var(--color-text-secondary)] mb-4">
-                Erstellen Sie einen Einladungslink, den Sie dem Kunden per E-Mail oder WhatsApp senden können.
+                Erstelle einen Einladungslink, den du dem Kunden per E-Mail oder WhatsApp senden kannst.
                 Der Kunde kann damit selbst ein Passwort setzen und sich anmelden.
               </p>
               <p className="text-[12px] text-[var(--color-text-tertiary)] mb-5">

@@ -556,8 +556,8 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
             </p>
             <p className="text-[13px] text-[var(--color-text-tertiary)] mt-1.5 max-w-[300px] mx-auto">
               {currentFolderId
-                ? "Ziehen Sie Videos hierher oder erstellen Sie Unterordner."
-                : "Erstellen Sie Ordner um Ihre Videos zu organisieren."}
+                ? "Ziehe Videos hierher oder erstelle Unterordner."
+                : "Erstelle Ordner um Videos zu organisieren."}
             </p>
             {user?.role === "admin" && (
               <button
