@@ -49,6 +49,7 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
   const [showStatusMenu, setShowStatusMenu] = useState(false);
+  const [pendingComments, setPendingComments] = useState<{ id: string; content: string; timestamp?: number; createdAt: number }[]>([]);
 
   const userMap = useMemo(() => {
     const map: Record<string, string> = {};
@@ -117,14 +118,22 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim() || !user || !token) return;
-    await createComment({
-      token,
-      targetType: "video",
-      targetId: videoId,
-      content: newComment.trim(),
-      timestamp: addTimestamp ? Math.floor(currentTime) : undefined,
-    });
+    const content = newComment.trim();
+    const ts = addTimestamp ? Math.floor(currentTime) : undefined;
+    const tempId = `pending-${Date.now()}`;
+    setPendingComments((p) => [...p, { id: tempId, content, timestamp: ts, createdAt: Date.now() }]);
     setNewComment("");
+    try {
+      await createComment({
+        token,
+        targetType: "video",
+        targetId: videoId,
+        content,
+        timestamp: ts,
+      });
+    } finally {
+      setPendingComments((p) => p.filter((c) => c.id !== tempId));
+    }
   };
 
   const handleSeek = (time: number) => {
@@ -332,6 +341,18 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
               onReplySubmit={handleReply}
               onReplyCancel={() => { setReplyingTo(null); setReplyText(""); }}
             />
+          ))}
+
+          {/* Optimistic pending comments */}
+          {pendingComments.map((pc) => (
+            <div key={pc.id} className="rounded-[var(--radius-md)] border border-[var(--color-accent)]/20 bg-[var(--color-accent-surface)] p-3 opacity-70 animate-in">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[12px] font-medium">{user?.name}</span>
+                {pc.timestamp != null && <TimestampBadge time={pc.timestamp} />}
+              </div>
+              <p className="text-[13px] leading-relaxed text-[var(--color-text-secondary)]">{pc.content}</p>
+              <p className="text-[11px] text-[var(--color-text-tertiary)] mt-2">Wird gesendet…</p>
+            </div>
           ))}
 
           {/* Resolved section */}

@@ -6,6 +6,7 @@ import { exportIdeasCSV } from "../lib/export";
 import { useState } from "react";
 import { STATUS_LABELS } from "../lib/utils";
 import { useClientFilter } from "../lib/clientFilter";
+import { useFocusTrap } from "../hooks/useFocusTrap";
 import type { Id } from "../../convex/_generated/dataModel";
 
 function StatusDot({ status }: { status: string }) {
@@ -32,6 +33,7 @@ function NewIdeaModal({ onClose }: { onClose: () => void }) {
   const [clientId, setClientId] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const trapRef = useFocusTrap<HTMLDivElement>(true, onClose);
   const categories = useQuery(
     api.categories.listByClient,
     clientId ? { clientId: clientId as Id<"clients"> } : "skip"
@@ -53,7 +55,7 @@ function NewIdeaModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] w-full max-w-[440px] mx-4">
+      <div ref={trapRef} className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] w-full max-w-[440px] mx-4">
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border-subtle)]">
           <h3 className="text-[17px] font-semibold">Neue Idee</h3>
           <button onClick={onClose} className="p-1 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors">
@@ -153,6 +155,7 @@ export function AiSuggestModal({ onClose, onAccept, preselectedClientId }: { onC
   const ideas = useQuery(api.ideas.list, {});
   const suggestIdeas = useAction(api.ai.suggestIdeas);
   const [clientId, setClientId] = useState(preselectedClientId || "");
+  const trapRef = useFocusTrap<HTMLDivElement>(true, onClose);
   const [suggestions, setSuggestions] = useState<Array<{ title: string; description: string; category?: string }>>([]);
   const [loading, setLoading] = useState(false);
   const now = new Date();
@@ -198,7 +201,7 @@ export function AiSuggestModal({ onClose, onAccept, preselectedClientId }: { onC
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] w-full max-w-[520px] mx-4 max-h-[80vh] overflow-hidden flex flex-col">
+      <div ref={trapRef} className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] w-full max-w-[520px] mx-4 max-h-[80vh] overflow-hidden flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border-subtle)]">
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-violet-500" />

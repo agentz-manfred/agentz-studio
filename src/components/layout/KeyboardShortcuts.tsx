@@ -2,15 +2,18 @@ import { useState, useEffect } from "react";
 import { X, Keyboard } from "lucide-react";
 
 const SHORTCUTS = [
+  { section: "Navigation", items: [
+    { keys: ["⌘", "K"], desc: "Suche / Command Palette" },
+    { keys: ["↑", "↓"], desc: "Sidebar Navigation" },
+    { keys: ["?"], desc: "Diese Übersicht" },
+    { keys: ["Esc"], desc: "Dialog / Modal schließen" },
+  ]},
   { section: "Video Player", items: [
     { keys: ["Space"], desc: "Play / Pause" },
     { keys: ["←"], desc: "5 Sekunden zurück" },
     { keys: ["→"], desc: "5 Sekunden vor" },
     { keys: ["M"], desc: "Ton ein/aus" },
     { keys: ["F"], desc: "Vollbild" },
-  ]},
-  { section: "Navigation", items: [
-    { keys: ["?"], desc: "Diese Übersicht" },
   ]},
 ];
 

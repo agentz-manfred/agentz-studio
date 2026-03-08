@@ -22,6 +22,8 @@ import {
   Eye,
   EyeOff,
   Users,
+  CheckSquare,
+  Square,
 } from "lucide-react";
 import { VIDEO_STATUS_LABELS, STATUS_BADGE_STYLES } from "../lib/utils";
 import { useClientFilter } from "../lib/clientFilter";
@@ -309,6 +311,8 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
   const [renaming, setRenaming] = useState<{ type: "folder" | "video"; id: string; name: string } | null>(null);
   const [dragOverFolder, setDragOverFolder] = useState<string | null>(null);
   const [assigningClient, setAssigningClient] = useState<{ type: "folder" | "video"; id: string; clientId?: string } | null>(null);
+  const [selectedVideoIds, setSelectedVideoIds] = useState<Set<string>>(new Set());
+  const [bulkMoveTarget, setBulkMoveTarget] = useState<string | null>(null);
 
   const { selectedClientId } = useClientFilter();
   const clients = useQuery(api.clients.list);
@@ -388,6 +392,30 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
     if (videoId && token) {
       await moveVideo({ token, videoId: videoId as Id<"videos">, folderId: currentFolderId });
     }
+  };
+
+  const toggleVideoSelect = (id: string) => {
+    setSelectedVideoIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const selectAllVideos = () => {
+    if (selectedVideoIds.size === filteredVideos.length) setSelectedVideoIds(new Set());
+    else setSelectedVideoIds(new Set(filteredVideos.map((v) => v._id)));
+  };
+
+  const handleBulkMove = async (targetFolderId: string | undefined) => {
+    if (!token || selectedVideoIds.size === 0) return;
+    const promises = [...selectedVideoIds].map((id) =>
+      moveVideo({ token, videoId: id as Id<"videos">, folderId: targetFolderId as Id<"folders"> | undefined })
+    );
+    await Promise.all(promises);
+    setSelectedVideoIds(new Set());
+    setBulkMoveTarget(null);
   };
 
   const isEmpty = filteredFolders.length === 0 && filteredVideos.length === 0;
@@ -511,34 +539,101 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
           </div>
         )}
 
+        {/* Bulk action bar */}
+        {selectedVideoIds.size > 0 && user?.role === "admin" && (
+          <div className="mb-4 animate-in">
+            <div className="flex items-center gap-3 px-4 py-2.5 rounded-[var(--radius-md)] bg-[var(--color-accent-surface)] border border-[var(--color-accent)]/20">
+              <span className="text-[13px] font-medium text-[var(--color-accent)]">
+                {selectedVideoIds.size} Video{selectedVideoIds.size > 1 ? "s" : ""} ausgewählt
+              </span>
+              <button
+                onClick={() => setBulkMoveTarget("__pick__")}
+                className="h-7 px-3 rounded-[var(--radius-sm)] bg-[var(--color-accent)] text-white text-[12px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors flex items-center gap-1.5"
+              >
+                <ArrowRight className="w-3 h-3" />
+                Verschieben
+              </button>
+              <button
+                onClick={() => setSelectedVideoIds(new Set())}
+                className="ml-auto text-[12px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
+              >
+                Auswahl aufheben
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Videos */}
         {filteredVideos.length > 0 && (
           <div className="animate-in stagger-3">
-            <p className="text-[11px] font-medium text-[var(--color-text-tertiary)] uppercase tracking-wider mb-2.5">Videos</p>
+            <div className="flex items-center gap-2 mb-2.5">
+              <p className="text-[11px] font-medium text-[var(--color-text-tertiary)] uppercase tracking-wider">Videos</p>
+              {user?.role === "admin" && filteredVideos.length > 0 && (
+                <button
+                  onClick={selectAllVideos}
+                  className="flex items-center gap-1 text-[11px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"
+                >
+                  {selectedVideoIds.size === filteredVideos.length ? (
+                    <CheckSquare className="w-3 h-3 text-[var(--color-accent)]" />
+                  ) : (
+                    <Square className="w-3 h-3" />
+                  )}
+                  Alle
+                </button>
+              )}
+            </div>
             {viewMode === "grid" ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {filteredVideos.map((video) => (
-                  <VideoFileCard
-                    key={video._id}
-                    video={video}
-                    viewMode="grid"
-                    onOpen={() => onNavigate("video", video._id)}
-                    onRename={() => setRenaming({ type: "video", id: video._id, name: video.title })}
-                    onDragStart={(e) => e.dataTransfer.setData("video-id", video._id)}
-                  />
+                  <div key={video._id} className="relative">
+                    {user?.role === "admin" && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); toggleVideoSelect(video._id); }}
+                        className="absolute top-2 left-2 z-10 p-0.5 rounded bg-black/40 backdrop-blur-sm"
+                      >
+                        {selectedVideoIds.has(video._id) ? (
+                          <CheckSquare className="w-4 h-4 text-[var(--color-accent)]" />
+                        ) : (
+                          <Square className="w-4 h-4 text-white/70 hover:text-white" />
+                        )}
+                      </button>
+                    )}
+                    <VideoFileCard
+                      video={video}
+                      viewMode="grid"
+                      onOpen={() => onNavigate("video", video._id)}
+                      onRename={() => setRenaming({ type: "video", id: video._id, name: video.title })}
+                      onDragStart={(e) => e.dataTransfer.setData("video-id", video._id)}
+                    />
+                  </div>
                 ))}
               </div>
             ) : (
               <div className="space-y-1.5">
                 {filteredVideos.map((video) => (
-                  <VideoFileCard
-                    key={video._id}
-                    video={video}
-                    viewMode="list"
-                    onOpen={() => onNavigate("video", video._id)}
-                    onRename={() => setRenaming({ type: "video", id: video._id, name: video.title })}
-                    onDragStart={(e) => e.dataTransfer.setData("video-id", video._id)}
-                  />
+                  <div key={video._id} className="flex items-center gap-2">
+                    {user?.role === "admin" && (
+                      <button
+                        onClick={() => toggleVideoSelect(video._id)}
+                        className="flex-shrink-0 p-1"
+                      >
+                        {selectedVideoIds.has(video._id) ? (
+                          <CheckSquare className="w-4 h-4 text-[var(--color-accent)]" />
+                        ) : (
+                          <Square className="w-4 h-4 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]" />
+                        )}
+                      </button>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <VideoFileCard
+                        video={video}
+                        viewMode="list"
+                        onOpen={() => onNavigate("video", video._id)}
+                        onRename={() => setRenaming({ type: "video", id: video._id, name: video.title })}
+                        onDragStart={(e) => e.dataTransfer.setData("video-id", video._id)}
+                      />
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
@@ -596,6 +691,56 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
           onCancel={() => setAssigningClient(null)}
         />
       )}
+      {bulkMoveTarget && (
+        <BulkMoveDialog
+          onMove={handleBulkMove}
+          onCancel={() => setBulkMoveTarget(null)}
+          currentFolderId={currentFolderId}
+        />
+      )}
+    </div>
+  );
+}
+
+function BulkMoveDialog({
+  onMove,
+  onCancel,
+  currentFolderId,
+}: {
+  onMove: (folderId: string | undefined) => void;
+  onCancel: () => void;
+  currentFolderId?: Id<"folders">;
+}) {
+  const allFolders = useQuery(api.folders.listAll, {});
+  const [selected, setSelected] = useState<string>("");
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={onCancel}>
+      <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] shadow-[var(--shadow-lg)] p-5 w-[360px]" onClick={(e) => e.stopPropagation()}>
+        <h3 className="text-[15px] font-semibold mb-3">Videos verschieben</h3>
+        <select
+          value={selected}
+          onChange={(e) => setSelected(e.target.value)}
+          className="w-full h-9 px-3 rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none"
+        >
+          <option value="">Mediathek (Root)</option>
+          {(allFolders || [])
+            .filter((f) => f._id !== currentFolderId)
+            .map((f) => (
+              <option key={f._id} value={f._id}>{f.name}</option>
+            ))}
+        </select>
+        <div className="flex justify-end gap-2 mt-4">
+          <button onClick={onCancel} className="h-8 px-3 rounded-[var(--radius-md)] text-[13px] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] transition-colors">Abbrechen</button>
+          <button
+            onClick={() => onMove(selected || undefined)}
+            className="h-8 px-3 rounded-[var(--radius-md)] text-[13px] bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] transition-colors font-medium flex items-center gap-1.5"
+          >
+            <ArrowRight className="w-3 h-3" />
+            Verschieben
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
