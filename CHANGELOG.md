@@ -1,5 +1,10 @@
 # AgentZ Studio — CHANGELOG
 
+## v2.11.0 (08.03.2026) — Nacht-Sprint Run 9: Zero Open Queries
+- **Security: Auth auf ALLE Queries** — videos.list, listByClient, listByFolder, comments.list, categories.listByClient, scripts.listByIdea, folders.getBreadcrumbs, folders.countItems — alle erfordern jetzt Auth-Token
+- **Data Isolation** — Client-User sehen bei Videos nur clientVisible + eigene, bei Comments nur eigene Ideas/Videos
+- **Frontend komplett angepasst** — Alle 8 betroffenen Pages (VideosPage, LibraryPage, IdeaDetail, ClientsPage, SettingsPage, PipelinePage, IdeasPage, ClientDetail, CommandPalette, ClientDashboard) übergeben Token
+
 ## v2.10.0 (08.03.2026) — Nacht-Sprint Run 8: Security Hardening + Resilience
 - **Email SMTP via Resend** — sendStatusNotification nutzt Resend API (fetch-basiert), Graceful Fallback wenn kein API-Key
 - **Comments Data Isolation** — Client-User sehen nur Kommentare zu eigenen Ideas/Videos

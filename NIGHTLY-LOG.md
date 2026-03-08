@@ -2,7 +2,39 @@
 
 ## Run 9/9 — 06:02 — 0 Items offen, LETZTER RUN
 
-TODO.md ist leer (nur Backlog). Fokus: Finaler Quality Check, Edge Cases, Design Polish.
+TODO.md ist leer (nur Backlog). Fokus: Finaler Security Audit.
+
+### ✅ Erledigt in diesem Run:
+1. **KRITISCH: Auth auf alle offenen Queries** — Systematischer Audit aller Convex-Queries. Gefunden: 8 Queries ohne Auth-Pflicht:
+   - `videos.list` — Alle Videos ohne Login abrufbar!
+   - `videos.listByClient` — Kundendaten offen
+   - `videos.listByFolder` — Mediathek-Inhalte offen
+   - `comments.list` — Kommentare ohne Auth lesbar (trotz Data Isolation nur MIT Token)
+   - `categories.listByClient` — Kategorien offen
+   - `scripts.listByIdea` — Skripte offen
+   - `folders.getBreadcrumbs` — Ordnerstruktur offen
+   - `folders.countItems` — Ordner-Counts offen
+2. **Alle gefixed** — Token required, leere Arrays ohne Auth, Client-Data-Isolation bei Videos
+3. **Frontend angepasst** — 10 Dateien: VideosPage, LibraryPage, IdeaDetail, ClientsPage, SettingsPage, PipelinePage, IdeasPage, ClientDetail, CommandPalette, ClientDashboard
+4. **TypeScript clean** — Keine Fehler
+5. **Build erfolgreich** — Main bundle 358KB gzip 108KB, gutes Code Splitting
+6. **Convex deployed + Git pushed**
+
+### Commits:
+- `695e9e4` — Security: require auth on all remaining open queries
+
+### 🏁 NACHT-SPRINT ABSCHLUSS (22:00 - 06:02):
+**9 Runs, ~7.5 Stunden, Ergebnis:**
+- ✅ Alle 14 TODO-Items implementiert (Run 1-2)
+- ✅ Kompletter Security Deep Dive — ALLE Endpoints auth-gesichert (Run 3-4, 8-9)
+- ✅ Code Splitting -66% Bundle-Größe (Run 4)
+- ✅ Keyboard Accessibility, Optimistic Updates, Bulk Ops (Run 5-6)
+- ✅ Archiv, Drag&Drop Ordner, Audit Log, Suche (Run 7)
+- ✅ Email-Notifications via Resend, Session Cleanup Cron (Run 8)
+- ✅ Lazy Load Retry, Error Boundaries, Skeleton Loading (Run 4-7)
+- ✅ Finaler Security Audit: 0 offene Queries mehr (Run 9)
+
+**v2.5.0 → v2.11.0 in einer Nacht. Production-ready.**
 
 ## Run 8/9 — 05:02 — 2 Items offen (1 erledigt, 1 implementiert), 1 Run verbleibend
 
