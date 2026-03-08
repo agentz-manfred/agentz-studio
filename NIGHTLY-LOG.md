@@ -201,6 +201,13 @@ Plan: Skeleton Loading für restliche Pages, Archiv-Funktion, Drag & Drop Ordner
 ### Commits:
 - `1b1b034` — Archive, skeleton loading, D&D folders, search, audit log
 
+### Bonus (noch im selben Run):
+6. **Audit Logging erweitert** — videos.ts (create, status_change, archive, delete), clients.ts (create, update), folders.ts (create, delete) — alle mit auditLog()
+
+### Commits:
+- `1b1b034` — Archive, skeleton loading, D&D folders, search, audit log
+- `bd1c98f` — Audit logging on videos, clients, folders mutations
+
 ### Geschätzte verbleibende Arbeit:
-- 1 Run: Audit-Logging in restliche Mutations + Email SMTP
-- Die 6 TODO-Items von vorher sind alle abgearbeitet!
+- Email SMTP-Integration (braucht externes API wie Resend/SendGrid)
+- Alle 6 Original-TODO-Items abgearbeitet!
