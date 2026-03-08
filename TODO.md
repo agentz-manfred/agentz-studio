@@ -4,7 +4,7 @@ Items werden von oben nach unten abgearbeitet. Erledigtes kommt ins CHANGELOG.md
 
 ## Features
 
-- [ ] **Generelles Styling-Audit:** Konsistenz überall prüfen. Sieht es wie ein eigenes Produkt aus oder wie ein shadcn-Template?
+- [x] **Generelles Styling-Audit:** ✅ Alle 11 Seiten Desktop + Mobile geprüft. Design konsistent, professionell, eigene Identität.
 
 ## Vom Nacht-Sprint als erledigt markiert (VERIFIZIERT ✅):
 - [x] Email SMTP ✅
@@ -40,9 +40,9 @@ Items werden von oben nach unten abgearbeitet. Erledigtes kommt ins CHANGELOG.md
 
 ### ⚠️ Sicherheit
 
-- [ ] **SECURITY: `simpleHash` statt bcrypt** (`convex/auth.ts:6`): Passwörter werden mit einer simplen XOR-Hash-Funktion gehasht. Kein Salt, trivial umkehrbar. Bei Datenleak sind alle Passwörter sofort kompromittiert. **Fix:** Bcrypt via Convex Action verwenden.
+- [x] **SECURITY: `simpleHash` statt bcrypt**: ✅ Bcrypt (10 rounds) via Convex Node Actions. Auto-Migration bestehender Passwörter beim Login. authActions.ts + authInternal.ts.
 
-- [ ] **SECURITY: `Math.random()` für Session-Tokens** (`convex/auth.ts:18`): Nicht kryptographisch sicher. Tokens sind vorhersagbar. **Fix:** `crypto.getRandomValues()` verwenden (in Convex Actions möglich).
+- [x] **SECURITY: `Math.random()` für Session-Tokens**: ✅ `crypto.randomBytes()` via Convex Node Actions. 64-Byte Base64URL Tokens.
 
 - [x] **SECURITY: Rate Limiting auf Login**: ✅ Max 5 Fehlversuche pro Minute pro Email. `loginAttempts` Tabelle, Cleanup in `cleanupSessions`.
 

@@ -1,5 +1,12 @@
 # AgentZ Studio — CHANGELOG
 
+## v2.12.0 (08.03.2026) — Security Hardening: bcrypt + Crypto Tokens
+- **SECURITY: bcrypt Password Hashing** — Alle Passwörter werden jetzt mit bcrypt (10 Rounds) gehasht statt der unsicheren simpleHash XOR-Funktion. Neue Convex Node Actions (`authActions.ts`) für Login, Register, ChangePassword, ResetPassword. Automatische Migration: bestehende simpleHash-Passwörter werden beim nächsten Login transparent zu bcrypt upgraded.
+- **SECURITY: Kryptographisch sichere Session-Tokens** — `crypto.randomBytes()` statt `Math.random()`. 64-Byte Base64URL-Tokens sind nicht mehr vorhersagbar.
+- **Invite-System:** `invitesActions.ts` + `invitesInternal.ts` — Invite-Redeem nutzt jetzt ebenfalls bcrypt + sichere Tokens.
+- **Code-Architektur:** Saubere Trennung in Node Actions (mit `"use node"`) und Internal Mutations/Queries. Frontend: `useAction` statt `useMutation` für alle Auth-Operationen.
+- **Visueller Audit:** Alle 11 Seiten auf Desktop (1280px) und Mobile (375px) geprüft — Design konsistent und professionell.
+
 ## v2.11.3 (08.03.2026) — Security & Code Quality
 - **SECURITY: Rate Limiting auf Login** — Max 5 Fehlversuche pro Minute pro Email. Neue `loginAttempts` Tabelle, automatisches Cleanup in `cleanupSessions`.
 - **CODE QUALITY: ~18x `as any` Casts entfernt** — `clientFilter` korrekt als `Id<"clients">` getypt, Client-Properties (`avatarColor`, `context`, `platforms`, `mainPlatform`, `videosPerMonth`) direkt ohne Cast angesprochen. Nur 2 harmlose `as any` verbleiben (navigator.standalone + KanbanBoard prop widening).
