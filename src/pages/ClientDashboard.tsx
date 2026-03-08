@@ -23,7 +23,7 @@ export function ClientDashboard({ onNavigate }: { onNavigate: (page: string, id?
     api.ideas.list,
     user?.clientId ? { clientId: user.clientId as any } : "skip"
   );
-  const shootDates = useQuery(api.shootDates.list, { token: token || "" });
+  const shootDates = useQuery(api.shootDates.list, token ? { token } : "skip");
   const videos = useQuery(
     api.videos.listByClient,
     user?.clientId ? { clientId: user.clientId as Id<"clients"> } : "skip"

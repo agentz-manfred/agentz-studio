@@ -387,7 +387,7 @@ export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onB
   const { user, token } = useAuth();
   const ideas = useQuery(api.ideas.list, {});
   const clients = useQuery(api.clients.list);
-  const shootDates = useQuery(api.shootDates.list, { token: token || "" });
+  const shootDates = useQuery(api.shootDates.list, token ? { token } : "skip");
   const updateStatus = useMutation(api.ideas.updateStatus);
   const updateIdea = useMutation(api.ideas.update);
   const archiveIdea = useMutation(api.ideas.archive);

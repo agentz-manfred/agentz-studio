@@ -503,7 +503,7 @@ export function AdminDashboard({
   const { user, token } = useAuth();
   const ideas = useQuery(api.ideas.list, {});
   const clients = useQuery(api.clients.list);
-  const shoots = useQuery(api.shootDates.list, { token: token || "" });
+  const shoots = useQuery(api.shootDates.list, token ? { token } : "skip");
   const [widgetConfig, setWidgetConfig] = useState<WidgetConfig>(getWidgetConfig);
   const [showWidgetConfig, setShowWidgetConfig] = useState(false);
 
