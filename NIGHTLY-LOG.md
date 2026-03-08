@@ -138,3 +138,32 @@ TODO war leer. Fokus: Security Deep Dive, Performance, Edge Cases.
 ## Run 5/9 — 02:02 — 6 Items offen, 4 Runs verbleibend
 
 Plan: Keyboard Accessibility, Optimistic Updates, Activity Log/Timeline
+
+---
+
+## Run 6/9 — 03:02 — 6 Items offen, 4 Runs verbleibend (03, 04, 05, 06)
+
+### Analyse: Was war wirklich noch offen?
+Beim Prüfen stellte sich heraus, dass 3 von 6 Items bereits implementiert waren:
+- ✅ Activity Log / Timeline → ClientDetail hatte es schon (mit Filtern!)
+- ✅ Dashboard Widgets Konfigurierbar → localStorage, show/hide, reorder war alles da
+- ✅ Export / Reporting → CSV-Export + Monatsbericht (HTML/Print-to-PDF) existierten
+- ✅ Bulk Operations Ideas → Multi-Select + Bulk-Status war fertig
+
+### ✅ Erledigt in diesem Run:
+1. **Keyboard Accessibility** — useFocusTrap Hook auf NewIdeaModal + AiSuggestModal angewendet, Keyboard Shortcuts Dialog erweitert (⌘K, ↑↓, Esc dokumentiert), :focus-visible war global schon vorhanden
+2. **Optimistic Comments (VideoReview)** — pendingComments State, sofortige Anzeige mit "Wird gesendet…" Badge, Server-Bestätigung im Hintergrund
+3. **Bulk Video Operations (Mediathek)** — Multi-Select Checkboxes (Grid + List View), "Alle auswählen", Bulk-Move-Bar mit Ordner-Picker Dialog
+4. **folders.listAll Query** — Neuer Convex-Endpunkt für alle Ordner (Admin-only, token required)
+5. **Security: folders.listAll** — Token von optional auf required geändert
+6. **CHANGELOG v2.8.0** — Alles dokumentiert
+
+### Commits:
+- `35c7edb` — Keyboard accessibility, optimistic comments, bulk video ops
+- `ca4d999` — Security: require auth token on folders.listAll
+
+### 📋 TODO.md ist LEER! 🎉
+Alle 6 TODO-Items abgearbeitet (3 implementiert, 3 waren schon fertig).
+
+### Nächster Run:
+TODO ist leer → Weitere Edge Cases, Design-Polierung, neue sinnvolle Features
