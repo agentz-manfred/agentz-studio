@@ -27,9 +27,9 @@ function TimestampBadge({ time, onClick }: { time: number; onClick?: () => void 
 
 export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; onBack: () => void; onNavigate?: (page: string, id?: string) => void }) {
   const { user, token } = useAuth();
-  const video = useQuery(api.videos.get, { videoId: videoId as Id<"videos"> });
-  const linkedIdea = useQuery(api.ideas.get, video?.ideaId ? { ideaId: video.ideaId } : "skip");
-  const comments = useQuery(api.comments.list, { targetType: "video", targetId: videoId });
+  const video = useQuery(api.videos.get, { videoId: videoId as Id<"videos">, token: token || undefined });
+  const linkedIdea = useQuery(api.ideas.get, video?.ideaId ? { ideaId: video.ideaId, token: token || undefined } : "skip");
+  const comments = useQuery(api.comments.list, { targetType: "video", targetId: videoId, token: token || undefined });
   const allUsers = useQuery(api.auth.listUsers, token ? { token } : "skip");
   const createComment = useMutation(api.comments.create);
   const resolveComment = useMutation(api.comments.resolve);

@@ -1,33 +1,43 @@
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { AuthProvider, useAuth } from "./lib/auth";
 import { LoginPage } from "./pages/Login";
-import { AdminDashboard } from "./pages/AdminDashboard";
-import { ClientDashboard } from "./pages/ClientDashboard";
-import { ClientsPage } from "./pages/ClientsPage";
-import { IdeasPage } from "./pages/IdeasPage";
-import { IdeaDetail } from "./pages/IdeaDetail";
-import { CalendarPage } from "./pages/CalendarPage";
-import { PipelinePage } from "./pages/PipelinePage";
-import { VideosPage } from "./pages/VideosPage";
-import { VideoReview } from "./pages/VideoReview";
-import { SharePage } from "./pages/SharePage";
-import { InvitePage } from "./pages/InvitePage";
-import { SettingsPage } from "./pages/SettingsPage";
-import { TeamPage } from "./pages/TeamPage";
-import { LibraryPage } from "./pages/LibraryPage";
-import { ClientDetail } from "./pages/ClientDetail";
-import { ImpressumPage, DatenschutzPage } from "./pages/LegalPages";
+import { lazy, Suspense, useState, useEffect } from "react";
+import { Loader2 } from "lucide-react";
 import { CookieBanner } from "./components/CookieBanner";
 import { Sidebar } from "./components/layout/Sidebar";
 import { MobileHeader } from "./components/layout/MobileHeader";
 import { ClientFilterProvider } from "./lib/clientFilter";
-import { useState, useEffect } from "react";
-import { Loader2 } from "lucide-react";
 import { KeyboardShortcutsDialog } from "./components/layout/KeyboardShortcuts";
 import { CommandPalette } from "./components/layout/CommandPalette";
 import { PageTransition } from "./components/layout/PageTransition";
 
+// Lazy-loaded pages for code splitting
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard").then(m => ({ default: m.AdminDashboard })));
+const ClientDashboard = lazy(() => import("./pages/ClientDashboard").then(m => ({ default: m.ClientDashboard })));
+const ClientsPage = lazy(() => import("./pages/ClientsPage").then(m => ({ default: m.ClientsPage })));
+const IdeasPage = lazy(() => import("./pages/IdeasPage").then(m => ({ default: m.IdeasPage })));
+const IdeaDetail = lazy(() => import("./pages/IdeaDetail").then(m => ({ default: m.IdeaDetail })));
+const CalendarPage = lazy(() => import("./pages/CalendarPage").then(m => ({ default: m.CalendarPage })));
+const PipelinePage = lazy(() => import("./pages/PipelinePage").then(m => ({ default: m.PipelinePage })));
+const VideosPage = lazy(() => import("./pages/VideosPage").then(m => ({ default: m.VideosPage })));
+const VideoReview = lazy(() => import("./pages/VideoReview").then(m => ({ default: m.VideoReview })));
+const SharePage = lazy(() => import("./pages/SharePage").then(m => ({ default: m.SharePage })));
+const InvitePage = lazy(() => import("./pages/InvitePage").then(m => ({ default: m.InvitePage })));
+const SettingsPage = lazy(() => import("./pages/SettingsPage").then(m => ({ default: m.SettingsPage })));
+const TeamPage = lazy(() => import("./pages/TeamPage").then(m => ({ default: m.TeamPage })));
+const LibraryPage = lazy(() => import("./pages/LibraryPage").then(m => ({ default: m.LibraryPage })));
+const ClientDetail = lazy(() => import("./pages/ClientDetail").then(m => ({ default: m.ClientDetail })));
+import { ImpressumPage, DatenschutzPage } from "./pages/LegalPages";
+
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
+
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center h-full min-h-[200px]">
+      <Loader2 className="w-5 h-5 animate-spin text-[var(--color-text-tertiary)]" />
+    </div>
+  );
+}
 
 function AdminRoutes({ currentPage, onNavigate }: { currentPage: string; onNavigate: (page: string, id?: string) => void }) {
   if (currentPage === "clients") return <ClientsPage onNavigate={onNavigate} />;
@@ -118,12 +128,14 @@ function AppContent() {
       <div className="flex-1 flex flex-col min-w-0">
         <MobileHeader onMenuClick={() => setSidebarOpen(true)} />
         <div className="flex-1 overflow-auto dot-grid">
-          <PageTransition pageKey={currentPage}>
-            {user.role === "admin"
-              ? <AdminRoutes currentPage={currentPage} onNavigate={handleNavigate} />
-              : <ClientRoutes currentPage={currentPage} onNavigate={handleNavigate} />
-            }
-          </PageTransition>
+          <Suspense fallback={<PageLoader />}>
+            <PageTransition pageKey={currentPage}>
+              {user.role === "admin"
+                ? <AdminRoutes currentPage={currentPage} onNavigate={handleNavigate} />
+                : <ClientRoutes currentPage={currentPage} onNavigate={handleNavigate} />
+              }
+            </PageTransition>
+          </Suspense>
         </div>
       </div>
     </div>

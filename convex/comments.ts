@@ -30,12 +30,14 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     const user = await authenticate(ctx, args.token);
+    const content = args.content.trim();
+    if (!content) throw new Error("Kommentar darf nicht leer sein");
 
     const commentId = await ctx.db.insert("comments", {
       targetType: args.targetType,
       targetId: args.targetId,
       userId: user._id,
-      content: args.content,
+      content,
       timestamp: args.timestamp,
       parentId: args.parentId,
       resolved: false,

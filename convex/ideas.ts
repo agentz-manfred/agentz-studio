@@ -73,6 +73,8 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     const user = await requireEditor(ctx, args.token);
+    const title = args.title.trim();
+    if (!title) throw new Error("Titel darf nicht leer sein");
 
     const existing = await ctx.db
       .query("ideas")
@@ -81,7 +83,7 @@ export const create = mutation({
 
     return ctx.db.insert("ideas", {
       clientId: args.clientId,
-      title: args.title,
+      title,
       description: args.description,
       categoryId: args.categoryId,
       status: "idee",
@@ -102,6 +104,7 @@ export const updateStatus = mutation({
   },
   handler: async (ctx, args) => {
     const user = await authenticate(ctx, args.token);
+    if (!STATUSES.includes(args.status as any)) throw new Error("Ungültiger Status");
     const idea = await ctx.db.get(args.ideaId);
     if (!idea) throw new Error("Idee nicht gefunden");
 

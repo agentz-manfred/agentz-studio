@@ -18,9 +18,17 @@ export const list = query({
 });
 
 export const get = query({
-  args: { id: v.id("clients") },
+  args: { id: v.id("clients"), token: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    return ctx.db.get(args.id);
+    const client = await ctx.db.get(args.id);
+    if (!client) return null;
+    if (args.token) {
+      const user = await authenticate(ctx, args.token);
+      if (user.role === "client" && user.clientId) {
+        if (client._id.toString() !== user.clientId.toString()) return null;
+      }
+    }
+    return client;
   },
 });
 
@@ -34,9 +42,15 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     await requireEditor(ctx, args.token);
-    const { token: _, ...data } = args;
+    const name = args.name.trim();
+    const email = args.email.trim();
+    if (!name) throw new Error("Name darf nicht leer sein");
+    if (!email) throw new Error("E-Mail darf nicht leer sein");
     return ctx.db.insert("clients", {
-      ...data,
+      name,
+      company: args.company?.trim(),
+      email,
+      phone: args.phone?.trim(),
       createdAt: Date.now(),
     });
   },

@@ -24,9 +24,17 @@ export const list = query({
 });
 
 export const get = query({
-  args: { folderId: v.id("folders") },
+  args: { folderId: v.id("folders"), token: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    return ctx.db.get(args.folderId);
+    const folder = await ctx.db.get(args.folderId);
+    if (!folder) return null;
+    if (args.token) {
+      const user = await authenticate(ctx, args.token);
+      if (user.role === "client" && user.clientId && folder.clientId) {
+        if (folder.clientId.toString() !== user.clientId.toString()) return null;
+      }
+    }
+    return folder;
   },
 });
 
@@ -54,8 +62,10 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     const user = await requireEditor(ctx, args.token);
+    const name = args.name.trim();
+    if (!name) throw new Error("Ordnername darf nicht leer sein");
     return ctx.db.insert("folders", {
-      name: args.name,
+      name,
       parentId: args.parentId,
       clientId: args.clientId,
       color: args.color,
@@ -69,7 +79,9 @@ export const rename = mutation({
   args: { token: v.string(), folderId: v.id("folders"), name: v.string() },
   handler: async (ctx, args) => {
     await requireEditor(ctx, args.token);
-    await ctx.db.patch(args.folderId, { name: args.name });
+    const name = args.name.trim();
+    if (!name) throw new Error("Ordnername darf nicht leer sein");
+    await ctx.db.patch(args.folderId, { name });
   },
 });
 

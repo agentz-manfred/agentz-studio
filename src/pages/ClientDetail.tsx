@@ -644,12 +644,15 @@ export function ClientDetail({
   const { user, token } = useAuth();
   const client = useQuery(api.clients.get, {
     id: clientId as Id<"clients">,
+    token: token || undefined,
   });
   const ideas = useQuery(api.ideas.list, {
     clientId: clientId as Id<"clients">,
+    token: token || undefined,
   });
   const shoots = useQuery(api.shootDates.list, {
     clientId: clientId as Id<"clients">,
+    token: token || undefined,
   });
   const users = useQuery(api.auth.listUsers, token ? { token } : "skip");
   const categories = useQuery(api.categories.listByClient, {

@@ -13,9 +13,18 @@ export const list = query({
 });
 
 export const get = query({
-  args: { videoId: v.id("videos") },
+  args: { videoId: v.id("videos"), token: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    return ctx.db.get(args.videoId);
+    const video = await ctx.db.get(args.videoId);
+    if (!video) return null;
+    if (args.token) {
+      const user = await authenticate(ctx, args.token);
+      if (user.role === "client" && user.clientId && video.ideaId) {
+        const idea = await ctx.db.get(video.ideaId);
+        if (idea && idea.clientId.toString() !== user.clientId.toString()) return null;
+      }
+    }
+    return video;
   },
 });
 
@@ -30,9 +39,11 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     const user = await requireEditor(ctx, args.token);
+    const title = args.title.trim();
+    if (!title) throw new Error("Titel darf nicht leer sein");
     return ctx.db.insert("videos", {
       ideaId: args.ideaId,
-      title: args.title,
+      title,
       status: "hochgeladen",
       uploadedBy: user._id,
       bunnyVideoId: args.bunnyVideoId,
@@ -47,6 +58,8 @@ export const updateStatus = mutation({
   args: { token: v.string(), videoId: v.id("videos"), status: v.string() },
   handler: async (ctx, args) => {
     const user = await authenticate(ctx, args.token);
+    const validStatuses = ["hochgeladen", "review", "korrektur", "freigegeben", "final"];
+    if (!validStatuses.includes(args.status)) throw new Error("Ungültiger Status");
     const video = await ctx.db.get(args.videoId);
     if (!video) throw new Error("Video nicht gefunden");
 
@@ -145,7 +158,9 @@ export const rename = mutation({
   args: { token: v.string(), videoId: v.id("videos"), title: v.string() },
   handler: async (ctx, args) => {
     await requireEditor(ctx, args.token);
-    await ctx.db.patch(args.videoId, { title: args.title });
+    const title = args.title.trim();
+    if (!title) throw new Error("Titel darf nicht leer sein");
+    await ctx.db.patch(args.videoId, { title });
   },
 });
 
