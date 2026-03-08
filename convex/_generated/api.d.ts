@@ -14,6 +14,7 @@ import type * as auth from "../auth.js";
 import type * as categories from "../categories.js";
 import type * as clients from "../clients.js";
 import type * as comments from "../comments.js";
+import type * as email from "../email.js";
 import type * as folders from "../folders.js";
 import type * as http from "../http.js";
 import type * as ideas from "../ideas.js";
@@ -40,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   categories: typeof categories;
   clients: typeof clients;
   comments: typeof comments;
+  email: typeof email;
   folders: typeof folders;
   http: typeof http;
   ideas: typeof ideas;

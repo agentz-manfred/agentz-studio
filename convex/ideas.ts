@@ -1,6 +1,7 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { authenticate, requireEditor } from "./lib";
+import { internal } from "./_generated/api";
 
 export const STATUSES = [
   "idee",
@@ -128,6 +129,45 @@ export const updateStatus = mutation({
       status: args.status,
       updatedAt: Date.now(),
     });
+
+    // In-app notification for client users
+    const STATUS_LABELS: Record<string, string> = {
+      idee: "Idee", skript: "Skript", freigabe: "Zur Freigabe", korrektur: "Korrektur",
+      freigegeben: "Freigegeben", gedreht: "Gedreht", geschnitten: "Geschnitten",
+      review: "Review", veröffentlicht: "Veröffentlicht",
+    };
+    const client = await ctx.db.get(idea.clientId);
+
+    // Notify client users about status changes they care about
+    const clientNotifyStatuses = ["freigabe", "korrektur", "veröffentlicht", "geschnitten"];
+    if (clientNotifyStatuses.includes(args.status) && client) {
+      // Find all client users for this client
+      const clientUsers = await ctx.db.query("users").collect();
+      const relevantUsers = clientUsers.filter(u => u.role === "client" && u.clientId?.toString() === idea.clientId.toString());
+      for (const cu of relevantUsers) {
+        await ctx.db.insert("notifications", {
+          userId: cu._id,
+          type: "status_change",
+          title: `Status: ${STATUS_LABELS[args.status] || args.status}`,
+          message: `"${idea.title}" wurde auf "${STATUS_LABELS[args.status] || args.status}" gesetzt.`,
+          targetType: "ideas",
+          targetId: idea._id.toString(),
+          read: false,
+          createdAt: Date.now(),
+        });
+      }
+
+      // Email notification
+      if (client.email) {
+        await ctx.scheduler.runAfter(0, internal.email.sendStatusNotification, {
+          clientEmail: client.email,
+          clientName: client.name,
+          ideaTitle: idea.title,
+          newStatus: args.status,
+          studioUrl: "https://agentz-studio.vercel.app",
+        });
+      }
+    }
   },
 });
 
