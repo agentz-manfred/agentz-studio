@@ -1,5 +1,8 @@
+"use node";
+
 import { internalAction } from "./_generated/server";
 import { v } from "convex/values";
+import nodemailer from "nodemailer";
 
 const STATUS_LABELS: Record<string, string> = {
   idee: "Idee",
@@ -75,13 +78,16 @@ export const sendStatusNotification = internalAction({
     studioUrl: v.string(),
   },
   handler: async (_ctx, args) => {
-    const resendApiKey = process.env.RESEND_API_KEY;
+    const smtpHost = process.env.SMTP_HOST;
+    const smtpPort = Number(process.env.SMTP_PORT || "587");
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
 
-    if (!resendApiKey) {
+    if (!smtpHost || !smtpUser || !smtpPass) {
       console.log(
         `📧 [DRY RUN] Email → ${args.clientEmail}: "${args.ideaTitle}" → ${args.newStatus}`
       );
-      console.log("   Set RESEND_API_KEY env var to enable email delivery.");
+      console.log("   Set SMTP_HOST, SMTP_USER, SMTP_PASS env vars to enable email delivery.");
       return;
     }
 
@@ -90,31 +96,27 @@ export const sendStatusNotification = internalAction({
     const html = buildEmailHtml(args);
 
     const fromAddress =
-      process.env.EMAIL_FROM || "AgentZ Studio <studio@agent-z.de>";
+      process.env.EMAIL_FROM || "AgentZ Studio <kontakt@agent-z.de>";
+
+    const transporter = nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: false,
+      auth: {
+        user: smtpUser,
+        pass: smtpPass,
+      },
+    });
 
     try {
-      const res = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${resendApiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: fromAddress,
-          to: [args.clientEmail],
-          subject,
-          html,
-        }),
+      const info = await transporter.sendMail({
+        from: fromAddress,
+        to: args.clientEmail,
+        subject,
+        html,
       });
 
-      if (!res.ok) {
-        const errText = await res.text();
-        console.error(`📧 Resend error (${res.status}): ${errText}`);
-        return;
-      }
-
-      const data = await res.json();
-      console.log(`📧 Email sent to ${args.clientEmail} (id: ${data.id})`);
+      console.log(`📧 Email sent to ${args.clientEmail} (messageId: ${info.messageId})`);
     } catch (err) {
       console.error(`📧 Email failed:`, err);
     }
