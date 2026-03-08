@@ -133,13 +133,23 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
     setTimeout(() => setSeekTo(null), 100);
   };
 
-  if (!video) {
+  if (video === undefined) {
     return (
       <div className="p-8">
         <button onClick={onBack} className="flex items-center gap-1.5 text-[13px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors mb-4">
           <ArrowLeft className="w-4 h-4" /> Zurück
         </button>
         <p className="text-[14px] text-[var(--color-text-tertiary)]">Video wird geladen…</p>
+      </div>
+    );
+  }
+  if (!video) {
+    return (
+      <div className="p-8">
+        <button onClick={onBack} className="flex items-center gap-1.5 text-[13px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors mb-4">
+          <ArrowLeft className="w-4 h-4" /> Zurück
+        </button>
+        <p className="text-[14px] text-[var(--color-text-tertiary)]">Video nicht gefunden</p>
       </div>
     );
   }

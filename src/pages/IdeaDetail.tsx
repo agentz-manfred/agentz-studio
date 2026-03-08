@@ -381,13 +381,16 @@ export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onB
   );
 
   if (!idea) {
+    const isLoading = ideas === undefined;
     return (
       <div className="p-8">
         <button onClick={onBack} className="flex items-center gap-1.5 text-[14px] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors mb-4">
           <ArrowLeft className="w-4 h-4" />
           Zurück
         </button>
-        <p className="text-[14px] text-[var(--color-text-tertiary)]">Idee wird geladen…</p>
+        <p className="text-[14px] text-[var(--color-text-tertiary)]">
+          {isLoading ? "Idee wird geladen…" : "Idee nicht gefunden"}
+        </p>
       </div>
     );
   }
