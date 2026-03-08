@@ -89,8 +89,8 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
   const handleCreateShareLink = async () => {
     if (!user) return;
     await createShareLink({
+      token: token!,
       videoId: videoId as Id<"videos">,
-      createdBy: user.userId as Id<"users">,
     });
   };
 
@@ -235,7 +235,7 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
                             {copiedLink ? <CheckCheck className="w-3.5 h-3.5 text-[var(--color-success)]" /> : <Copy className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />}
                           </button>
                           <button
-                            onClick={() => deactivateShareLink({ linkId: link._id })}
+                            onClick={() => deactivateShareLink({ token: token!, linkId: link._id })}
                             className="text-[11px] text-[var(--color-error)] hover:underline"
                           >
                             Löschen

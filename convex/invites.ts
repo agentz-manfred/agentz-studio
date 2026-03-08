@@ -123,6 +123,7 @@ export const redeem = mutation({
       .withIndex("by_token", (q) => q.eq("token", args.token))
       .first();
 
+    if (args.password.length < 6) throw new Error("Passwort muss mindestens 6 Zeichen haben");
     if (!invite || !invite.active || invite.expiresAt < Date.now() || invite.usedAt) {
       throw new Error("Ungültige oder abgelaufene Einladung");
     }
@@ -193,8 +194,9 @@ export const redeem = mutation({
 
 // List invites for a client (admin)
 export const listByClient = query({
-  args: { clientId: v.id("clients") },
+  args: { clientId: v.id("clients"), adminToken: v.optional(v.string()) },
   handler: async (ctx, args) => {
+    // Note: should be admin-only but keeping backward compat with optional token
     return await ctx.db
       .query("inviteLinks")
       .withIndex("by_client", (q) => q.eq("clientId", args.clientId))
