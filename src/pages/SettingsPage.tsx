@@ -1,5 +1,5 @@
 import { useAuth } from "../lib/auth";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useTheme } from "../hooks/useTheme";
 import { usePWAInstall } from "../hooks/usePWAInstall";
@@ -16,7 +16,7 @@ function InfoRow({ label, value, mono }: { label: string; value: string | number
 }
 
 function PasswordChangeSection() {
-  const changePassword = useMutation(api.auth.changePassword);
+  const changePassword = useAction(api.authActions.changePassword);
   const [current, setCurrent] = useState("");
   const [newPw, setNewPw] = useState("");
   const [confirm, setConfirm] = useState("");

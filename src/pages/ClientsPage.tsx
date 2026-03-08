@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useState } from "react";
 import { useAuth } from "../lib/auth";
@@ -101,7 +101,7 @@ function CreateClientModal({ onClose }: { onClose: () => void }) {
 }
 
 function CreateLoginModal({ client, onClose }: { client: any; onClose: () => void }) {
-  const register = useMutation(api.auth.register);
+  const register = useAction(api.authActions.register);
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);

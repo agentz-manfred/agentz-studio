@@ -1,11 +1,11 @@
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useState } from "react";
 import { Loader2, CheckCircle2, XCircle, Eye, EyeOff, ArrowRight } from "lucide-react";
 
 export function InvitePage({ token, onLogin }: { token: string; onLogin: (sessionToken: string) => void }) {
   const invite = useQuery(api.invites.validate, { token });
-  const redeemInvite = useMutation(api.invites.redeem);
+  const redeemInvite = useAction(api.invitesActions.redeem);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);

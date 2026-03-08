@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
 import {
@@ -142,7 +142,7 @@ function UserModal({
 
 function ResetPasswordModal({ user, onClose }: { user: any; onClose: () => void }) {
   const { token } = useAuth();
-  const resetPassword = useMutation(api.auth.resetPassword);
+  const resetPassword = useAction(api.authActions.resetPassword);
   const [password, setPassword] = useState("");
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
@@ -188,7 +188,7 @@ export function TeamPage() {
   const { user: currentUser, token } = useAuth();
   const users = useQuery(api.auth.listUsers, token ? { token } : "skip");
   const clients = useQuery(api.clients.list, token ? { token } : "skip");
-  const registerUser = useMutation(api.auth.register);
+  const registerUser = useAction(api.authActions.register);
   const updateUser = useMutation(api.auth.updateUser);
   const deleteUser = useMutation(api.auth.deleteUser);
 

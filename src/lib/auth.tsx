@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
 interface User {
@@ -27,7 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const session = useQuery(api.auth.getSession, token ? { token } : "skip");
-  const loginMutation = useMutation(api.auth.login);
+  const loginAction = useAction(api.authActions.login);
   const logoutMutation = useMutation(api.auth.logout);
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [session, token]);
 
   const login = async (email: string, password: string) => {
-    const result = await loginMutation({ email, password });
+    const result = await loginAction({ email, password });
     localStorage.setItem("session_token", result.token);
     setToken(result.token);
   };
