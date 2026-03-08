@@ -31,6 +31,11 @@ export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: 
     {} as Record<string, string>
   );
 
+  const clientInfoMap = (clients || []).reduce(
+    (acc, c) => ({ ...acc, [c._id]: { name: c.name, avatarColor: (c as any).avatarColor } }),
+    {} as Record<string, { name: string; avatarColor?: string }>
+  );
+
   const handleStatusChange = async (ideaId: string, newStatus: string) => {
     if (!user || !token) return;
     await updateStatus({
@@ -84,6 +89,7 @@ export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: 
           ideas={(ideas || []) as any}
           onStatusChange={handleStatusChange}
           clientNames={clientNames}
+          clientInfoMap={clientInfoMap}
           onIdeaClick={onNavigate ? (id) => onNavigate("idea", id) : undefined}
         />
       </div>

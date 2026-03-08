@@ -589,7 +589,7 @@ export function SettingsPage() {
             <span className="text-[14px] font-semibold">System</span>
           </div>
           <div className="px-5 py-1">
-            <InfoRow label="Version" value="2.0.0" />
+            <InfoRow label="Version" value={__APP_VERSION__} />
             <InfoRow label="Backend" value="Convex" />
             <InfoRow label="Video CDN" value="Bunny Stream" />
             <InfoRow label="Hosting" value="Vercel" />

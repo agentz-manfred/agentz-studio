@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useMemo } from "react";
+import { useState, useCallback, useRef, useMemo, useEffect } from "react";
 import {
   Kanban,
   KanbanBoard as KanbanBoardPrimitive,
@@ -17,10 +17,16 @@ interface Idea {
   clientId: string;
 }
 
+interface ClientInfo {
+  name: string;
+  avatarColor?: string;
+}
+
 interface KanbanBoardProps {
   ideas: Idea[];
   onStatusChange: (ideaId: string, newStatus: string) => void;
   clientNames?: Record<string, string>;
+  clientInfoMap?: Record<string, ClientInfo>;
   onIdeaClick?: (ideaId: string) => void;
 }
 
@@ -31,7 +37,7 @@ function hexToRgba(hex: string, alpha: number) {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }: KanbanBoardProps) {
+export function KanbanBoard({ ideas, onStatusChange, clientNames, clientInfoMap, onIdeaClick }: KanbanBoardProps) {
   const columns = useMemo(() => {
     const result: Record<string, Idea[]> = {};
     for (const status of STATUS_ORDER) {
@@ -41,6 +47,7 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }:
   }, [ideas]);
 
   const [localColumns, setLocalColumns] = useState<Record<string, Idea[]> | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const displayColumns = localColumns ?? columns;
 
   const prevIdeasRef = useRef(ideas);
@@ -84,9 +91,11 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }:
       value={displayColumns}
       onValueChange={handleValueChange}
       getItemValue={(item: Idea) => item._id}
-      onDragEnd={handleDragEnd}
+      onDragStart={() => setIsDragging(true)}
+      onDragEnd={(e) => { setIsDragging(false); handleDragEnd(); }}
+      onDragCancel={() => setIsDragging(false)}
     >
-      <KanbanBoardPrimitive className="grid auto-cols-[260px] grid-flow-col gap-3 overflow-x-auto pb-4">
+      <KanbanBoardPrimitive className="grid auto-cols-[240px] sm:auto-cols-[260px] grid-flow-col gap-2 sm:gap-3 overflow-x-auto pb-4 snap-x snap-mandatory sm:snap-none" style={{ touchAction: "pan-y" }}>
         {STATUS_ORDER.map((status) => {
           const color = STATUS_COLORS[status] || "#a3a3a3";
           const statusIdeas = displayColumns[status] || [];
@@ -95,7 +104,7 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }:
             <KanbanColumn
               key={status}
               value={status}
-              className="!bg-transparent !border-0 !p-0 !rounded-none gap-0"
+              className="!bg-transparent !border-0 !p-0 !rounded-none gap-0 snap-start"
             >
               {/* Column Header */}
               <div className="flex items-center justify-between px-2 py-2 mb-2">
@@ -120,6 +129,8 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }:
               <div className="flex flex-col gap-2 min-h-[100px]">
                 {statusIdeas.map((idea) => {
                   const clientName = clientNames?.[idea.clientId];
+                  const clientInfo = clientInfoMap?.[idea.clientId];
+                  const avatarBg = clientInfo?.avatarColor || "#4F46E5";
                   return (
                     <KanbanItem
                       key={idea._id}
@@ -133,7 +144,7 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }:
                           "transition-shadow hover:shadow-md",
                           "active:shadow-lg active:scale-[1.02]",
                         )}
-                        onClick={onIdeaClick ? () => onIdeaClick(idea._id) : undefined}
+                        onClick={onIdeaClick && !isDragging ? () => onIdeaClick(idea._id) : undefined}
                       >
                         {/* Accent bar top */}
                         <div
@@ -152,7 +163,7 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }:
                           <div className="flex items-center gap-1.5 mt-2.5 pt-2 border-t border-[var(--color-border-subtle)]">
                             <div
                               className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-[9px] font-bold text-white"
-                              style={{ background: color }}
+                              style={{ background: avatarBg }}
                             >
                               {clientName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
                             </div>
@@ -182,6 +193,8 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }:
           if (!idea) return <div className="size-full rounded-lg bg-[var(--color-accent)]/10" />;
           const clientName = clientNames?.[idea.clientId];
           const color = STATUS_COLORS[idea.status] || "#a3a3a3";
+          const cInfo = clientInfoMap?.[idea.clientId];
+          const avatarBg = cInfo?.avatarColor || "#4F46E5";
           return (
             <div className="rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] p-3 shadow-xl rotate-[2deg] w-[260px]">
               <div
@@ -195,7 +208,7 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, onIdeaClick }:
                 <div className="flex items-center gap-1.5 mt-2">
                   <div
                     className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-[9px] font-bold text-white"
-                    style={{ background: color }}
+                    style={{ background: avatarBg }}
                   >
                     {clientName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
                   </div>

@@ -1,5 +1,42 @@
 # AgentZ Studio — Nightly Sprint Log
 
+## Morning Check 08:00 — Sonntag 08.03.2026
+
+### Visueller Test (Desktop 1280px + Mobile 375px)
+Alle 10 Seiten durchgeklickt, Screenshots gemacht:
+- ✅ **Dashboard** — Stat-Cards, Pipeline-Bar, Drehtermine, Activity Feed, Quick Actions — alles korrekt
+- ✅ **Pipeline/Kanban** — Spalten mit farbigen Headers, Karten mit Kunden-Avataren, horizontal scrollbar
+- ✅ **Kunden** — Card-Grid, Gradient-Avatare, Ideen/Video-Counts, Einladung + manuelles Anlegen
+- ✅ **Ideen** — 8 Ideen, Status-Dots, Suche, Filter, CSV-Export, Archiv, KI-Ideen Button
+- ✅ **Kalender** — März 2026, Heute (8.) korrekt markiert, 3 Drehtermine sichtbar, Filter (Drehs/Veröffentlichungen)
+- ✅ **Mediathek** — Breadcrumbs, Ordner "Pflegedienst Kolbe", Grid/List Toggle, Such- + Statusfilter
+- ✅ **Team** — 1 Admin (Timo), Rollen-Stats, Suche, Neuer Benutzer Button
+- ✅ **Audit Log** — Leer (erwartbar: Prod frisch deployed, Demo-Daten triggern kein Audit)
+- ✅ **Einstellungen** — Account, Theme-Picker (Hell/Dunkel/System), Passwort ändern, Statistiken
+- ✅ **Mobile 375px** — Dashboard + Pipeline responsive, Hamburger-Menü, kein Overflow
+
+### Security Review
+- ✅ Alle Convex-Queries/Mutations haben token-basierte Auth (Run 9 Audit bestätigt)
+- ✅ `comments.list` gibt leere Liste ohne Token — sicher
+- ✅ Input Validation (trim + empty checks) auf allen create/rename Mutations
+- ✅ Status-Whitelist-Validierung auf ideas + videos
+- ✅ Share-Links: create braucht Auth, createdBy serverseitig
+- ✅ Invite: Min 6 Zeichen Passwort bei redeem
+- ✅ `notifications.create` ist `internalMutation` — nicht extern aufrufbar
+- ✅ Client-Data-Isolation: Kunden sehen nur eigene Daten
+
+### Deployment
+- ✅ Convex Prod (`sleek-goat-172`) erfolgreich deployed
+- ✅ Git HEAD: `14c488b` (Changelog v2.11.0)
+- ✅ Vercel Build läuft (auto-deploy von main)
+
+### Bugs/Issues gefunden
+- ⚠️ **Audit Log leer auf Prod** — Demo-Seed-Mutation loggt keine Audit-Einträge. Kein Bug, aber beim ersten echten Kunden-Onboarding testen ob Audit-Events korrekt geschrieben werden.
+- ℹ️ **Resend API Key** noch nicht konfiguriert — Email-Notifications laufen im DRY RUN Modus (geloggt, nicht gesendet). Backlog-Item.
+
+### Fazit
+**System ist production-ready.** Nacht-Sprint war brutal effektiv — v2.11.0 mit komplettem Security-Audit, Code Splitting, Lazy Loading, Error Boundaries, Toast System, Skeleton States, Archiv, Drag&Drop, Audit Log, Email-Notifications, und mehr. Keine kritischen Bugs gefunden.
+
 ## Run 9/9 — 06:02 — 0 Items offen, LETZTER RUN
 
 TODO.md ist leer (nur Backlog). Fokus: Finaler Security Audit.

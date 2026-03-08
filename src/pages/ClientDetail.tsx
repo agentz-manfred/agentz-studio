@@ -104,6 +104,7 @@ function ProfileEditor({
     mainPlatform: client.mainPlatform || "",
     videosPerMonth: client.videosPerMonth ?? "",
     context: client.context || "",
+    avatarColor: (client as any).avatarColor || "#4F46E5",
   });
 
   const togglePlatform = (id: string) => {
@@ -141,6 +142,7 @@ function ProfileEditor({
           ? Number(form.videosPerMonth)
           : undefined,
         context: form.context || undefined,
+        avatarColor: form.avatarColor || undefined,
       });
       onClose();
     } catch (e) {
@@ -203,6 +205,31 @@ function ProfileEditor({
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
               className={inputClass}
+            />
+          </div>
+        </div>
+
+        {/* Avatar Color */}
+        <div>
+          <label className={labelClass}>Avatar-Farbe</label>
+          <div className="flex items-center gap-3">
+            <div className="flex gap-1.5 flex-wrap">
+              {["#4F46E5", "#7C3AED", "#2563EB", "#0891B2", "#059669", "#D97706", "#DC2626", "#DB2777", "#4338CA", "#0D9488", "#CA8A04", "#9333EA"].map(c => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setForm({ ...form, avatarColor: c })}
+                  className={`w-7 h-7 rounded-full border-2 transition-all ${form.avatarColor === c ? "border-[var(--color-text-primary)] scale-110" : "border-transparent hover:scale-105"}`}
+                  style={{ background: c }}
+                />
+              ))}
+            </div>
+            <input
+              type="color"
+              value={form.avatarColor}
+              onChange={(e) => setForm({ ...form, avatarColor: e.target.value })}
+              className="w-7 h-7 rounded cursor-pointer border-0 p-0"
+              title="Eigene Farbe wählen"
             />
           </div>
         </div>
@@ -880,8 +907,8 @@ export function ClientDetail({
 
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--color-accent)] to-[var(--color-accent-hover)] flex items-center justify-center text-white text-[20px] font-semibold">
-              {client.name.charAt(0).toUpperCase()}
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-[20px] font-semibold" style={{ background: (client as any).avatarColor || '#4F46E5' }}>
+              {client.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase()}
             </div>
             <div>
               <h1 className="text-[22px] font-semibold tracking-[-0.02em]">

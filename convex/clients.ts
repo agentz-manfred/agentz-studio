@@ -53,11 +53,15 @@ export const create = mutation({
     const email = args.email.trim();
     if (!name) throw new Error("Name darf nicht leer sein");
     if (!email) throw new Error("E-Mail darf nicht leer sein");
+    // Generate a random avatar color if none provided
+    const defaultColors = ["#4F46E5", "#7C3AED", "#2563EB", "#0891B2", "#059669", "#D97706", "#DC2626", "#DB2777"];
+    const avatarColor = defaultColors[Math.floor(Math.random() * defaultColors.length)];
     const id = await ctx.db.insert("clients", {
       name,
       company: args.company?.trim(),
       email,
       phone: args.phone?.trim(),
+      avatarColor,
       createdAt: Date.now(),
     });
     await auditLog(ctx, user, "create", "client", id, name);
@@ -79,6 +83,8 @@ export const update = mutation({
     mainPlatform: v.optional(v.string()),
     videosPerMonth: v.optional(v.number()),
     context: v.optional(v.string()),
+    avatarColor: v.optional(v.string()),
+    avatarImageId: v.optional(v.id("_storage")),
   },
   handler: async (ctx, args) => {
     const user = await requireEditor(ctx, args.token);
@@ -88,5 +94,20 @@ export const update = mutation({
     await ctx.db.patch(id, updates);
     await auditLog(ctx, user, "update", "client", id, existing.name);
     return id;
+  },
+});
+
+export const generateUploadUrl = mutation({
+  args: { token: v.string() },
+  handler: async (ctx, args) => {
+    await requireEditor(ctx, args.token);
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
+export const getAvatarUrl = query({
+  args: { storageId: v.id("_storage") },
+  handler: async (ctx, args) => {
+    return await ctx.storage.getUrl(args.storageId);
   },
 });

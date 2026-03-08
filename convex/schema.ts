@@ -36,6 +36,8 @@ export default defineSchema({
     mainPlatform: v.optional(v.string()),
     videosPerMonth: v.optional(v.number()),
     context: v.optional(v.string()), // Rich text / WYSIWYG content (HTML)
+    avatarColor: v.optional(v.string()), // hex color for avatar background
+    avatarImageId: v.optional(v.id("_storage")), // uploaded photo
     createdAt: v.number(),
   }),
 

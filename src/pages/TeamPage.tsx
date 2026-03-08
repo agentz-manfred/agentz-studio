@@ -105,7 +105,7 @@ function UserModal({
           <div>
             <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Rolle *</label>
             <div className="grid grid-cols-2 gap-2">
-              {(["admin", "editor", "viewer", "client"] as const).map((r) => {
+              {(["admin", "editor", "viewer"] as const).map((r) => {
                 const rc = ROLE_COLORS[r];
                 return (
                   <button key={r} type="button" onClick={() => setRole(r)}
@@ -123,18 +123,6 @@ function UserModal({
               })}
             </div>
           </div>
-          {role === "client" && (
-            <div>
-              <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Kundenzuordnung</label>
-              <select value={clientId} onChange={(e) => setClientId(e.target.value)}
-                className="w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none">
-                <option value="">Kein Kunde zugeordnet</option>
-                {(clients || []).map((c) => (
-                  <option key={c._id} value={c._id}>{c.name}{c.company ? ` (${c.company})` : ""}</option>
-                ))}
-              </select>
-            </div>
-          )}
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose}
               className="flex-1 h-10 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[14px] font-medium hover:bg-[var(--color-surface-2)] transition-colors">
@@ -213,6 +201,8 @@ export function TeamPage() {
 
   const filteredUsers = (users || [])
     .filter((u) => {
+      // Kunden nicht im Team anzeigen — werden über Kunden-Seite verwaltet
+      if (u.role === "client") return false;
       if (search && !u.name.toLowerCase().includes(search.toLowerCase()) && !u.email.toLowerCase().includes(search.toLowerCase())) return false;
       if (roleFilter !== "all" && u.role !== roleFilter) return false;
       return true;
@@ -281,8 +271,8 @@ export function TeamPage() {
 
       <div className="px-6 lg:px-8 py-5">
         {/* Role stats */}
-        <div className="grid grid-cols-4 gap-3 mb-5">
-          {(["admin", "editor", "viewer", "client"] as const).map((r) => {
+        <div className="grid grid-cols-3 gap-3 mb-5">
+          {(["admin", "editor", "viewer"] as const).map((r) => {
             const rc = ROLE_COLORS[r];
             return (
               <button key={r}
