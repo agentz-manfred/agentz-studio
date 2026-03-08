@@ -8,6 +8,7 @@ import { STATUS_LABELS } from "../lib/utils";
 import { useClientFilter } from "../lib/clientFilter";
 import { useFocusTrap } from "../hooks/useFocusTrap";
 import { useToast } from "../components/ui/Toast";
+import { IdeasListSkeleton } from "../components/ui/Skeleton";
 import type { Id } from "../../convex/_generated/dataModel";
 
 function StatusDot({ status }: { status: string }) {
@@ -344,6 +345,8 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
   });
 
   const statuses = ["all", ...Object.keys(STATUS_LABELS)];
+
+  if (ideas === undefined) return <IdeasListSkeleton />;
 
   return (
     <div className="max-w-[960px] mx-auto">

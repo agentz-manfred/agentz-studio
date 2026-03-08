@@ -3,6 +3,7 @@ import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
 import { usePWAInstall } from "../hooks/usePWAInstall";
 import { STATUS_BADGE_STYLES } from "../lib/utils";
+import { DashboardSkeleton } from "../components/ui/Skeleton";
 import { useState, useMemo, useCallback } from "react";
 import {
   Users,
@@ -520,6 +521,8 @@ export function AdminDashboard({
   const hour = now.getHours();
   const greeting =
     hour < 6 ? "Gute Nacht" : hour < 12 ? "Guten Morgen" : hour < 18 ? "Guten Tag" : "Guten Abend";
+
+  if (ideas === undefined && clients === undefined) return <DashboardSkeleton />;
 
   return (
     <div className="max-w-[1000px] mx-auto pb-12">
