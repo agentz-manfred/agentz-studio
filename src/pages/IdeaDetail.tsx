@@ -232,17 +232,25 @@ function CommentSection({ ideaId }: { ideaId: string }) {
   const createComment = useMutation(api.comments.create);
   const resolveComment = useMutation(api.comments.resolve);
   const [newComment, setNewComment] = useState("");
+  const [pendingComments, setPendingComments] = useState<{ id: string; content: string; createdAt: number }[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim() || !user || !token) return;
-    await createComment({
-      token,
-      targetType: "idea",
-      targetId: ideaId,
-      content: newComment.trim(),
-    });
+    const content = newComment.trim();
+    const tempId = `pending-${Date.now()}`;
+    setPendingComments((p) => [...p, { id: tempId, content, createdAt: Date.now() }]);
     setNewComment("");
+    try {
+      await createComment({
+        token,
+        targetType: "idea",
+        targetId: ideaId,
+        content,
+      });
+    } finally {
+      setPendingComments((p) => p.filter((c) => c.id !== tempId));
+    }
   };
 
   return (
@@ -258,6 +266,15 @@ function CommentSection({ ideaId }: { ideaId: string }) {
       </h3>
 
       <div className="space-y-3 mb-4">
+        {pendingComments.map((pc) => (
+          <div
+            key={pc.id}
+            className="rounded-[var(--radius-md)] border border-[var(--color-accent)]/20 bg-[var(--color-accent-surface)] p-3 animate-pulse"
+          >
+            <p className="text-[14px] leading-relaxed">{pc.content}</p>
+            <p className="text-[11px] text-[var(--color-text-tertiary)] mt-2">Wird gesendet…</p>
+          </div>
+        ))}
         {(comments || []).filter(c => !c.parentId).map((comment) => (
           <div
             key={comment._id}

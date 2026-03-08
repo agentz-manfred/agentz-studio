@@ -26,6 +26,11 @@ import {
   Globe,
   CalendarDays,
   Hash,
+  Activity,
+  MessageSquare,
+  Upload,
+  ArrowRight,
+  Filter,
 } from "lucide-react";
 import { RichTextEditor, RichTextDisplay } from "../components/ui/RichTextEditor";
 
@@ -631,6 +636,158 @@ function ProfileInfo({ client }: { client: any }) {
   );
 }
 
+/* ─── Activity Timeline ─── */
+function ActivityTimeline({
+  clientId,
+  onNavigate,
+}: {
+  clientId: string;
+  onNavigate: (page: string, id?: string) => void;
+}) {
+  const { token } = useAuth();
+  const activity = useQuery(api.activity.listByClient, {
+    clientId: clientId as Id<"clients">,
+    token: token || undefined,
+    limit: 30,
+  });
+  const [filter, setFilter] = useState<"all" | "status" | "comment" | "upload">("all");
+
+  const filtered = (activity || []).filter(
+    (a) => filter === "all" || a.type === filter
+  );
+
+  const filterButtons: { key: typeof filter; label: string; icon: any }[] = [
+    { key: "all", label: "Alle", icon: Activity },
+    { key: "status", label: "Status", icon: ArrowRight },
+    { key: "comment", label: "Kommentare", icon: MessageSquare },
+    { key: "upload", label: "Uploads", icon: Upload },
+  ];
+
+  const formatTime = (ts: number) => {
+    const d = new Date(ts);
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffH = diffMs / 3600000;
+    if (diffH < 1) return `vor ${Math.max(1, Math.round(diffMs / 60000))} Min.`;
+    if (diffH < 24) return `vor ${Math.round(diffH)} Std.`;
+    if (diffH < 48) return "Gestern";
+    return d.toLocaleDateString("de-DE", { day: "2-digit", month: "short" });
+  };
+
+  return (
+    <section>
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-[15px] font-semibold flex items-center gap-2">
+          <Activity className="w-4 h-4 text-[var(--color-text-tertiary)]" />
+          Aktivität
+        </h2>
+        <div className="flex items-center gap-1">
+          {filterButtons.map((fb) => (
+            <button
+              key={fb.key}
+              onClick={() => setFilter(fb.key)}
+              className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-all ${
+                filter === fb.key
+                  ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/20"
+                  : "text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-2)] border border-transparent"
+              }`}
+            >
+              {fb.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {!activity ? (
+        <div className="flex items-center justify-center h-20">
+          <div className="w-4 h-4 border-2 border-[var(--color-accent)] border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-8 text-center">
+          <Activity className="w-8 h-8 mx-auto mb-2 text-[var(--color-text-tertiary)] opacity-30" />
+          <p className="text-[13px] text-[var(--color-text-tertiary)]">
+            Noch keine Aktivitäten
+          </p>
+        </div>
+      ) : (
+        <div className="relative">
+          {/* Timeline line */}
+          <div className="absolute left-[15px] top-3 bottom-3 w-px bg-[var(--color-border-subtle)]" />
+
+          <div className="space-y-0">
+            {filtered.map((item, i) => {
+              let icon: any;
+              let color: string;
+              let title: string;
+              let detail: string | null = null;
+              let clickTarget: { page: string; id?: string } | null = null;
+
+              if (item.type === "status") {
+                icon = ArrowRight;
+                color = "#3b82f6";
+                const fromLabel = STATUS_LABELS[item.fromStatus] || item.fromStatus;
+                const toLabel = STATUS_LABELS[item.toStatus] || item.toStatus;
+                title = `${fromLabel} → ${toLabel}`;
+                detail = item.ideaTitle;
+                clickTarget = { page: "idea", id: item.ideaId };
+              } else if (item.type === "comment") {
+                icon = MessageSquare;
+                color = "#8b5cf6";
+                title = `Kommentar zu ${item.targetTitle}`;
+                detail = item.content.length > 80 ? item.content.slice(0, 80) + "…" : item.content;
+                clickTarget = item.targetType === "idea"
+                  ? { page: "idea", id: item.targetId }
+                  : { page: "video", id: item.targetId };
+              } else {
+                icon = Upload;
+                color = "#22c55e";
+                title = `Video hochgeladen`;
+                detail = item.title;
+              }
+
+              const Icon = icon;
+
+              return (
+                <button
+                  key={`${item.type}-${item.id}`}
+                  onClick={() => clickTarget && onNavigate(clickTarget.page, clickTarget.id)}
+                  disabled={!clickTarget}
+                  className="w-full flex items-start gap-3 pl-0 pr-4 py-2.5 text-left hover:bg-[var(--color-accent-surface)] rounded-[var(--radius-md)] transition-colors group relative"
+                >
+                  {/* Icon dot */}
+                  <div
+                    className="w-[30px] h-[30px] rounded-full flex items-center justify-center flex-shrink-0 relative z-10"
+                    style={{ background: color + "15" }}
+                  >
+                    <Icon className="w-3.5 h-3.5" style={{ color }} />
+                  </div>
+
+                  <div className="flex-1 min-w-0 pt-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[13px] font-medium truncate">{title}</span>
+                      <span className="text-[11px] text-[var(--color-text-tertiary)] tabular-nums flex-shrink-0">
+                        {formatTime(item.createdAt)}
+                      </span>
+                    </div>
+                    {detail && (
+                      <p className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5 truncate">
+                        {detail}
+                      </p>
+                    )}
+                    <p className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5">
+                      {item.userName}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 /* ─── Main ClientDetail ─── */
 export function ClientDetail({
   clientId,
@@ -959,6 +1116,9 @@ export function ClientDetail({
             </div>
           )}
         </section>
+
+        {/* Activity Timeline */}
+        <ActivityTimeline clientId={clientId} onNavigate={onNavigate} />
       </div>
 
       {showAiSuggest && (

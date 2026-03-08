@@ -132,3 +132,9 @@ TODO war leer. Fokus: Security Deep Dive, Performance, Edge Cases.
 - TODO.md ist leer
 - Keine kritischen Bugs gefunden
 - Mögliche nächste Steps: Session Cleanup (expired sessions), Error Boundaries, E2E Tests, weitere Design-Polierung
+
+---
+
+## Run 5/9 — 02:02 — 6 Items offen, 4 Runs verbleibend
+
+Plan: Keyboard Accessibility, Optimistic Updates, Activity Log/Timeline

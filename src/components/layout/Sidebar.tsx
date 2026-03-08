@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useAuth } from "../../lib/auth";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
@@ -63,13 +63,20 @@ function NotificationPanel({
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
+    const mouseHandler = (e: MouseEvent) => {
       if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
         onClose();
       }
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    const keyHandler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("mousedown", mouseHandler);
+    document.addEventListener("keydown", keyHandler);
+    return () => {
+      document.removeEventListener("mousedown", mouseHandler);
+      document.removeEventListener("keydown", keyHandler);
+    };
   }, [onClose]);
 
   const hasUnread = notifications?.some((n) => !n.read);
@@ -284,7 +291,23 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
       {user?.role === "admin" && <ClientFilterDropdown />}
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5">
+      <nav
+        className="flex-1 px-3 py-4 space-y-0.5"
+        role="navigation"
+        aria-label="Hauptnavigation"
+        onKeyDown={(e) => {
+          if (!["ArrowDown", "ArrowUp"].includes(e.key)) return;
+          e.preventDefault();
+          const buttons = Array.from(
+            e.currentTarget.querySelectorAll<HTMLElement>("button[data-nav]")
+          );
+          const idx = buttons.indexOf(document.activeElement as HTMLElement);
+          const next = e.key === "ArrowDown"
+            ? (idx + 1) % buttons.length
+            : (idx - 1 + buttons.length) % buttons.length;
+          buttons[next]?.focus();
+        }}
+      >
         {nav.map((item) => {
           const isActive =
             currentPage === item.id ||
@@ -294,6 +317,7 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
           return (
             <button
               key={item.id}
+              data-nav
               onClick={() => onNavigate(item.id)}
               className={cn(
                 "w-full flex items-center gap-3 px-3 h-9 rounded-[var(--radius-sm)] text-[14px] transition-all duration-150 ease-[var(--ease-out)]",

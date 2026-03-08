@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
-import { Lightbulb, ChevronRight, Search, Plus, X, Sparkles, Check } from "lucide-react";
+import { Lightbulb, ChevronRight, Search, Plus, X, Sparkles, Check, CheckSquare, Square } from "lucide-react";
 import { useState } from "react";
 import { STATUS_LABELS } from "../lib/utils";
 import { useClientFilter } from "../lib/clientFilter";
@@ -295,7 +295,34 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [showNewIdea, setShowNewIdea] = useState(false);
   const [showAiSuggest, setShowAiSuggest] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkStatus, setBulkStatus] = useState("");
   const createIdea = useMutation(api.ideas.create);
+  const updateStatus = useMutation(api.ideas.updateStatus);
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const selectAll = () => {
+    if (selectedIds.size === filtered.length) setSelectedIds(new Set());
+    else setSelectedIds(new Set(filtered.map((i) => i._id)));
+  };
+
+  const handleBulkStatusChange = async () => {
+    if (!bulkStatus || !token || selectedIds.size === 0) return;
+    const promises = [...selectedIds].map((id) =>
+      updateStatus({ token, ideaId: id as Id<"ideas">, status: bulkStatus })
+    );
+    await Promise.all(promises);
+    setSelectedIds(new Set());
+    setBulkStatus("");
+  };
 
   const clientMap = (clients || []).reduce(
     (acc, c) => ({ ...acc, [c._id]: c }),
@@ -365,38 +392,106 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
         </select>
       </div>
 
+      {/* Bulk action bar */}
+      {selectedIds.size > 0 && user?.role === "admin" && (
+        <div className="px-6 lg:px-8 pb-2">
+          <div className="flex items-center gap-3 px-4 py-2.5 rounded-[var(--radius-md)] bg-[var(--color-accent-surface)] border border-[var(--color-accent)]/20">
+            <span className="text-[13px] font-medium text-[var(--color-accent)]">
+              {selectedIds.size} ausgewählt
+            </span>
+            <select
+              value={bulkStatus}
+              onChange={(e) => setBulkStatus(e.target.value)}
+              className="h-7 px-2 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-1)] text-[12px] focus:outline-none"
+            >
+              <option value="">Status ändern…</option>
+              {Object.entries(STATUS_LABELS).map(([k, v]) => (
+                <option key={k} value={k}>{v}</option>
+              ))}
+            </select>
+            <button
+              onClick={handleBulkStatusChange}
+              disabled={!bulkStatus}
+              className="h-7 px-3 rounded-[var(--radius-sm)] bg-[var(--color-accent)] text-white text-[12px] font-medium disabled:opacity-40 hover:bg-[var(--color-accent-hover)] transition-colors"
+            >
+              Anwenden
+            </button>
+            <button
+              onClick={() => setSelectedIds(new Set())}
+              className="ml-auto text-[12px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
+            >
+              Auswahl aufheben
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Idea list */}
       <div className="px-6 lg:px-8 pb-8 space-y-1.5">
-        {filtered.map((idea, i) => (
+        {user?.role === "admin" && filtered.length > 0 && (
           <button
-            key={idea._id}
-            onClick={() => onNavigate("idea", idea._id)}
-            className={`animate-in stagger-${Math.min(i + 1, 4)} w-full text-left bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-4 hover:shadow-[var(--shadow-sm)] transition-all group`}
+            onClick={selectAll}
+            className="flex items-center gap-2 text-[12px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] mb-1 px-1"
           >
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <StatusDot status={idea.status} />
-                <div className="min-w-0">
-                  <p className="text-[14px] font-medium truncate">{idea.title}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-[12px] text-[var(--color-text-tertiary)]">
-                      {STATUS_LABELS[idea.status]}
-                    </span>
-                    {clientMap[idea.clientId] && (
-                      <>
-                        <span className="text-[var(--color-text-tertiary)]">·</span>
-                        <span className="text-[12px] text-[var(--color-text-tertiary)]">
-                          {clientMap[idea.clientId].name}
-                        </span>
-                      </>
-                    )}
+            {selectedIds.size === filtered.length ? (
+              <CheckSquare className="w-3.5 h-3.5 text-[var(--color-accent)]" />
+            ) : (
+              <Square className="w-3.5 h-3.5" />
+            )}
+            Alle auswählen
+          </button>
+        )}
+        {filtered.map((idea, i) => {
+          const isSelected = selectedIds.has(idea._id);
+          return (
+          <div
+            key={idea._id}
+            className={`animate-in stagger-${Math.min(i + 1, 4)} flex items-center gap-2`}
+          >
+            {user?.role === "admin" && (
+              <button
+                onClick={(e) => { e.stopPropagation(); toggleSelect(idea._id); }}
+                className="flex-shrink-0 p-1"
+              >
+                {isSelected ? (
+                  <CheckSquare className="w-4 h-4 text-[var(--color-accent)]" />
+                ) : (
+                  <Square className="w-4 h-4 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]" />
+                )}
+              </button>
+            )}
+            <button
+              onClick={() => onNavigate("idea", idea._id)}
+              className={`flex-1 text-left bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border p-4 hover:shadow-[var(--shadow-sm)] transition-all group ${
+                isSelected ? "border-[var(--color-accent)]/30 bg-[var(--color-accent-surface)]" : "border-[var(--color-border-subtle)]"
+              }`}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <StatusDot status={idea.status} />
+                  <div className="min-w-0">
+                    <p className="text-[14px] font-medium truncate">{idea.title}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[12px] text-[var(--color-text-tertiary)]">
+                        {STATUS_LABELS[idea.status]}
+                      </span>
+                      {clientMap[idea.clientId] && (
+                        <>
+                          <span className="text-[var(--color-text-tertiary)]">·</span>
+                          <span className="text-[12px] text-[var(--color-text-tertiary)]">
+                            {clientMap[idea.clientId].name}
+                          </span>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
+                <ChevronRight className="w-4 h-4 text-[var(--color-text-tertiary)] group-hover:text-[var(--color-text-secondary)] transition-colors flex-shrink-0" />
               </div>
-              <ChevronRight className="w-4 h-4 text-[var(--color-text-tertiary)] group-hover:text-[var(--color-text-secondary)] transition-colors flex-shrink-0" />
-            </div>
-          </button>
-        ))}
+            </button>
+          </div>
+          );
+        })}
 
         {filtered.length === 0 && (
           <div className="text-center py-16">
