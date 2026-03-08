@@ -47,8 +47,10 @@ function FolderCard({
   onDelete,
   onToggleVisibility,
   onAssignClient,
+  onDragStart,
   onDragOver,
   onDrop,
+  isDragOver,
 }: {
   folder: { _id: string; name: string; color?: string; createdAt: number; clientId?: string; clientVisible?: boolean };
   clientName?: string;
