@@ -33,6 +33,7 @@ import {
   Filter,
 } from "lucide-react";
 import { RichTextEditor, RichTextDisplay } from "../components/ui/RichTextEditor";
+import { openMonthlyReport } from "../lib/export";
 
 const STATUS_LABELS: Record<string, string> = {
   idea: "Idee",
@@ -907,6 +908,37 @@ export function ClientDetail({
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                if (!ideas) return;
+                const now = new Date();
+                const monthLabel = now.toLocaleDateString("de-DE", { month: "long", year: "numeric" });
+                const byStatus: Record<string, number> = {};
+                for (const i of ideas) {
+                  byStatus[i.status] = (byStatus[i.status] || 0) + 1;
+                }
+                openMonthlyReport({
+                  clientName: client.name,
+                  month: monthLabel,
+                  totalIdeas: ideas.length,
+                  byStatus,
+                  published: ideas
+                    .filter((i) => i.status === "veröffentlicht")
+                    .map((i) => ({
+                      title: i.title,
+                      date: new Date(i.updatedAt).toLocaleDateString("de-DE"),
+                    })),
+                  inProgress: ideas
+                    .filter((i) => !["idee", "veröffentlicht"].includes(i.status))
+                    .map((i) => ({ title: i.title, status: i.status })),
+                });
+              }}
+              className="h-8 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[12px] font-medium hover:bg-[var(--color-surface-2)] transition-colors flex items-center gap-1.5"
+              title="Monatsbericht generieren"
+            >
+              <FileText className="w-3 h-3" />
+              Bericht
+            </button>
             <button
               onClick={() => setShowAiSuggest(true)}
               className="h-8 px-3 rounded-[var(--radius-md)] bg-gradient-to-r from-violet-500/10 to-indigo-500/10 text-violet-700 dark:text-violet-300 border border-violet-200/50 dark:border-violet-500/20 text-[12px] font-medium hover:from-violet-500/20 hover:to-indigo-500/20 transition-all flex items-center gap-1.5"

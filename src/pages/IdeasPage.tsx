@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
-import { Lightbulb, ChevronRight, Search, Plus, X, Sparkles, Check, CheckSquare, Square } from "lucide-react";
+import { Lightbulb, ChevronRight, Search, Plus, X, Sparkles, Check, CheckSquare, Square, Download } from "lucide-react";
+import { exportIdeasCSV } from "../lib/export";
 import { useState } from "react";
 import { STATUS_LABELS } from "../lib/utils";
 import { useClientFilter } from "../lib/clientFilter";
@@ -390,6 +391,23 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
             </option>
           ))}
         </select>
+        {user?.role === "admin" && (
+          <button
+            onClick={() =>
+              exportIdeasCSV(
+                filtered.map((i) => ({
+                  ...i,
+                  clientName: clientMap[i.clientId]?.name,
+                }))
+              )
+            }
+            className="h-9 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-1)] text-[13px] hover:bg-[var(--color-surface-2)] transition-colors flex items-center gap-1.5"
+            title="Als CSV exportieren"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">CSV</span>
+          </button>
+        )}
       </div>
 
       {/* Bulk action bar */}

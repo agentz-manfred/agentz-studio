@@ -3,7 +3,7 @@ import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
 import { usePWAInstall } from "../hooks/usePWAInstall";
 import { STATUS_BADGE_STYLES } from "../lib/utils";
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import {
   Users,
   Film,
@@ -20,6 +20,12 @@ import {
   Share,
   Smartphone,
   X,
+  Settings2,
+  Eye,
+  EyeOff,
+  GripVertical,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 
 /* ─── Status Config ─── */
@@ -376,6 +382,117 @@ function PWAInstallBanner() {
   );
 }
 
+/* ─── Widget Config ─── */
+const WIDGET_DEFS = [
+  { id: "pipeline", label: "Pipeline" },
+  { id: "shoots", label: "Drehtermine" },
+  { id: "activity", label: "Letzte Aktivität" },
+] as const;
+
+type WidgetId = (typeof WIDGET_DEFS)[number]["id"];
+
+interface WidgetConfig {
+  order: WidgetId[];
+  hidden: WidgetId[];
+}
+
+function getWidgetConfig(): WidgetConfig {
+  try {
+    const stored = localStorage.getItem("agentz-dashboard-widgets");
+    if (stored) return JSON.parse(stored);
+  } catch {}
+  return { order: WIDGET_DEFS.map((w) => w.id), hidden: [] };
+}
+
+function saveWidgetConfig(config: WidgetConfig) {
+  localStorage.setItem("agentz-dashboard-widgets", JSON.stringify(config));
+}
+
+function WidgetConfigurator({
+  config,
+  onChange,
+  onClose,
+}: {
+  config: WidgetConfig;
+  onChange: (c: WidgetConfig) => void;
+  onClose: () => void;
+}) {
+  const toggleWidget = (id: WidgetId) => {
+    const hidden = config.hidden.includes(id)
+      ? config.hidden.filter((h) => h !== id)
+      : [...config.hidden, id];
+    const next = { ...config, hidden };
+    saveWidgetConfig(next);
+    onChange(next);
+  };
+
+  const moveWidget = (id: WidgetId, dir: -1 | 1) => {
+    const order = [...config.order];
+    const idx = order.indexOf(id);
+    const newIdx = idx + dir;
+    if (newIdx < 0 || newIdx >= order.length) return;
+    [order[idx], order[newIdx]] = [order[newIdx], order[idx]];
+    const next = { ...config, order };
+    saveWidgetConfig(next);
+    onChange(next);
+  };
+
+  return (
+    <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] p-4 shadow-[var(--shadow-md)]">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-[13px] font-semibold">Widgets anpassen</h3>
+        <button onClick={onClose} className="p-1 rounded hover:bg-[var(--color-surface-2)]">
+          <X className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
+        </button>
+      </div>
+      <div className="space-y-1">
+        {config.order.map((id, idx) => {
+          const def = WIDGET_DEFS.find((w) => w.id === id);
+          if (!def) return null;
+          const isHidden = config.hidden.includes(id);
+          return (
+            <div
+              key={id}
+              className="flex items-center gap-2 px-2 py-1.5 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors"
+            >
+              <button
+                onClick={() => toggleWidget(id)}
+                className="p-0.5"
+                title={isHidden ? "Einblenden" : "Ausblenden"}
+              >
+                {isHidden ? (
+                  <EyeOff className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
+                ) : (
+                  <Eye className="w-3.5 h-3.5 text-[var(--color-accent)]" />
+                )}
+              </button>
+              <span className={`flex-1 text-[13px] ${isHidden ? "text-[var(--color-text-tertiary)] line-through" : ""}`}>
+                {def.label}
+              </span>
+              <div className="flex gap-0.5">
+                <button
+                  onClick={() => moveWidget(id, -1)}
+                  disabled={idx === 0}
+                  className="p-0.5 disabled:opacity-20"
+                >
+                  <ArrowUp className="w-3 h-3 text-[var(--color-text-tertiary)]" />
+                </button>
+                <button
+                  onClick={() => moveWidget(id, 1)}
+                  disabled={idx === config.order.length - 1}
+                  className="p-0.5 disabled:opacity-20"
+                >
+                  <ArrowDown className="w-3 h-3 text-[var(--color-text-tertiary)]" />
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /* ─── Main Dashboard ─── */
 export function AdminDashboard({
   onNavigate,
@@ -386,11 +503,18 @@ export function AdminDashboard({
   const ideas = useQuery(api.ideas.list, {});
   const clients = useQuery(api.clients.list);
   const shoots = useQuery(api.shootDates.list, {});
+  const [widgetConfig, setWidgetConfig] = useState<WidgetConfig>(getWidgetConfig);
+  const [showWidgetConfig, setShowWidgetConfig] = useState(false);
 
   const published = (ideas || []).filter((i) => i.status === "veröffentlicht").length;
   const inProgress = (ideas || []).filter(
     (i) => !["idee", "veröffentlicht"].includes(i.status)
   ).length;
+
+  const isWidgetVisible = useCallback(
+    (id: WidgetId) => !widgetConfig.hidden.includes(id),
+    [widgetConfig.hidden]
+  );
 
   const now = new Date();
   const hour = now.getHours();
@@ -509,22 +633,56 @@ export function AdminDashboard({
           </div>
         </div>
       ) : (
-        /* Two-column layout for larger screens */
-        <div className="px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-6">
-            <PipelineProgress ideas={ideas || []} />
-            <UpcomingShoots
-              shoots={shoots || []}
-              clients={clients || []}
-              onNavigate={onNavigate}
-            />
+        /* Widgets area */
+        <div className="px-6 lg:px-8">
+          {/* Widget config toggle */}
+          <div className="flex justify-end mb-3 relative">
+            <button
+              onClick={() => setShowWidgetConfig(!showWidgetConfig)}
+              className="p-1.5 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-2)] transition-colors"
+              title="Widgets anpassen"
+            >
+              <Settings2 className="w-4 h-4" />
+            </button>
+            {showWidgetConfig && (
+              <div className="absolute right-0 top-8 z-20 w-[240px]">
+                <WidgetConfigurator
+                  config={widgetConfig}
+                  onChange={setWidgetConfig}
+                  onClose={() => setShowWidgetConfig(false)}
+                />
+              </div>
+            )}
           </div>
-          <div>
-            <RecentActivity
-              ideas={ideas || []}
-              clients={clients || []}
-              onNavigate={onNavigate}
-            />
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {widgetConfig.order.map((widgetId) => {
+              if (widgetConfig.hidden.includes(widgetId)) return null;
+              switch (widgetId) {
+                case "pipeline":
+                  return <PipelineProgress key={widgetId} ideas={ideas || []} />;
+                case "shoots":
+                  return (
+                    <UpcomingShoots
+                      key={widgetId}
+                      shoots={shoots || []}
+                      clients={clients || []}
+                      onNavigate={onNavigate}
+                    />
+                  );
+                case "activity":
+                  return (
+                    <RecentActivity
+                      key={widgetId}
+                      ideas={ideas || []}
+                      clients={clients || []}
+                      onNavigate={onNavigate}
+                    />
+                  );
+                default:
+                  return null;
+              }
+            })}
           </div>
         </div>
       )}
