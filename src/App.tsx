@@ -4,6 +4,7 @@ import { LoginPage } from "./pages/Login";
 import { lazy, Suspense, useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { CookieBanner } from "./components/CookieBanner";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Sidebar } from "./components/layout/Sidebar";
 import { MobileHeader } from "./components/layout/MobileHeader";
 import { ClientFilterProvider } from "./lib/clientFilter";
@@ -128,14 +129,16 @@ function AppContent() {
       <div className="flex-1 flex flex-col min-w-0">
         <MobileHeader onMenuClick={() => setSidebarOpen(true)} />
         <div className="flex-1 overflow-auto dot-grid">
-          <Suspense fallback={<PageLoader />}>
-            <PageTransition pageKey={currentPage}>
-              {user.role === "admin"
-                ? <AdminRoutes currentPage={currentPage} onNavigate={handleNavigate} />
-                : <ClientRoutes currentPage={currentPage} onNavigate={handleNavigate} />
-              }
-            </PageTransition>
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense fallback={<PageLoader />}>
+              <PageTransition pageKey={currentPage}>
+                {user.role === "admin"
+                  ? <AdminRoutes currentPage={currentPage} onNavigate={handleNavigate} />
+                  : <ClientRoutes currentPage={currentPage} onNavigate={handleNavigate} />
+                }
+              </PageTransition>
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </div>
     </div>

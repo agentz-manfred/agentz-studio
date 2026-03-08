@@ -255,3 +255,21 @@ export const logout = mutation({
     if (session) await ctx.db.delete(session._id);
   },
 });
+
+// Clean up expired sessions — call periodically
+export const cleanupSessions = mutation({
+  args: { token: v.string() },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.token);
+    const now = Date.now();
+    const allSessions = await ctx.db.query("sessions").collect();
+    let deleted = 0;
+    for (const s of allSessions) {
+      if (s.expiresAt < now) {
+        await ctx.db.delete(s._id);
+        deleted++;
+      }
+    }
+    return { deleted, remaining: allSessions.length - deleted };
+  },
+});
