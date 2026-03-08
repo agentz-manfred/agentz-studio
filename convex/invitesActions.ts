@@ -20,7 +20,7 @@ export const redeem = action({
     password: v.string(),
     name: v.optional(v.string()),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<unknown> => {
     if (args.password.length < 6) throw new Error("Passwort muss mindestens 6 Zeichen haben");
 
     const data = await ctx.runQuery(internal.invitesInternal.validateInvite, { token: args.token });

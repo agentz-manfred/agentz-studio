@@ -35,7 +35,7 @@ export const register = action({
     clientId: v.optional(v.id("clients")),
     adminToken: v.optional(v.string()),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<{ userId: string; token: string }> => {
     const anyUser = await ctx.runQuery(internal.authInternal.getAnyUser);
 
     if (anyUser) {
@@ -74,7 +74,7 @@ export const seedAdmin = action({
     password: v.string(),
     name: v.string(),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<{ status: "exists"; message: string } | { status: "created"; userId: string }> => {
     const anyUser = await ctx.runQuery(internal.authInternal.getAnyUser);
     if (anyUser) return { status: "exists" as const, message: "Admin existiert bereits" };
 
@@ -95,7 +95,7 @@ export const login = action({
     email: v.string(),
     password: v.string(),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<{ userId: string; token: string; role: string; name: string }> => {
     // Rate limiting
     const recentFailed = await ctx.runQuery(internal.authInternal.getRecentLoginAttempts, { email: args.email });
     if (recentFailed >= 5) {

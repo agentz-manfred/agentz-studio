@@ -96,7 +96,7 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, clientInfoMap,
       onDragEnd={(e) => { setIsDragging(false); handleDragEnd(); }}
       onDragCancel={() => setIsDragging(false)}
     >
-      <KanbanBoardPrimitive className="grid auto-cols-[240px] sm:auto-cols-[260px] grid-flow-col gap-2 sm:gap-3 overflow-x-auto pb-4 snap-x snap-mandatory sm:snap-none" style={{ touchAction: "pan-y" }}>
+      <KanbanBoardPrimitive className="grid auto-cols-[240px] sm:auto-cols-[260px] grid-flow-col gap-2 sm:gap-3 overflow-x-auto pb-4 snap-x snap-mandatory sm:snap-none" style={{ touchAction: "auto" }}>
         {STATUS_ORDER.map((status) => {
           const color = STATUS_COLORS[status] || "#a3a3a3";
           const statusIdeas = displayColumns[status] || [];
