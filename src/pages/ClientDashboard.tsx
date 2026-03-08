@@ -18,12 +18,12 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export function ClientDashboard({ onNavigate }: { onNavigate: (page: string, id?: string) => void }) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const ideas = useQuery(
     api.ideas.list,
     user?.clientId ? { clientId: user.clientId as any } : "skip"
   );
-  const shootDates = useQuery(api.shootDates.list, {});
+  const shootDates = useQuery(api.shootDates.list, { token: token || "" });
   const videos = useQuery(
     api.videos.listByClient,
     user?.clientId ? { clientId: user.clientId as Id<"clients"> } : "skip"

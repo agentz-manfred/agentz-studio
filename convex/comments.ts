@@ -9,7 +9,29 @@ export const list = query({
     token: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    // TODO: validate that client user has access to this target
+    // Validate client users can only see comments on their own content
+    if (args.token) {
+      const user = await authenticate(ctx, args.token);
+      if (user.role === "client" && user.clientId) {
+        // For ideas: check the idea belongs to this client
+        if (args.targetType === "idea") {
+          const idea = await ctx.db.get(args.targetId as any) as any;
+          if (idea && idea.clientId?.toString() !== user.clientId.toString()) {
+            return [];
+          }
+        }
+        // For videos: check via linked idea
+        if (args.targetType === "video") {
+          const video = await ctx.db.get(args.targetId as any) as any;
+          if (video?.ideaId) {
+            const idea = await ctx.db.get(video.ideaId) as any;
+            if (idea && idea.clientId?.toString() !== user.clientId.toString()) {
+              return [];
+            }
+          }
+        }
+      }
+    }
     return ctx.db
       .query("comments")
       .withIndex("by_target", (q) =>

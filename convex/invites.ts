@@ -192,11 +192,18 @@ export const redeem = mutation({
   },
 });
 
-// List invites for a client (admin)
+// List invites for a client (admin only)
 export const listByClient = query({
-  args: { clientId: v.id("clients"), adminToken: v.optional(v.string()) },
+  args: { clientId: v.id("clients"), adminToken: v.string() },
   handler: async (ctx, args) => {
-    // Note: should be admin-only but keeping backward compat with optional token
+    const session = await ctx.db
+      .query("sessions")
+      .withIndex("by_token", (q) => q.eq("token", args.adminToken))
+      .first();
+    if (!session || session.expiresAt < Date.now()) return [];
+    const user = await ctx.db.get(session.userId);
+    if (!user || user.role !== "admin") return [];
+
     return await ctx.db
       .query("inviteLinks")
       .withIndex("by_client", (q) => q.eq("clientId", args.clientId))

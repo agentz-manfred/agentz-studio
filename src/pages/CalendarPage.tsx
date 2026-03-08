@@ -365,7 +365,7 @@ export function CalendarPage({ onNavigate }: { onNavigate?: (page: string, id?: 
   const { user, token } = useAuth();
   const { selectedClientId } = useClientFilter();
   const clients = useQuery(api.clients.list);
-  const allShootDates = useQuery(api.shootDates.list, {});
+  const allShootDates = useQuery(api.shootDates.list, { token: token || "" });
   const allIdeasWithPublishDates = useQuery(api.ideas.withPublishDates);
   const shootDates = selectedClientId
     ? (allShootDates || []).filter(s => s.clientId === selectedClientId)

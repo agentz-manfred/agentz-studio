@@ -10,11 +10,14 @@ export const list = query({
       if (user.role === "client" && user.clientId) {
         return ctx.db.query("shootDates").withIndex("by_client", (q) => q.eq("clientId", user.clientId!)).collect();
       }
+      // Admin/Editor: return all or filtered
+      if (args.clientId) {
+        return ctx.db.query("shootDates").withIndex("by_client", (q) => q.eq("clientId", args.clientId!)).collect();
+      }
+      return ctx.db.query("shootDates").collect();
     }
-    if (args.clientId) {
-      return ctx.db.query("shootDates").withIndex("by_client", (q) => q.eq("clientId", args.clientId!)).collect();
-    }
-    return ctx.db.query("shootDates").collect();
+    // No token = no data
+    return [];
   },
 });
 
