@@ -1,5 +1,15 @@
 # AgentZ Studio — CHANGELOG
 
+## v2.11.1 (08.03.2026) — TODO Cleanup Sprint
+- **Kanban DnD Mobile Fix:** TouchSensor mit Activation Constraints (150ms delay, 8px tolerance), MouseSensor mit 3px distance, snap-x scrolling für mobile Columns, touch-action: pan-y auf Board-Container
+- **Kunden-Avatar Fix:** Neues `avatarColor` Feld in Schema, automatische Farbzuweisung bei Erstellung, Color Picker im Kundenprofil (12 Presets + Custom), konsistente Darstellung überall (Kanban, Kunden-Liste, Kunden-Detail)
+- **Team-Seite:** Rolle "Kunde" aus dem "Neuer Benutzer"-Dialog entfernt, Kunden aus Team-Liste gefiltert, Role-Stats von 4 auf 3 Spalten
+- **Versionsnummer:** Dynamisch aus package.json via Vite define, aktualisiert auf v2.11.0
+- **KI-Skript Output:** Verifiziert — HTML-Rendering + kein Preamble ✅
+- **Termine:** Verifiziert — Edit-Modus im EventPopover funktioniert ✅
+- **ClientAvatar-Komponente:** Wiederverwendbar, mit Image-Support vorbereitet
+- **File Storage:** generateUploadUrl + getAvatarUrl für zukünftige Foto-Uploads
+
 ## v2.11.0 (08.03.2026) — Nacht-Sprint Run 9: Zero Open Queries
 - **Security: Auth auf ALLE Queries** — videos.list, listByClient, listByFolder, comments.list, categories.listByClient, scripts.listByIdea, folders.getBreadcrumbs, folders.countItems — alle erfordern jetzt Auth-Token
 - **Data Isolation** — Client-User sehen bei Videos nur clientVisible + eigene, bei Comments nur eigene Ideas/Videos
