@@ -5,6 +5,7 @@ import { lazy, Suspense, useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { CookieBanner } from "./components/CookieBanner";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { ToastProvider } from "./components/ui/Toast";
 import { Sidebar } from "./components/layout/Sidebar";
 import { MobileHeader } from "./components/layout/MobileHeader";
 import { ClientFilterProvider } from "./lib/clientFilter";
@@ -230,7 +231,7 @@ function AppRouter() {
   if (route === "invite") return <><InviteRoute /><CookieBanner /></>;
   if (route === "impressum") return <><ImpressumPage onBack={goBack} /><CookieBanner /></>;
   if (route === "datenschutz") return <><DatenschutzPage onBack={goBack} /><CookieBanner /></>;
-  return <AuthProvider><ClientFilterProvider><AppContent /></ClientFilterProvider></AuthProvider>;
+  return <AuthProvider><ClientFilterProvider><ToastProvider><AppContent /></ToastProvider></ClientFilterProvider></AuthProvider>;
 }
 
 export default function App() {

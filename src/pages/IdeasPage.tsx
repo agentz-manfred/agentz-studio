@@ -7,6 +7,7 @@ import { useState } from "react";
 import { STATUS_LABELS } from "../lib/utils";
 import { useClientFilter } from "../lib/clientFilter";
 import { useFocusTrap } from "../hooks/useFocusTrap";
+import { useToast } from "../components/ui/Toast";
 import type { Id } from "../../convex/_generated/dataModel";
 
 function StatusDot({ status }: { status: string }) {
@@ -303,6 +304,7 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
   const [bulkStatus, setBulkStatus] = useState("");
   const createIdea = useMutation(api.ideas.create);
   const updateStatus = useMutation(api.ideas.updateStatus);
+  const { toast } = useToast();
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
@@ -320,10 +322,12 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
 
   const handleBulkStatusChange = async () => {
     if (!bulkStatus || !token || selectedIds.size === 0) return;
+    const count = selectedIds.size;
     const promises = [...selectedIds].map((id) =>
       updateStatus({ token, ideaId: id as Id<"ideas">, status: bulkStatus })
     );
     await Promise.all(promises);
+    toast(`${count} Idee${count > 1 ? "n" : ""} auf "${STATUS_LABELS[bulkStatus]}" gesetzt`);
     setSelectedIds(new Set());
     setBulkStatus("");
   };

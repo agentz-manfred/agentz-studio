@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { VIDEO_STATUS_LABELS, STATUS_BADGE_STYLES } from "../lib/utils";
 import { useClientFilter } from "../lib/clientFilter";
+import { useToast } from "../components/ui/Toast";
 import type { Id } from "../../convex/_generated/dataModel";
 
 interface LibraryPageProps {
@@ -313,6 +314,7 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
   const [assigningClient, setAssigningClient] = useState<{ type: "folder" | "video"; id: string; clientId?: string } | null>(null);
   const [selectedVideoIds, setSelectedVideoIds] = useState<Set<string>>(new Set());
   const [bulkMoveTarget, setBulkMoveTarget] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const { selectedClientId } = useClientFilter();
   const clients = useQuery(api.clients.list);
@@ -355,6 +357,7 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
       name,
       parentId: currentFolderId,
     });
+    toast(`Ordner "${name}" erstellt`);
     setShowNewFolder(false);
   };
 
@@ -410,10 +413,12 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
 
   const handleBulkMove = async (targetFolderId: string | undefined) => {
     if (!token || selectedVideoIds.size === 0) return;
+    const count = selectedVideoIds.size;
     const promises = [...selectedVideoIds].map((id) =>
       moveVideo({ token, videoId: id as Id<"videos">, folderId: targetFolderId as Id<"folders"> | undefined })
     );
     await Promise.all(promises);
+    toast(`${count} Video${count > 1 ? "s" : ""} verschoben`);
     setSelectedVideoIds(new Set());
     setBulkMoveTarget(null);
   };
