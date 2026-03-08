@@ -8,7 +8,7 @@ import { ArrowLeft, MessageSquare, Send, Check, ChevronDown, FileText, Plus, Sav
 import { VideoUpload } from "../components/video/VideoUpload";
 import type { Id } from "../../convex/_generated/dataModel";
 
-function StatusBadge({ status }: { status: string }) {
+export function StatusBadge({ status }: { status: string }) {
   const s = STATUS_BADGE_STYLES[status] || { bg: "rgba(163,163,163,0.12)", color: "#737373" };
   return (
     <span
@@ -20,7 +20,7 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function StatusSelector({ current, onChange }: { current: string; onChange: (s: string) => void }) {
+export function StatusSelector({ current, onChange }: { current: string; onChange: (s: string) => void }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="relative">
@@ -33,8 +33,8 @@ function StatusSelector({ current, onChange }: { current: string; onChange: (s: 
       </button>
       {open && (
         <>
-          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-1 w-48 bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border)] shadow-[var(--shadow-md)] z-20 py-1">
+          <div className="fixed inset-0 z-[90]" onClick={() => setOpen(false)} />
+          <div className="absolute left-0 sm:right-0 sm:left-auto top-full mt-1 w-48 bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border)] shadow-[var(--shadow-md)] z-[100] py-1">
             {STATUS_ORDER.map((s) => (
               <button
                 key={s}
@@ -54,7 +54,7 @@ function StatusSelector({ current, onChange }: { current: string; onChange: (s: 
   );
 }
 
-function ScriptEditor({ ideaId, ideaTitle, ideaDescription, clientName, clientCompany, clientContext, clientPlatforms, clientMainPlatform }: { ideaId: string; ideaTitle: string; ideaDescription?: string; clientName: string; clientCompany?: string; clientContext?: string; clientPlatforms?: string[]; clientMainPlatform?: string }) {
+export function ScriptEditor({ ideaId, ideaTitle, ideaDescription, clientName, clientCompany, clientContext, clientPlatforms, clientMainPlatform }: { ideaId: string; ideaTitle: string; ideaDescription?: string; clientName: string; clientCompany?: string; clientContext?: string; clientPlatforms?: string[]; clientMainPlatform?: string }) {
   const { user, token } = useAuth();
   const scripts = useQuery(api.scripts.listByIdea, token ? { ideaId: ideaId as Id<"ideas">, token } : "skip");
   const createScript = useMutation(api.scripts.create);
@@ -226,7 +226,7 @@ function ScriptEditor({ ideaId, ideaTitle, ideaDescription, clientName, clientCo
   );
 }
 
-function CommentSection({ ideaId }: { ideaId: string }) {
+export function CommentSection({ ideaId }: { ideaId: string }) {
   const { user, token } = useAuth();
   const comments = useQuery(api.comments.list, { targetType: "idea", targetId: ideaId });
   const createComment = useMutation(api.comments.create);
@@ -323,7 +323,7 @@ function CommentSection({ ideaId }: { ideaId: string }) {
   );
 }
 
-function VideoSection({ ideaId, onNavigate }: { ideaId: string; onNavigate?: (page: string, id?: string) => void }) {
+export function VideoSection({ ideaId, onNavigate }: { ideaId: string; onNavigate?: (page: string, id?: string) => void }) {
   const { user, token } = useAuth();
   const videos = useQuery(api.videos.list, token ? { ideaId: ideaId as Id<"ideas">, token } : "skip");
   const cdnHost = import.meta.env.VITE_BUNNY_CDN_HOSTNAME;

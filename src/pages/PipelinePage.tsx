@@ -6,6 +6,7 @@ import { KanbanBoard } from "../components/kanban/KanbanBoard";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { PipelineSkeleton } from "../components/ui/Skeleton";
+import { IdeaDrawer } from "../components/ideas/IdeaDrawer";
 import type { Id } from "../../convex/_generated/dataModel";
 
 export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: string) => void }) {
@@ -21,6 +22,7 @@ export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: 
   const [newDesc, setNewDesc] = useState("");
   const [selectedClient, setSelectedClient] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [drawerIdeaId, setDrawerIdeaId] = useState<string | null>(null);
   const pipelineCategories = useQuery(
     api.categories.listByClient,
     selectedClient && token ? { clientId: selectedClient as Id<"clients">, token } : "skip"
@@ -90,9 +92,16 @@ export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: 
           onStatusChange={handleStatusChange}
           clientNames={clientNames}
           clientInfoMap={clientInfoMap}
-          onIdeaClick={onNavigate ? (id) => onNavigate("idea", id) : undefined}
+          onIdeaClick={(id) => setDrawerIdeaId(id)}
         />
       </div>
+
+      {/* Idea Drawer (Slide-Over) */}
+      <IdeaDrawer
+        ideaId={drawerIdeaId}
+        onClose={() => setDrawerIdeaId(null)}
+        onNavigate={onNavigate}
+      />
 
       {/* New Idea Modal */}
       {showNewIdea && (
