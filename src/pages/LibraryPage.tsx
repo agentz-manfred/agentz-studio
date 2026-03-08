@@ -335,8 +335,8 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
     parentId: currentFolderId,
     ...(selectedClientId ? { clientId: selectedClientId as Id<"clients"> } : {}),
   });
-  const videos = useQuery(api.videos.listByFolder, { folderId: currentFolderId });
-  const breadcrumbs = useQuery(api.folders.getBreadcrumbs, { folderId: currentFolderId });
+  const videos = useQuery(api.videos.listByFolder, token ? { folderId: currentFolderId, token } : "skip");
+  const breadcrumbs = useQuery(api.folders.getBreadcrumbs, token ? { folderId: currentFolderId, token } : "skip");
 
   const createFolder = useMutation(api.folders.create);
   const renameFolder = useMutation(api.folders.rename);

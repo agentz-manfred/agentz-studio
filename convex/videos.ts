@@ -12,12 +12,18 @@ async function auditLog(ctx: any, user: any, action: string, entityType: string,
 export const list = query({
   args: { ideaId: v.optional(v.id("ideas")), token: v.optional(v.string()) },
   handler: async (ctx, args) => {
+    if (!args.token) return [];
+    const user = await authenticate(ctx, args.token);
     if (args.ideaId) {
       const vids = await ctx.db.query("videos").withIndex("by_idea", (q) => q.eq("ideaId", args.ideaId!)).collect();
-      return vids.filter((v) => !v.archived);
+      const filtered = vids.filter((v) => !v.archived);
+      if (user.role === "client") return filtered.filter((v) => v.clientId === user.clientId && v.clientVisible);
+      return filtered;
     }
     const all = await ctx.db.query("videos").collect();
-    return all.filter((v) => !v.archived);
+    const filtered = all.filter((v) => !v.archived);
+    if (user.role === "client") return filtered.filter((v) => v.clientId === user.clientId && v.clientVisible);
+    return filtered;
   },
 });
 
@@ -138,8 +144,10 @@ export const createBunnyVideo = action({
 });
 
 export const listByClient = query({
-  args: { clientId: v.id("clients") },
+  args: { clientId: v.id("clients"), token: v.optional(v.string()) },
   handler: async (ctx, args) => {
+    if (!args.token) return [];
+    await authenticate(ctx, args.token);
     const ideas = await ctx.db.query("ideas").withIndex("by_client", (q) => q.eq("clientId", args.clientId)).collect();
     const ideaIds = new Set(ideas.map((i) => i._id));
     const allVideos = await ctx.db.query("videos").collect();
@@ -148,14 +156,20 @@ export const listByClient = query({
 });
 
 export const listByFolder = query({
-  args: { folderId: v.optional(v.id("folders")) },
+  args: { folderId: v.optional(v.id("folders")), token: v.optional(v.string()) },
   handler: async (ctx, args) => {
+    if (!args.token) return [];
+    const user = await authenticate(ctx, args.token);
     if (args.folderId) {
       const vids = await ctx.db.query("videos").withIndex("by_folder", (q) => q.eq("folderId", args.folderId)).collect();
-      return vids.filter((v) => !v.archived);
+      const filtered = vids.filter((v) => !v.archived);
+      if (user.role === "client") return filtered.filter((v) => v.clientVisible);
+      return filtered;
     }
     const all = await ctx.db.query("videos").collect();
-    return all.filter((v) => !v.folderId && !v.archived);
+    const filtered = all.filter((v) => !v.folderId && !v.archived);
+    if (user.role === "client") return filtered.filter((v) => v.clientVisible);
+    return filtered;
   },
 });
 

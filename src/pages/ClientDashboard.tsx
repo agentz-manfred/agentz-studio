@@ -26,7 +26,7 @@ export function ClientDashboard({ onNavigate }: { onNavigate: (page: string, id?
   const shootDates = useQuery(api.shootDates.list, token ? { token } : "skip");
   const videos = useQuery(
     api.videos.listByClient,
-    user?.clientId ? { clientId: user.clientId as Id<"clients"> } : "skip"
+    user?.clientId && token ? { clientId: user.clientId as Id<"clients">, token } : "skip"
   );
 
   const published = (ideas || []).filter((i) => i.status === "veröffentlicht").length;

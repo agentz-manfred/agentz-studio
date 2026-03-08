@@ -23,7 +23,7 @@ export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: 
   const [selectedCategory, setSelectedCategory] = useState("");
   const pipelineCategories = useQuery(
     api.categories.listByClient,
-    selectedClient ? { clientId: selectedClient as Id<"clients"> } : "skip"
+    selectedClient && token ? { clientId: selectedClient as Id<"clients">, token } : "skip"
   );
 
   const clientNames = (clients || []).reduce(

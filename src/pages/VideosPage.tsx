@@ -12,13 +12,15 @@ interface VideosPageProps {
 }
 
 export function VideosPage({ onNavigate }: VideosPageProps) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { selectedClientId } = useClientFilter();
   const isClient = user?.role === "client";
   const clientFilter = isClient && user?.clientId ? user.clientId : selectedClientId;
   const videos = useQuery(
     clientFilter ? api.videos.listByClient : api.videos.list,
-    clientFilter ? { clientId: clientFilter as Id<"clients"> } : (isClient ? "skip" : {})
+    clientFilter 
+      ? { clientId: clientFilter as Id<"clients">, token: token ?? undefined } 
+      : (token ? { token } : "skip")
   );
   const ideas = useQuery(api.ideas.list, clientFilter ? { clientId: clientFilter as Id<"clients"> } : {});
   const clients = useQuery(api.clients.list);

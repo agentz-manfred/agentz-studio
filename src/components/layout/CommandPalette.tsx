@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
+import { useAuth } from "../../lib/auth";
 import {
   Search,
   Users,
@@ -36,9 +37,10 @@ export function CommandPalette({
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
+  const { token } = useAuth();
   const clients = useQuery(api.clients.list);
   const ideas = useQuery(api.ideas.list, {});
-  const videos = useQuery(api.videos.list, {});
+  const videos = useQuery(api.videos.list, token ? { token } : "skip");
 
   // Keyboard shortcut to open
   useEffect(() => {

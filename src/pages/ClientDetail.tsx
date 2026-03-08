@@ -350,9 +350,9 @@ function ProfileEditor({
 /* ─── Category Manager ─── */
 function CategoryManager({ clientId }: { clientId: string }) {
   const { token } = useAuth();
-  const categories = useQuery(api.categories.listByClient, {
-    clientId: clientId as Id<"clients">,
-  });
+  const categories = useQuery(api.categories.listByClient, token ? {
+    clientId: clientId as Id<"clients">, token,
+  } : "skip");
   const createCategory = useMutation(api.categories.create);
   const updateCategory = useMutation(api.categories.update);
   const removeCategory = useMutation(api.categories.remove);
@@ -813,9 +813,9 @@ export function ClientDetail({
     token: token || undefined,
   });
   const users = useQuery(api.auth.listUsers, token ? { token } : "skip");
-  const categories = useQuery(api.categories.listByClient, {
-    clientId: clientId as Id<"clients">,
-  });
+  const categories = useQuery(api.categories.listByClient, token ? {
+    clientId: clientId as Id<"clients">, token,
+  } : "skip");
 
   const [editing, setEditing] = useState(false);
   const [showAiSuggest, setShowAiSuggest] = useState(false);

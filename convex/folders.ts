@@ -55,9 +55,11 @@ export const get = query({
 });
 
 export const getBreadcrumbs = query({
-  args: { folderId: v.optional(v.id("folders")) },
+  args: { folderId: v.optional(v.id("folders")), token: v.optional(v.string()) },
   handler: async (ctx, args) => {
     if (!args.folderId) return [];
+    if (!args.token) return [];
+    await authenticate(ctx, args.token);
     const crumbs: { _id: string; name: string }[] = [];
     let current = await ctx.db.get(args.folderId);
     while (current) {
@@ -150,8 +152,10 @@ export const remove = mutation({
 });
 
 export const countItems = query({
-  args: { folderId: v.id("folders") },
+  args: { folderId: v.id("folders"), token: v.optional(v.string()) },
   handler: async (ctx, args) => {
+    if (!args.token) return { folders: 0, videos: 0 };
+    await authenticate(ctx, args.token);
     const folders = await ctx.db.query("folders").withIndex("by_parent", (q) => q.eq("parentId", args.folderId)).collect();
     const videos = await ctx.db.query("videos").withIndex("by_folder", (q) => q.eq("folderId", args.folderId)).collect();
     return { folders: folders.length, videos: videos.length };

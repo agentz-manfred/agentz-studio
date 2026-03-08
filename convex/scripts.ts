@@ -3,8 +3,10 @@ import { v } from "convex/values";
 import { authenticate, requireEditor } from "./lib";
 
 export const listByIdea = query({
-  args: { ideaId: v.id("ideas") },
+  args: { ideaId: v.id("ideas"), token: v.optional(v.string()) },
   handler: async (ctx, args) => {
+    if (!args.token) return [];
+    await authenticate(ctx, args.token);
     return ctx.db.query("scripts").withIndex("by_idea", (q) => q.eq("ideaId", args.ideaId)).collect();
   },
 });

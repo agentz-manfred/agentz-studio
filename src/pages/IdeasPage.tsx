@@ -38,7 +38,7 @@ function NewIdeaModal({ onClose }: { onClose: () => void }) {
   const trapRef = useFocusTrap<HTMLDivElement>(true, onClose);
   const categories = useQuery(
     api.categories.listByClient,
-    clientId ? { clientId: clientId as Id<"clients"> } : "skip"
+    clientId && token ? { clientId: clientId as Id<"clients">, token } : "skip"
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -164,7 +164,7 @@ export function AiSuggestModal({ onClose, onAccept, preselectedClientId }: { onC
   const [selectedMonth, setSelectedMonth] = useState(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`);
 
   const selectedClient = (clients || []).find(c => c._id === clientId);
-  const categories = useQuery(api.categories.listByClient, clientId ? { clientId: clientId as Id<"clients"> } : "skip");
+  const categories = useQuery(api.categories.listByClient, clientId && token ? { clientId: clientId as Id<"clients">, token } : "skip");
 
   const videosPerMonth = (selectedClient as any)?.videosPerMonth || 5;
 

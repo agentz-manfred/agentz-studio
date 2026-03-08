@@ -484,7 +484,7 @@ export function SettingsPage() {
   const clients = useQuery(api.clients.list);
   const ideas = useQuery(api.ideas.list, {});
   const users = useQuery(api.auth.listUsers, token ? { token } : "skip");
-  const videos = useQuery(api.videos.list, {});
+  const videos = useQuery(api.videos.list, token ? { token } : "skip");
 
   const published = (ideas || []).filter((i) => i.status === "veröffentlicht").length;
   const inProgress = (ideas || []).filter((i) => !["idee", "veröffentlicht"].includes(i.status)).length;

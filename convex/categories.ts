@@ -1,10 +1,12 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { requireEditor } from "./lib";
+import { authenticate, requireEditor } from "./lib";
 
 export const listByClient = query({
-  args: { clientId: v.id("clients") },
+  args: { clientId: v.id("clients"), token: v.optional(v.string()) },
   handler: async (ctx, args) => {
+    if (!args.token) return [];
+    await authenticate(ctx, args.token);
     return ctx.db.query("categories").withIndex("by_client", (q) => q.eq("clientId", args.clientId)).collect();
   },
 });

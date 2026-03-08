@@ -322,7 +322,7 @@ export function ClientsPage({ onNavigate }: { onNavigate?: (page: string, id?: s
   const clients = useQuery(api.clients.list);
   const users = useQuery(api.auth.listUsers, token ? { token } : "skip");
   const ideas = useQuery(api.ideas.list, {});
-  const videos = useQuery(api.videos.list, {});
+  const videos = useQuery(api.videos.list, token ? { token } : "skip");
   const [showCreate, setShowCreate] = useState(false);
   const [search, setSearch] = useState("");
   const [loginClient, setLoginClient] = useState<any>(null);

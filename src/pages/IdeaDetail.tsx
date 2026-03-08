@@ -56,7 +56,7 @@ function StatusSelector({ current, onChange }: { current: string; onChange: (s: 
 
 function ScriptEditor({ ideaId, ideaTitle, ideaDescription, clientName, clientCompany, clientContext, clientPlatforms, clientMainPlatform }: { ideaId: string; ideaTitle: string; ideaDescription?: string; clientName: string; clientCompany?: string; clientContext?: string; clientPlatforms?: string[]; clientMainPlatform?: string }) {
   const { user, token } = useAuth();
-  const scripts = useQuery(api.scripts.listByIdea, { ideaId: ideaId as Id<"ideas"> });
+  const scripts = useQuery(api.scripts.listByIdea, token ? { ideaId: ideaId as Id<"ideas">, token } : "skip");
   const createScript = useMutation(api.scripts.create);
   const updateScript = useMutation(api.scripts.update);
   const generateScript = useAction(api.ai.generateScript);
@@ -324,8 +324,8 @@ function CommentSection({ ideaId }: { ideaId: string }) {
 }
 
 function VideoSection({ ideaId, onNavigate }: { ideaId: string; onNavigate?: (page: string, id?: string) => void }) {
-  const { user } = useAuth();
-  const videos = useQuery(api.videos.list, { ideaId: ideaId as Id<"ideas"> });
+  const { user, token } = useAuth();
+  const videos = useQuery(api.videos.list, token ? { ideaId: ideaId as Id<"ideas">, token } : "skip");
   const cdnHost = import.meta.env.VITE_BUNNY_CDN_HOSTNAME;
 
   return (
