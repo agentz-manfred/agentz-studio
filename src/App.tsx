@@ -13,23 +13,39 @@ import { KeyboardShortcutsDialog } from "./components/layout/KeyboardShortcuts";
 import { CommandPalette } from "./components/layout/CommandPalette";
 import { PageTransition } from "./components/layout/PageTransition";
 
-// Lazy-loaded pages for code splitting
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard").then(m => ({ default: m.AdminDashboard })));
-const ClientDashboard = lazy(() => import("./pages/ClientDashboard").then(m => ({ default: m.ClientDashboard })));
-const ClientsPage = lazy(() => import("./pages/ClientsPage").then(m => ({ default: m.ClientsPage })));
-const IdeasPage = lazy(() => import("./pages/IdeasPage").then(m => ({ default: m.IdeasPage })));
-const IdeaDetail = lazy(() => import("./pages/IdeaDetail").then(m => ({ default: m.IdeaDetail })));
-const CalendarPage = lazy(() => import("./pages/CalendarPage").then(m => ({ default: m.CalendarPage })));
-const PipelinePage = lazy(() => import("./pages/PipelinePage").then(m => ({ default: m.PipelinePage })));
-const VideosPage = lazy(() => import("./pages/VideosPage").then(m => ({ default: m.VideosPage })));
-const VideoReview = lazy(() => import("./pages/VideoReview").then(m => ({ default: m.VideoReview })));
-const SharePage = lazy(() => import("./pages/SharePage").then(m => ({ default: m.SharePage })));
-const InvitePage = lazy(() => import("./pages/InvitePage").then(m => ({ default: m.InvitePage })));
-const SettingsPage = lazy(() => import("./pages/SettingsPage").then(m => ({ default: m.SettingsPage })));
-const TeamPage = lazy(() => import("./pages/TeamPage").then(m => ({ default: m.TeamPage })));
-const LibraryPage = lazy(() => import("./pages/LibraryPage").then(m => ({ default: m.LibraryPage })));
-const ClientDetail = lazy(() => import("./pages/ClientDetail").then(m => ({ default: m.ClientDetail })));
-const AuditLogPage = lazy(() => import("./pages/AuditLogPage").then(m => ({ default: m.AuditLogPage })));
+// Lazy-loaded pages with auto-retry on chunk load failure (happens after deploys)
+function lazyRetry<T extends React.ComponentType<any>>(
+  factory: () => Promise<{ default: T }>,
+  retries = 2
+): React.LazyExoticComponent<T> {
+  return lazy(() =>
+    factory().catch((err) => {
+      if (retries > 0 && err.message?.includes("dynamically imported module")) {
+        // Force reload to get new chunk manifest
+        window.location.reload();
+        return new Promise(() => {}); // never resolves, page will reload
+      }
+      throw err;
+    })
+  );
+}
+
+const AdminDashboard = lazyRetry(() => import("./pages/AdminDashboard").then(m => ({ default: m.AdminDashboard })));
+const ClientDashboard = lazyRetry(() => import("./pages/ClientDashboard").then(m => ({ default: m.ClientDashboard })));
+const ClientsPage = lazyRetry(() => import("./pages/ClientsPage").then(m => ({ default: m.ClientsPage })));
+const IdeasPage = lazyRetry(() => import("./pages/IdeasPage").then(m => ({ default: m.IdeasPage })));
+const IdeaDetail = lazyRetry(() => import("./pages/IdeaDetail").then(m => ({ default: m.IdeaDetail })));
+const CalendarPage = lazyRetry(() => import("./pages/CalendarPage").then(m => ({ default: m.CalendarPage })));
+const PipelinePage = lazyRetry(() => import("./pages/PipelinePage").then(m => ({ default: m.PipelinePage })));
+const VideosPage = lazyRetry(() => import("./pages/VideosPage").then(m => ({ default: m.VideosPage })));
+const VideoReview = lazyRetry(() => import("./pages/VideoReview").then(m => ({ default: m.VideoReview })));
+const SharePage = lazyRetry(() => import("./pages/SharePage").then(m => ({ default: m.SharePage })));
+const InvitePage = lazyRetry(() => import("./pages/InvitePage").then(m => ({ default: m.InvitePage })));
+const SettingsPage = lazyRetry(() => import("./pages/SettingsPage").then(m => ({ default: m.SettingsPage })));
+const TeamPage = lazyRetry(() => import("./pages/TeamPage").then(m => ({ default: m.TeamPage })));
+const LibraryPage = lazyRetry(() => import("./pages/LibraryPage").then(m => ({ default: m.LibraryPage })));
+const ClientDetail = lazyRetry(() => import("./pages/ClientDetail").then(m => ({ default: m.ClientDetail })));
+const AuditLogPage = lazyRetry(() => import("./pages/AuditLogPage").then(m => ({ default: m.AuditLogPage })));
 import { ImpressumPage, DatenschutzPage } from "./pages/LegalPages";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);

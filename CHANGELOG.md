@@ -1,5 +1,23 @@
 # AgentZ Studio — CHANGELOG
 
+## v2.10.0 (08.03.2026) — Nacht-Sprint Run 8: Security Hardening + Resilience
+- **Email SMTP via Resend** — sendStatusNotification nutzt Resend API (fetch-basiert), Graceful Fallback wenn kein API-Key
+- **Comments Data Isolation** — Client-User sehen nur Kommentare zu eigenen Ideas/Videos
+- **shootDates Auth** — Kein Daten-Leak mehr ohne Token, Backend gibt [] ohne Auth
+- **invites.listByClient Auth** — Jetzt Admin-only mit Token-Validierung
+- **Session Cleanup Cron** — Tägliches Aufräumen abgelaufener Sessions (3:00 UTC)
+- **Lazy Load Retry** — Auto-Reload bei "Failed to fetch dynamically imported module" nach Deployments
+- **Frontend Token Passing** — Alle shootDates-Queries nutzen "skip" statt leerer Strings
+
+## v2.9.0 (08.03.2026) — Nacht-Sprint Run 7: Archive + DnD + Audit
+- **Archiv-Funktion** — Ideas + Videos archivieren/wiederherstellen, Archiv-Tab, Bulk-Archivierung
+- **Skeleton Loading** — Shimmer-Skeletons auf allen 7 Hauptseiten
+- **Drag & Drop Ordner** — Ordner in Ordner verschachteln, Circular-Reference-Check
+- **Suche verbessern** — Volltextsuche über Titel UND Beschreibungen
+- **Audit Log** — Neues Schema + Page + Typ-Filter, Logging auf ideas, videos, clients, folders
+- **Toast Notifications** — Lightweight success/error/info Toasts
+- **Email + In-App Notifications** — Status-Change triggert Benachrichtigungen
+
 ## v2.8.0 (08.03.2026) — Nacht-Sprint Run 6: Accessibility + Bulk Ops
 - **Keyboard Accessibility** — Focus-Trap (useFocusTrap) auf NewIdeaModal + AiSuggestModal, erweiterte Keyboard-Shortcuts (⌘K, ↑↓, Esc)
 - **Optimistic Comments** — VideoReview zeigt Kommentare sofort an (pending state), kein Warten auf Server
