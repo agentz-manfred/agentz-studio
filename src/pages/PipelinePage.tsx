@@ -12,7 +12,7 @@ export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: 
   const { user, token } = useAuth();
   const { selectedClientId } = useClientFilter();
   const clientFilter = user?.role === "client" && user.clientId ? user.clientId : selectedClientId;
-  const ideas = useQuery(api.ideas.list, token ? (clientFilter ? { clientId: clientFilter as any, token } : { token }) : "skip");
+  const ideas = useQuery(api.ideas.list, token ? (clientFilter ? { clientId: clientFilter, token } : { token }) : "skip");
   const clients = useQuery(api.clients.list, token ? { token } : "skip");
   const updateStatus = useMutation(api.ideas.updateStatus);
   const createIdea = useMutation(api.ideas.create);
@@ -32,7 +32,7 @@ export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: 
   );
 
   const clientInfoMap = (clients || []).reduce(
-    (acc, c) => ({ ...acc, [c._id]: { name: c.name, avatarColor: (c as any).avatarColor } }),
+    (acc, c) => ({ ...acc, [c._id]: { name: c.name, avatarColor: c.avatarColor } }),
     {} as Record<string, { name: string; avatarColor?: string }>
   );
 
@@ -86,7 +86,7 @@ export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: 
 
       <div className="p-6 lg:p-8">
         <KanbanBoard
-          ideas={(ideas || []) as any}
+          ideas={(ideas || []) as any[]}
           onStatusChange={handleStatusChange}
           clientNames={clientNames}
           clientInfoMap={clientInfoMap}

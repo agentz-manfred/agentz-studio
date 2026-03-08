@@ -528,9 +528,9 @@ export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onB
           ideaDescription={idea.description}
           clientName={client?.name || ""}
           clientCompany={client?.company}
-          clientContext={(client as any)?.context}
-          clientPlatforms={(client as any)?.platforms}
-          clientMainPlatform={(client as any)?.mainPlatform}
+          clientContext={client?.context}
+          clientPlatforms={client?.platforms}
+          clientMainPlatform={client?.mainPlatform}
         />
       </div>
 

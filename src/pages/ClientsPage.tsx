@@ -402,7 +402,7 @@ export function ClientsPage({ onNavigate }: { onNavigate?: (page: string, id?: s
               {/* Top: Avatar + Name + Actions */}
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 text-white text-[14px] font-bold" style={{ background: (client as any).avatarColor || '#4F46E5' }}>
+                  <div className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 text-white text-[14px] font-bold" style={{ background: client.avatarColor || '#4F46E5' }}>
                     {initials}
                   </div>
                   <div className="min-w-0">

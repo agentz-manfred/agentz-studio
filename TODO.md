@@ -44,11 +44,11 @@ Items werden von oben nach unten abgearbeitet. Erledigtes kommt ins CHANGELOG.md
 
 - [ ] **SECURITY: `Math.random()` für Session-Tokens** (`convex/auth.ts:18`): Nicht kryptographisch sicher. Tokens sind vorhersagbar. **Fix:** `crypto.getRandomValues()` verwenden (in Convex Actions möglich).
 
-- [ ] **SECURITY: Kein Rate Limiting auf Login**: Brute-Force auf Login-Endpoint möglich. **Fix:** Rate Limiting implementieren (z.B. max 5 Versuche pro Minute pro Email).
+- [x] **SECURITY: Rate Limiting auf Login**: ✅ Max 5 Fehlversuche pro Minute pro Email. `loginAttempts` Tabelle, Cleanup in `cleanupSessions`.
 
 ### 🔧 Code-Qualität
 
-- [ ] **~20x `as any` Casts**: Vor allem für Client-Properties (`avatarColor`, `context`, `platforms`, `mainPlatform`). Convex Query Return-Types inkludieren diese Fields nicht korrekt. **Fix:** Convex-Rückgabetypen korrekt tippen oder explizite Interfaces definieren.
+- [x] **`as any` Casts bereinigt**: ✅ `clientFilter` korrekt als `Id<"clients">` getypt, ~18 `as any` Casts entfernt. Nur 2 verbleibend (navigator.standalone + KanbanBoard Prop-Widening).
 
 - [ ] **Inkonsistente Text-Editoren**: Tiptap/RichTextEditor nur in IdeaDetail (Skript + Client-Kontext). Überall sonst plain `<textarea>` (Kalender-Notes, KI-Prompts in Settings, Neue-Idee-Beschreibung, Pipeline Quick-Add). Nicht zwingend Bug, aber inkonsistent.
 

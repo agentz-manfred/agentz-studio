@@ -93,7 +93,7 @@ function ProfileEditor({
     mainPlatform: client.mainPlatform || "",
     videosPerMonth: client.videosPerMonth ?? "",
     context: client.context || "",
-    avatarColor: (client as any).avatarColor || "#4F46E5",
+    avatarColor: client.avatarColor || "#4F46E5",
   });
 
   const togglePlatform = (id: string) => {
@@ -896,7 +896,7 @@ export function ClientDetail({
 
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-[20px] font-semibold" style={{ background: (client as any).avatarColor || '#4F46E5' }}>
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-[20px] font-semibold" style={{ background: client.avatarColor || '#4F46E5' }}>
               {client.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase()}
             </div>
             <div>

@@ -356,7 +356,7 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
     .filter((v) => {
       if (searchQuery && !v.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
       if (statusFilter !== "all" && v.status !== statusFilter) return false;
-      if (selectedClientId && (v as any).clientId && (v as any).clientId !== selectedClientId) return false;
+      if (selectedClientId && v.clientId && v.clientId !== selectedClientId) return false;
       return true;
     })
     .sort((a, b) => {

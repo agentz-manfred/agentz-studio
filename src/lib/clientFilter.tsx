@@ -1,8 +1,9 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
+import type { Id } from "../../convex/_generated/dataModel";
 
 interface ClientFilterContextValue {
-  selectedClientId: string | null;
-  setSelectedClientId: (id: string | null) => void;
+  selectedClientId: Id<"clients"> | null;
+  setSelectedClientId: (id: Id<"clients"> | null) => void;
 }
 
 const ClientFilterContext = createContext<ClientFilterContextValue>({
@@ -11,7 +12,7 @@ const ClientFilterContext = createContext<ClientFilterContextValue>({
 });
 
 export function ClientFilterProvider({ children }: { children: ReactNode }) {
-  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+  const [selectedClientId, setSelectedClientId] = useState<Id<"clients"> | null>(null);
   return (
     <ClientFilterContext.Provider value={{ selectedClientId, setSelectedClientId }}>
       {children}

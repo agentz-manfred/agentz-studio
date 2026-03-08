@@ -15,6 +15,7 @@ interface Idea {
   description?: string;
   status: string;
   clientId: string;
+  [key: string]: unknown;
 }
 
 interface ClientInfo {

@@ -99,14 +99,40 @@ export const login = mutation({
     password: v.string(),
   },
   handler: async (ctx, args) => {
+    // Rate limiting: max 5 failed attempts per email in last 60 seconds
+    const oneMinuteAgo = Date.now() - 60 * 1000;
+    const recentAttempts = await ctx.db
+      .query("loginAttempts")
+      .withIndex("by_email", (q) => q.eq("email", args.email))
+      .collect();
+    const recentFailed = recentAttempts.filter(
+      (a) => a.attemptAt > oneMinuteAgo && !a.success
+    );
+    if (recentFailed.length >= 5) {
+      throw new Error("Zu viele Anmeldeversuche. Bitte warte eine Minute.");
+    }
+
     const user = await ctx.db
       .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.email))
       .first();
 
     if (!user || user.passwordHash !== simpleHash(args.password)) {
+      // Log failed attempt
+      await ctx.db.insert("loginAttempts", {
+        email: args.email,
+        attemptAt: Date.now(),
+        success: false,
+      });
       throw new Error("Ungültige Anmeldedaten");
     }
+
+    // Log successful attempt
+    await ctx.db.insert("loginAttempts", {
+      email: args.email,
+      attemptAt: Date.now(),
+      success: true,
+    });
 
     const token = generateToken();
     await ctx.db.insert("sessions", {
@@ -270,6 +296,17 @@ export const cleanupSessions = mutation({
         deleted++;
       }
     }
-    return { deleted, remaining: allSessions.length - deleted };
+    // Clean up old login attempts (older than 1 hour)
+    const oneHourAgo = now - 60 * 60 * 1000;
+    const oldAttempts = await ctx.db.query("loginAttempts").collect();
+    let attemptsDeleted = 0;
+    for (const a of oldAttempts) {
+      if (a.attemptAt < oneHourAgo) {
+        await ctx.db.delete(a._id);
+        attemptsDeleted++;
+      }
+    }
+
+    return { deleted, remaining: allSessions.length - deleted, attemptsDeleted };
   },
 });

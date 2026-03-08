@@ -21,7 +21,7 @@ export function ClientDashboard({ onNavigate }: { onNavigate: (page: string, id?
   const { user, token } = useAuth();
   const ideas = useQuery(
     api.ideas.list,
-    user?.clientId && token ? { clientId: user.clientId as any, token } : "skip"
+    user?.clientId && token ? { clientId: user.clientId!, token } : "skip"
   );
   const shootDates = useQuery(api.shootDates.list, token ? { token } : "skip");
   const videos = useQuery(

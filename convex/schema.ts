@@ -188,6 +188,14 @@ export default defineSchema({
     .index("by_entity", ["entityType", "entityId"])
     .index("by_time", ["createdAt"]),
 
+  loginAttempts: defineTable({
+    email: v.string(),
+    attemptAt: v.number(),
+    success: v.boolean(),
+  })
+    .index("by_email", ["email"])
+    .index("by_time", ["attemptAt"]),
+
   settings: defineTable({
     key: v.string(),
     value: v.string(),
