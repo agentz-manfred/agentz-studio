@@ -1,11 +1,28 @@
 # AgentZ Studio — TODO
 
-*Aktuell keine offenen Items. Alle Features aus dem Nacht-Sprint wurden implementiert.*
+## Nächste Schritte (Prio)
 
-## Abgeschlossen in Run 6
-- ✅ Keyboard Accessibility (Focus-Trap in Modals, visible focus-ring global, Arrow-Keys Sidebar, Keyboard Shortcuts erweitert)
-- ✅ Optimistic Updates (Kommentare in VideoReview sofort sichtbar, IdeaDetail hatte es schon)
-- ✅ Bulk Operations Videos (Multi-Select, Alle auswählen, Bulk-Verschieben in Ordner)
-- ✅ Activity Log / Timeline (war bereits implementiert in ClientDetail)
-- ✅ Dashboard Widgets Konfigurierbar (war bereits implementiert mit localStorage)
-- ✅ Export / Reporting (CSV + Monatsbericht waren bereits implementiert)
+### 1. Email-Benachrichtigungen
+- Status-Änderung → Email an zugehörigen Kunden
+- Neuer Kommentar → Email an Admins
+- Convex Action mit SMTP (kontakt@agent-z.de)
+
+### 2. Skeleton Loading States
+- Dashboard, Ideen, Pipeline: Shimmer-Skeletons statt Spinner
+- Besserer perceived performance
+
+### 3. Drag & Drop Ordner-Verschachtelung
+- Ordner in Ordner ziehen in Mediathek
+- Visuelles Feedback (Highlight) beim Hover
+
+### 4. Archiv-Funktion
+- Ideen + Videos archivieren (nicht löschen)
+- Archiv-Tab in Listen mit Toggle
+
+### 5. Suche verbessern
+- Volltextsuche über Beschreibungen/Kommentare (nicht nur Titel)
+- Recent searches speichern
+
+### 6. Audit Log (Admin)
+- Wer hat was wann geändert (Mutation-basiert)
+- Filtbar nach User, Aktion, Zeitraum
