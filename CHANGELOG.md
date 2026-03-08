@@ -1,5 +1,9 @@
 # AgentZ Studio — CHANGELOG
 
+## v2.11.3 (08.03.2026) — Security & Code Quality
+- **SECURITY: Rate Limiting auf Login** — Max 5 Fehlversuche pro Minute pro Email. Neue `loginAttempts` Tabelle, automatisches Cleanup in `cleanupSessions`.
+- **CODE QUALITY: ~18x `as any` Casts entfernt** — `clientFilter` korrekt als `Id<"clients">` getypt, Client-Properties (`avatarColor`, `context`, `platforms`, `mainPlatform`, `videosPerMonth`) direkt ohne Cast angesprochen. Nur 2 harmlose `as any` verbleiben (navigator.standalone + KanbanBoard prop widening).
+
 ## v2.11.2 (08.03.2026) — Bug Fix Sprint
 - **BUG FIX: AiSuggestModal token undefined** — `useAuth()` fehlte in der Komponente, Kategorien wurden nie geladen. Gefixt.
 - **BUG FIX: ClientDetail englische Status-Keys** — Lokale STATUS_LABELS nutzten englische Keys (`idea`, `script`...) statt deutsche (`idee`, `skript`...). Jetzt wird `STATUS_LABELS` aus `utils.ts` importiert + STATUS_COLORS auf deutsche Keys umgestellt.
