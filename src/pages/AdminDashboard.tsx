@@ -48,7 +48,7 @@ const STATUS_ORDER = [
 ];
 
 const STATUS_COLORS: Record<string, string> = {
-  idee: "#a3a3a3",
+  idee: "#888888",
   skript: "#8b5cf6",
   freigabe: "#f59e0b",
   korrektur: "#ef4444",
@@ -56,52 +56,80 @@ const STATUS_COLORS: Record<string, string> = {
   gedreht: "#06b6d4",
   geschnitten: "#8b5cf6",
   review: "#f97316",
-  veröffentlicht: "#16a34a",
+  veröffentlicht: "#00DC82",
 };
 
-/* ─── Stat Card ─── */
+/* ─── Stat Card (Brutalist) ─── */
 function StatCard({
   icon: Icon,
   label,
   value,
   delay,
   onClick,
-  accentColor,
+  isGreen,
 }: {
   icon: any;
   label: string;
   value: number | string;
   delay: string;
   onClick?: () => void;
-  accentColor?: string;
+  isGreen?: boolean;
 }) {
   return (
     <button
       onClick={onClick}
-      className={`animate-in ${delay} stat-card accent-left bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] p-5 text-left group w-full relative overflow-hidden hover:shadow-[var(--shadow-md)] hover:border-[var(--color-border)]`}
-      style={{ '--accent-line-color': accentColor } as React.CSSProperties}
+      className={`animate-in ${delay} group w-full text-left relative overflow-hidden
+        bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] p-5
+        transition-all duration-[var(--duration-fast)] ease-[var(--ease-brutal)]
+        hover:translate-x-[-2px] hover:translate-y-[-2px]
+        ${isGreen
+          ? "hover:shadow-[var(--shadow-brutal)] hover:border-[var(--color-green)]"
+          : "hover:shadow-[var(--shadow-brutal-dark)] hover:border-[var(--color-border-green)]"
+        }`}
     >
-      <div className="flex items-center justify-between relative z-10">
-        <div>
-          <p className="text-[32px] font-bold tracking-[-0.04em] leading-none tabular-nums" style={{ color: accentColor }}>
+      {/* Left accent bar */}
+      <div
+        className={`absolute left-0 top-0 bottom-0 w-[3px] transition-all duration-200 ${
+          isGreen ? "bg-[var(--color-green)]" : "bg-[var(--color-surface-4)]"
+        } group-hover:bg-[var(--color-green)]`}
+      />
+
+      <div className="relative z-10">
+        <div className="flex items-start justify-between">
+          <p
+            className={`text-[36px] font-bold tracking-[-0.04em] leading-none tabular-nums font-[var(--font-display)]
+              ${isGreen ? "text-[var(--color-green)]" : "text-[var(--color-text-primary)]"}`}
+            style={{ fontFamily: "var(--font-display)" }}
+          >
             {value}
           </p>
-          <div className="flex items-center gap-1.5 mt-2">
+          <div
+            className={`w-8 h-8 flex items-center justify-center border transition-all duration-200
+              ${isGreen
+                ? "border-[var(--color-green)] bg-[var(--color-green-subtle)]"
+                : "border-[var(--color-border-strong)] bg-[var(--color-surface-2)]"
+              } group-hover:border-[var(--color-green)] group-hover:bg-[var(--color-green-subtle)]`}
+          >
             <Icon
-              className="w-3.5 h-3.5"
-              strokeWidth={1.75}
-              style={{ color: accentColor, opacity: 0.6 }}
+              className={`w-4 h-4 transition-colors duration-200
+                ${isGreen ? "text-[var(--color-green)]" : "text-[var(--color-text-tertiary)]"}
+                group-hover:text-[var(--color-green)]`}
+              strokeWidth={2}
             />
-            <p className="text-[13px] text-[var(--color-text-secondary)] font-medium">{label}</p>
           </div>
         </div>
-        <ArrowUpRight className="w-4 h-4 text-[var(--color-text-tertiary)] opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all duration-200" />
+        <div className="flex items-center gap-2 mt-3">
+          <p className="text-[12px] uppercase tracking-[0.08em] font-semibold text-[var(--color-text-tertiary)] group-hover:text-[var(--color-text-secondary)] transition-colors">
+            {label}
+          </p>
+          <ArrowUpRight className="w-3 h-3 text-[var(--color-text-muted)] opacity-0 group-hover:opacity-100 transition-all duration-200" />
+        </div>
       </div>
     </button>
   );
 }
 
-/* ─── Quick Action ─── */
+/* ─── Quick Action (Brutalist) ─── */
 function QuickAction({
   icon: Icon,
   label,
@@ -116,15 +144,52 @@ function QuickAction({
   return (
     <button
       onClick={onClick}
-      className={`animate-in ${delay} quick-action flex items-center gap-2 px-4 h-9 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-1)] text-[13px] font-medium text-[var(--color-text-secondary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-all duration-200 ease-[var(--ease-out)] shadow-[var(--shadow-xs)]`}
+      className={`animate-in ${delay} flex items-center gap-2 px-4 h-9
+        border-2 border-[var(--color-border-strong)] bg-[var(--color-surface-1)]
+        text-[12px] uppercase tracking-[0.06em] font-semibold text-[var(--color-text-secondary)]
+        hover:border-[var(--color-green)] hover:text-[var(--color-green)] hover:bg-[var(--color-green-subtle)]
+        hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[var(--shadow-brutal-sm)]
+        transition-all duration-[var(--duration-fast)] ease-[var(--ease-brutal)]`}
     >
-      <Icon className="w-3.5 h-3.5" strokeWidth={1.75} />
+      <Icon className="w-3.5 h-3.5" strokeWidth={2} />
       {label}
     </button>
   );
 }
 
-/* ─── Pipeline Progress ─── */
+/* ─── Section Header (Brutalist) ─── */
+function SectionHeader({
+  title,
+  actionLabel,
+  onAction,
+}: {
+  title: string;
+  actionLabel?: string;
+  onAction?: () => void;
+}) {
+  return (
+    <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center gap-3">
+        <div className="w-[3px] h-5 bg-[var(--color-green)]" />
+        <h2 className="text-[13px] uppercase tracking-[0.08em] font-bold text-[var(--color-text-primary)]">
+          {title}
+        </h2>
+      </div>
+      {actionLabel && onAction && (
+        <button
+          onClick={onAction}
+          className="text-[11px] uppercase tracking-[0.06em] font-semibold text-[var(--color-text-muted)]
+            hover:text-[var(--color-green)] flex items-center gap-1 transition-colors duration-150"
+        >
+          {actionLabel}
+          <ChevronRight className="w-3 h-3" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+/* ─── Pipeline Progress (Brutalist) ─── */
 function PipelineProgress({ ideas }: { ideas: any[] }) {
   if (ideas.length === 0) return null;
 
@@ -137,15 +202,14 @@ function PipelineProgress({ ideas }: { ideas: any[] }) {
 
   return (
     <div className="animate-in stagger-3">
-      <h2 className="text-[15px] font-semibold tracking-[-0.01em] mb-3">Pipeline</h2>
-      <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] p-5">
-        {/* Bar */}
-        <div className="flex h-2 rounded-full overflow-hidden bg-[var(--color-surface-2)] mb-4">
+      <SectionHeader title="Pipeline" />
+      <div className="bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] p-5">
+        {/* Bar — square, no border-radius */}
+        <div className="flex h-3 overflow-hidden bg-[var(--color-surface-0)] border border-[var(--color-border)] mb-5">
           {STATUS_ORDER.map((status) => {
             const count = statusCounts[status] || 0;
             if (count === 0) return null;
             const pct = (count / ideas.length) * 100;
-            const isPublished = status === "veröffentlicht";
             return (
               <div
                 key={status}
@@ -160,15 +224,18 @@ function PipelineProgress({ ideas }: { ideas: any[] }) {
         </div>
 
         {/* Legend */}
-        <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+        <div className="flex flex-wrap gap-x-4 gap-y-2">
           {activeStatuses.map((status) => (
-            <div key={status} className="flex items-center gap-1.5">
+            <div key={status} className="flex items-center gap-2">
               <div
-                className="w-2 h-2 rounded-full"
+                className="w-2.5 h-2.5"
                 style={{ background: STATUS_COLORS[status] || "var(--color-accent)" }}
               />
-              <span className="text-[12px] text-[var(--color-text-tertiary)]">
-                {STATUS_LABELS[status]} ({statusCounts[status]})
+              <span className="text-[11px] uppercase tracking-[0.04em] font-medium text-[var(--color-text-tertiary)]">
+                {STATUS_LABELS[status]}
+              </span>
+              <span className="text-[11px] font-bold text-[var(--color-text-secondary)] tabular-nums">
+                {statusCounts[status]}
               </span>
             </div>
           ))}
@@ -178,7 +245,7 @@ function PipelineProgress({ ideas }: { ideas: any[] }) {
   );
 }
 
-/* ─── Upcoming Shoots ─── */
+/* ─── Upcoming Shoots (Brutalist) ─── */
 function UpcomingShoots({
   shoots,
   clients,
@@ -200,56 +267,63 @@ function UpcomingShoots({
 
   return (
     <div className="animate-in stagger-4">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-[15px] font-semibold tracking-[-0.01em]">Nächste Drehtermine</h2>
-        <button
-          onClick={() => onNavigate("calendar")}
-          className="text-[12px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] flex items-center gap-0.5 transition-colors"
-        >
-          Alle <ChevronRight className="w-3 h-3" />
-        </button>
-      </div>
-      <div className="space-y-2">
-        {upcoming.map((shoot) => {
+      <SectionHeader title="Nächste Drehtermine" actionLabel="Alle" onAction={() => onNavigate("calendar")} />
+      <div className="space-y-0">
+        {upcoming.map((shoot, idx) => {
           const client = clientMap.get(shoot.clientId);
           const d = new Date(shoot.date + "T00:00:00");
           const isToday = shoot.date === today;
           return (
             <div
               key={shoot._id}
-              className={`bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border px-4 py-3 flex items-center gap-3 transition-colors ${
-                isToday
-                  ? "border-[var(--color-accent)] bg-[var(--color-accent-surface)]"
-                  : "border-[var(--color-border-subtle)]"
-              }`}
+              className={`bg-[var(--color-surface-1)] border-2 px-4 py-3 flex items-center gap-4
+                transition-all duration-[var(--duration-fast)] ease-[var(--ease-brutal)]
+                hover:translate-x-[-1px] hover:translate-y-[-1px]
+                ${idx > 0 ? "-mt-[2px]" : ""}
+                ${isToday
+                  ? "border-[var(--color-green)] hover:shadow-[var(--shadow-brutal)]"
+                  : "border-[var(--color-border-strong)] hover:shadow-[var(--shadow-brutal-sm)] hover:border-[var(--color-border-green)]"
+                }`}
             >
-              <div className="w-11 h-11 rounded-[var(--radius-md)] bg-[var(--color-surface-2)] flex flex-col items-center justify-center flex-shrink-0">
-                <span className="text-[10px] font-medium text-[var(--color-text-tertiary)] uppercase leading-none">
+              {/* Date block */}
+              <div className={`w-12 h-12 flex flex-col items-center justify-center flex-shrink-0 border
+                ${isToday
+                  ? "bg-[var(--color-green)] border-[var(--color-green-dark)] text-[#0A0A0A]"
+                  : "bg-[var(--color-surface-2)] border-[var(--color-border)]"
+                }`}
+              >
+                <span className={`text-[9px] font-bold uppercase tracking-[0.1em] leading-none
+                  ${isToday ? "" : "text-[var(--color-text-tertiary)]"}`}
+                >
                   {d.toLocaleDateString("de-DE", { month: "short" })}
                 </span>
-                <span className="text-[18px] font-semibold leading-none tracking-[-0.02em]">
+                <span className={`text-[20px] font-bold leading-none tracking-[-0.02em]
+                  ${isToday ? "" : ""}`}
+                  style={{ fontFamily: "var(--font-display)" }}
+                >
                   {d.getDate()}
                 </span>
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-[14px] font-medium truncate">
+                <p className="text-[13px] font-semibold truncate">
                   {client?.company || client?.name || "Unbekannt"}
                   {isToday && (
-                    <span className="ml-2 text-[11px] font-medium text-[var(--color-accent)] uppercase tracking-wide">
+                    <span className="ml-2 text-[10px] font-bold text-[var(--color-green)] uppercase tracking-[0.1em]
+                      bg-[var(--color-green-subtle)] px-2 py-0.5 border border-[var(--color-border-green)]">
                       Heute
                     </span>
                   )}
                 </p>
-                <div className="flex items-center gap-3 mt-0.5">
+                <div className="flex items-center gap-3 mt-1">
                   {shoot.time && (
-                    <span className="text-[12px] text-[var(--color-text-tertiary)] flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
+                    <span className="text-[11px] text-[var(--color-text-tertiary)] flex items-center gap-1 font-mono">
+                      <Clock className="w-3 h-3" strokeWidth={2} />
                       {shoot.time}
                     </span>
                   )}
                   {shoot.location && (
-                    <span className="text-[12px] text-[var(--color-text-tertiary)] flex items-center gap-1 truncate">
-                      <MapPin className="w-3 h-3" />
+                    <span className="text-[11px] text-[var(--color-text-tertiary)] flex items-center gap-1 truncate">
+                      <MapPin className="w-3 h-3" strokeWidth={2} />
                       {shoot.location}
                     </span>
                   )}
@@ -263,7 +337,7 @@ function UpcomingShoots({
   );
 }
 
-/* ─── Recent Activity ─── */
+/* ─── Recent Activity (Brutalist) ─── */
 function RecentActivity({
   ideas,
   clients,
@@ -280,45 +354,46 @@ function RecentActivity({
 
   return (
     <div className="animate-in stagger-4">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-[15px] font-semibold tracking-[-0.01em]">Letzte Aktivität</h2>
-        <button
-          onClick={() => onNavigate("ideas")}
-          className="text-[12px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] flex items-center gap-0.5 transition-colors"
-        >
-          Alle <ChevronRight className="w-3 h-3" />
-        </button>
-      </div>
-      <div className="space-y-1">
-        {recent.map((idea) => {
+      <SectionHeader title="Letzte Aktivität" actionLabel="Alle" onAction={() => onNavigate("ideas")} />
+      <div className="space-y-0">
+        {recent.map((idea, idx) => {
           const client = clientMap.get(idea.clientId);
           return (
             <button
               key={idea._id}
               onClick={() => onNavigate("idea", idea._id)}
-              className="w-full bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] px-4 py-3 flex items-center justify-between hover:shadow-[var(--shadow-xs)] hover:border-[var(--color-border)] transition-all duration-150 group text-left"
+              className={`w-full bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)]
+                px-4 py-3 flex items-center justify-between
+                hover:border-[var(--color-border-green)] hover:translate-x-[-1px] hover:translate-y-[-1px]
+                hover:shadow-[var(--shadow-brutal-sm)]
+                transition-all duration-[var(--duration-fast)] ease-[var(--ease-brutal)] group text-left
+                ${idx > 0 ? "-mt-[2px]" : ""}`}
             >
               <div className="min-w-0 flex-1">
-                <p className="text-[14px] font-medium truncate group-hover:text-[var(--color-accent)]">
+                <p className="text-[13px] font-semibold truncate group-hover:text-[var(--color-green)] transition-colors">
                   {idea.title}
                 </p>
-                <p className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5 truncate">
+                <p className="text-[11px] text-[var(--color-text-muted)] mt-0.5 truncate uppercase tracking-[0.04em]">
                   {client?.company || client?.name}
                 </p>
               </div>
-              <div className="flex items-center gap-2.5 flex-shrink-0 ml-3">
+              <div className="flex items-center gap-3 flex-shrink-0 ml-3">
                 {(() => {
-                  const s = STATUS_BADGE_STYLES[idea.status] || { bg: "rgba(163,163,163,0.12)", color: "#737373" };
+                  const statusColor = STATUS_COLORS[idea.status] || "#888888";
                   return (
                     <span
-                      className="text-[11px] font-medium px-2 py-0.5 rounded-full"
-                      style={{ background: s.bg, color: s.color }}
+                      className="text-[10px] font-bold uppercase tracking-[0.06em] px-2 py-0.5 border"
+                      style={{
+                        background: `${statusColor}15`,
+                        color: statusColor,
+                        borderColor: `${statusColor}40`,
+                      }}
                     >
                       {STATUS_LABELS[idea.status] || idea.status}
                     </span>
                   );
                 })()}
-                <span className="text-[11px] text-[var(--color-text-tertiary)] tabular-nums">
+                <span className="text-[11px] text-[var(--color-text-muted)] tabular-nums font-mono">
                   {new Date(idea.updatedAt).toLocaleDateString("de-DE", {
                     day: "2-digit",
                     month: "2-digit",
@@ -333,7 +408,7 @@ function RecentActivity({
   );
 }
 
-/* ─── PWA Install Banner ─── */
+/* ─── PWA Install Banner (Brutalist) ─── */
 function PWAInstallBanner() {
   const { canInstall, isInstalled, isIOS, install } = usePWAInstall();
   const [dismissed, setDismissed] = useState(false);
@@ -343,18 +418,23 @@ function PWAInstallBanner() {
   if (!canInstall && !isIOS) return null;
 
   return (
-    <div className="animate-in stagger-1 install-banner rounded-[var(--radius-lg)] p-4 flex items-center gap-4 text-white mb-4">
-      <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
-        <Smartphone className="w-5 h-5" strokeWidth={1.75} />
+    <div className="animate-in stagger-1 bg-[var(--color-surface-1)] border-2 border-[var(--color-green)]
+      p-4 flex items-center gap-4 relative overflow-hidden mb-4">
+      {/* Green glow top-right */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-[radial-gradient(circle,rgba(0,220,130,0.12)_0%,transparent_70%)] pointer-events-none" />
+
+      <div className="w-10 h-10 bg-[var(--color-green-subtle)] border-2 border-[var(--color-green)]
+        flex items-center justify-center flex-shrink-0">
+        <Smartphone className="w-5 h-5 text-[var(--color-green)]" strokeWidth={2} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[14px] font-semibold">App installieren</p>
+        <p className="text-[13px] font-bold uppercase tracking-[0.04em]">App installieren</p>
         {isIOS ? (
-          <p className="text-[12px] text-white/70 mt-0.5">
+          <p className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5">
             Tippe auf <Share className="w-3 h-3 inline -mt-0.5" /> Teilen → „Zum Home-Bildschirm"
           </p>
         ) : (
-          <p className="text-[12px] text-white/70 mt-0.5">
+          <p className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5">
             AgentZ Studio als App auf deinem Gerät nutzen
           </p>
         )}
@@ -367,7 +447,7 @@ function PWAInstallBanner() {
             setInstalling(false);
           }}
           disabled={installing}
-          className="flex-shrink-0 flex items-center gap-1.5 px-4 h-8 rounded-lg bg-white text-[#1e40af] text-[13px] font-semibold hover:bg-white/90 transition-colors disabled:opacity-50"
+          className="btn-brutal flex-shrink-0 flex items-center gap-1.5 px-4 h-8 text-[12px] disabled:opacity-50"
         >
           <Download className="w-3.5 h-3.5" />
           {installing ? "…" : "Installieren"}
@@ -375,9 +455,10 @@ function PWAInstallBanner() {
       )}
       <button
         onClick={() => setDismissed(true)}
-        className="flex-shrink-0 p-1 rounded-md hover:bg-white/10 transition-colors"
+        className="flex-shrink-0 p-1.5 border border-[var(--color-border-strong)]
+          hover:border-[var(--color-error)] hover:text-[var(--color-error)] transition-colors"
       >
-        <X className="w-4 h-4 text-white/60" />
+        <X className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
       </button>
     </div>
   );
@@ -439,11 +520,15 @@ function WidgetConfigurator({
   };
 
   return (
-    <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] p-4 shadow-[var(--shadow-md)]">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-[13px] font-semibold">Widgets anpassen</h3>
-        <button onClick={onClose} className="p-1 rounded hover:bg-[var(--color-surface-2)]">
-          <X className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
+    <div className="bg-[var(--color-surface-1)] border-2 border-[var(--color-green)] p-4 shadow-[var(--shadow-brutal)]">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="w-[3px] h-4 bg-[var(--color-green)]" />
+          <h3 className="text-[12px] uppercase tracking-[0.08em] font-bold">Widgets</h3>
+        </div>
+        <button onClick={onClose} className="p-1 border border-[var(--color-border-strong)]
+          hover:border-[var(--color-error)] hover:text-[var(--color-error)] transition-colors">
+          <X className="w-3 h-3 text-[var(--color-text-tertiary)]" />
         </button>
       </div>
       <div className="space-y-1">
@@ -454,7 +539,8 @@ function WidgetConfigurator({
           return (
             <div
               key={id}
-              className="flex items-center gap-2 px-2 py-1.5 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors"
+              className="flex items-center gap-2 px-2 py-2 hover:bg-[var(--color-surface-2)] transition-colors
+                border border-transparent hover:border-[var(--color-border)]"
             >
               <button
                 onClick={() => toggleWidget(id)}
@@ -462,28 +548,29 @@ function WidgetConfigurator({
                 title={isHidden ? "Einblenden" : "Ausblenden"}
               >
                 {isHidden ? (
-                  <EyeOff className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
+                  <EyeOff className="w-3.5 h-3.5 text-[var(--color-text-muted)]" strokeWidth={2} />
                 ) : (
-                  <Eye className="w-3.5 h-3.5 text-[var(--color-accent)]" />
+                  <Eye className="w-3.5 h-3.5 text-[var(--color-green)]" strokeWidth={2} />
                 )}
               </button>
-              <span className={`flex-1 text-[13px] ${isHidden ? "text-[var(--color-text-tertiary)] line-through" : ""}`}>
+              <span className={`flex-1 text-[12px] uppercase tracking-[0.04em] font-medium
+                ${isHidden ? "text-[var(--color-text-muted)] line-through" : "text-[var(--color-text-secondary)]"}`}>
                 {def.label}
               </span>
               <div className="flex gap-0.5">
                 <button
                   onClick={() => moveWidget(id, -1)}
                   disabled={idx === 0}
-                  className="p-0.5 disabled:opacity-20"
+                  className="p-0.5 disabled:opacity-20 hover:text-[var(--color-green)] transition-colors"
                 >
-                  <ArrowUp className="w-3 h-3 text-[var(--color-text-tertiary)]" />
+                  <ArrowUp className="w-3 h-3 text-[var(--color-text-tertiary)]" strokeWidth={2} />
                 </button>
                 <button
                   onClick={() => moveWidget(id, 1)}
                   disabled={idx === config.order.length - 1}
-                  className="p-0.5 disabled:opacity-20"
+                  className="p-0.5 disabled:opacity-20 hover:text-[var(--color-green)] transition-colors"
                 >
-                  <ArrowDown className="w-3 h-3 text-[var(--color-text-tertiary)]" />
+                  <ArrowDown className="w-3 h-3 text-[var(--color-text-tertiary)]" strokeWidth={2} />
                 </button>
               </div>
             </div>
@@ -526,15 +613,24 @@ export function AdminDashboard({
 
   return (
     <div className="max-w-[1000px] mx-auto pb-12">
-      {/* Header with hero gradient */}
-      <div className="px-6 lg:px-8 pt-8 pb-6 hero-gradient rounded-b-[24px]">
-        <div className="animate-in">
-          <p className="text-[13px] text-[var(--color-text-tertiary)] mb-1">{greeting}</p>
-          <h1 className="text-[28px] font-bold tracking-[-0.04em]">{user?.name}</h1>
+      {/* ═══ Header — Brutalist Hero ═══ */}
+      <div className="px-6 lg:px-8 pt-8 pb-6 relative">
+        {/* Subtle green glow top-left */}
+        <div className="absolute top-0 left-0 w-64 h-64 bg-[radial-gradient(circle,rgba(0,220,130,0.06)_0%,transparent_70%)] pointer-events-none" />
+
+        <div className="animate-in relative">
+          <p className="text-[11px] uppercase tracking-[0.12em] font-semibold text-[var(--color-text-muted)] mb-2">
+            {greeting}
+          </p>
+          <h1 className="text-[32px] font-bold tracking-[-0.04em] uppercase" style={{ fontFamily: "var(--font-display)" }}>
+            {user?.name}
+          </h1>
+          {/* Green accent line under name */}
+          <div className="w-12 h-[3px] bg-[var(--color-green)] mt-2" />
         </div>
 
         {/* Quick Actions */}
-        <div className="flex flex-wrap gap-2 mt-5">
+        <div className="flex flex-wrap gap-2 mt-6 relative">
           <QuickAction
             icon={Lightbulb}
             label="Neue Idee"
@@ -562,21 +658,20 @@ export function AdminDashboard({
         </div>
       </div>
 
-      {/* PWA Install Banner */}
+      {/* ═══ PWA Install Banner ═══ */}
       <div className="px-6 lg:px-8 pb-2">
         <PWAInstallBanner />
       </div>
 
-      {/* Stats */}
-      <div className="px-6 lg:px-8 pb-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {/* ═══ Stats Grid ═══ */}
+      <div className="px-6 lg:px-8 pb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-0">
           <StatCard
             icon={Users}
             label="Kunden"
             value={(clients || []).length}
             delay="stagger-1"
             onClick={() => onNavigate("clients")}
-            accentColor="#6366f1"
           />
           <StatCard
             icon={Lightbulb}
@@ -584,7 +679,6 @@ export function AdminDashboard({
             value={(ideas || []).length}
             delay="stagger-2"
             onClick={() => onNavigate("ideas")}
-            accentColor="#f59e0b"
           />
           <StatCard
             icon={TrendingUp}
@@ -592,7 +686,6 @@ export function AdminDashboard({
             value={inProgress}
             delay="stagger-3"
             onClick={() => onNavigate("pipeline")}
-            accentColor="#3b82f6"
           />
           <StatCard
             icon={Film}
@@ -600,34 +693,44 @@ export function AdminDashboard({
             value={published}
             delay="stagger-4"
             onClick={() => onNavigate("pipeline")}
-            accentColor="#16a34a"
+            isGreen
           />
         </div>
       </div>
 
-      {/* Content area */}
+      {/* ═══ Content Area ═══ */}
       {(ideas || []).length === 0 && (shoots || []).length === 0 ? (
-        /* Empty state / Onboarding */
+        /* Empty state — Brutalist onboarding */
         <div className="px-6 lg:px-8 animate-in stagger-3">
-          <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border)] p-8 text-center">
-            <div className="w-14 h-14 mx-auto mb-4 rounded-[var(--radius-lg)] bg-[var(--color-surface-2)] flex items-center justify-center">
-              <Lightbulb className="w-6 h-6 text-[var(--color-text-tertiary)]" strokeWidth={1.5} />
+          <div className="bg-[var(--color-surface-1)] border-2 border-dashed border-[var(--color-border-strong)] p-8 text-center relative">
+            {/* Decorative corner marks */}
+            <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[var(--color-green)]" />
+            <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[var(--color-green)]" />
+            <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[var(--color-green)]" />
+            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[var(--color-green)]" />
+
+            <div className="w-14 h-14 mx-auto mb-4 bg-[var(--color-surface-2)] border-2 border-[var(--color-border-strong)]
+              flex items-center justify-center">
+              <Lightbulb className="w-6 h-6 text-[var(--color-green)]" strokeWidth={1.5} />
             </div>
-            <h2 className="text-[18px] font-semibold tracking-[-0.02em] mb-1">Bereit loszulegen</h2>
-            <p className="text-[14px] text-[var(--color-text-tertiary)] max-w-md mx-auto mb-6">
+            <h2 className="text-[16px] font-bold uppercase tracking-[0.04em] mb-2"
+              style={{ fontFamily: "var(--font-display)" }}>
+              Bereit loszulegen
+            </h2>
+            <p className="text-[13px] text-[var(--color-text-tertiary)] max-w-md mx-auto mb-6">
               Erstelle deinen ersten Kunden und lege die erste Video-Idee an. Von hier aus steuerst du die komplette Production Pipeline.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <button
                 onClick={() => onNavigate("clients")}
-                className="flex items-center gap-2 h-10 px-5 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[14px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors"
+                className="btn-brutal flex items-center gap-2 h-10 px-5"
               >
                 <Users className="w-4 h-4" />
                 Ersten Kunden anlegen
               </button>
               <button
                 onClick={() => onNavigate("ideas")}
-                className="flex items-center gap-2 h-10 px-5 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[14px] font-medium hover:bg-[var(--color-surface-2)] transition-colors"
+                className="btn-brutal-outline flex items-center gap-2 h-10 px-5"
               >
                 <Lightbulb className="w-4 h-4" />
                 Erste Idee erstellen
@@ -639,16 +742,20 @@ export function AdminDashboard({
         /* Widgets area */
         <div className="px-6 lg:px-8">
           {/* Widget config toggle */}
-          <div className="flex justify-end mb-3 relative">
+          <div className="flex justify-end mb-4 relative">
             <button
               onClick={() => setShowWidgetConfig(!showWidgetConfig)}
-              className="p-1.5 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-2)] transition-colors"
+              className={`p-2 border-2 transition-all duration-[var(--duration-fast)] ease-[var(--ease-brutal)]
+                ${showWidgetConfig
+                  ? "border-[var(--color-green)] text-[var(--color-green)] bg-[var(--color-green-subtle)]"
+                  : "border-[var(--color-border-strong)] text-[var(--color-text-muted)] hover:border-[var(--color-green)] hover:text-[var(--color-green)]"
+                }`}
               title="Widgets anpassen"
             >
-              <Settings2 className="w-4 h-4" />
+              <Settings2 className="w-4 h-4" strokeWidth={2} />
             </button>
             {showWidgetConfig && (
-              <div className="absolute right-0 top-8 z-20 w-[240px]">
+              <div className="absolute right-0 top-10 z-20 w-[240px]">
                 <WidgetConfigurator
                   config={widgetConfig}
                   onChange={setWidgetConfig}

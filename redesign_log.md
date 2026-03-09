@@ -174,3 +174,121 @@
 - ✅ Keine alten rounded-corner Styles mehr
 - ✅ Cleanup: Preview-HTML und .env.local gelöscht
 - ✅ Dev-Server gestoppt
+
+## Phase 4: Admin Dashboard (10.03.2026, 00:00)
+
+### Was wurde gemacht
+
+**AdminDashboard.tsx — Komplett-Redesign:**
+
+**StatCard — Brutal:**
+- 2px solid border (border-strong), 0px radius — komplett square
+- Left accent bar (3px): default surface-4, hover → green, "isGreen"-Variante permanent green
+- Hover: translate(-2px, -2px) + brutal-dark shadow (normal cards) / brutal green shadow (green card)
+- Hover: border-color → border-green / green
+- Value: Space Grotesk, 36px, bold, tabular-nums
+- Icon-Box: 32x32, square, eigene border+background, green-Variante mit green-subtle bg
+- Label: 12px uppercase, 0.08em tracking, font-semibold, text-tertiary
+- ArrowUpRight: opacity-0 → 1 on hover
+- "Veröffentlicht" Card: Green-Value, green accent-bar, green icon-box, green brutal shadow on hover
+
+**QuickAction — Brutal:**
+- 2px border, square (no radius), uppercase, 0.06em tracking
+- Hover: green border, green text, green-subtle background
+- Hover: translate(-1px, -1px) + brutal-sm shadow
+- StrokeWidth 2 auf Icons (crisp)
+
+**SectionHeader — Neu:**
+- Green accent bar (3px × 20px) links vom Titel
+- 13px uppercase, 0.08em tracking, font-bold
+- Optional "Alle →" Action-Link (11px, uppercase, muted → green on hover)
+
+**PipelineProgress — Brutal:**
+- Card: 2px border-strong, 0px radius
+- Bar: 12px height (statt 8px), square, mit 1px border
+- Legend: Square dots (10px × 10px), separate count in bold
+- Uppercase labels mit tracking
+
+**UpcomingShoots — Brutal:**
+- Stacked items (negative margin -2px für zusammenhängende Borders)
+- 2px border, square
+- Date-Box: 48×48, square, eigene border
+- "Heute": Green background auf Date-Box mit dark text, green border auf gesamtes Item
+- "Heute"-Badge: Inline, green-subtle bg, green border, uppercase tracking
+- Time in mono-font
+- Hover: translate + brutal-sm shadow
+
+**RecentActivity — Brutal:**
+- Stacked items (negative margin -2px)
+- 2px border, square, text-left
+- Title: 13px semibold, goes green on hover
+- Client: 11px uppercase tracking, text-muted
+- Status-Badges: Square, 1px border, colored (consistent mit STATUS_COLORS)
+- Date: mono font, tabular-nums
+- Hover: border-green + translate + shadow
+
+**Header — Brutal:**
+- Greeting: 11px uppercase, 0.12em tracking, text-muted
+- Name: Space Grotesk, 32px, uppercase, bold
+- Green accent bar (48px × 3px) unter dem Namen
+- Subtle green glow top-left (decorative, 6% opacity)
+
+**PWAInstallBanner — Brutal:**
+- 2px green border, square
+- Icon-Box: green-subtle bg, 2px green border
+- Labels: uppercase, bold
+- Install-Button: btn-brutal helper class
+- Close: border + hover → error-red
+- Green glow Deko top-right
+
+**WidgetConfigurator — Brutal:**
+- 2px green border + brutal green shadow
+- Green accent bar im Header
+- Uppercase labels, 0.04em tracking
+- Items: border on hover, hover → surface-2
+- Close: border, hover → error-red
+- Arrows: hover → green
+
+**Empty State — Brutal:**
+- 2px dashed border-strong
+- Decorative corner marks (4 Ecken, green L-shapes)
+- Icon-Box: square, 2px border
+- Title: Space Grotesk, uppercase
+- Buttons: btn-brutal + btn-brutal-outline helper classes
+
+**Entfernte Patterns (altes Design):**
+- Keine rounded corners mehr (rounded-full, radius-lg, radius-md)
+- Keine hero-gradient class mehr
+- Keine farbigen accentColor props (stattdessen: uniform oder isGreen boolean)
+- Keine rounded status-badges (jetzt square mit border)
+- Keine weichen box-shadows (jetzt brutal offsets)
+
+### Design-Entscheidungen
+- **isGreen statt accentColor**: Statt 4 verschiedene bunte Akzentfarben ein binäres System — normal oder green-highlighted. Weniger Chaos, mehr Brand-Kohärenz.
+- **Stacked Items (negative margin)**: Shoot-Items und Activity-Items stehen direkt zusammen — spart vertikalen Raum und wirkt wie ein Daten-Terminal.
+- **Square everything**: Konsequent 0px radius. Keine Ausnahmen. Auch Date-Boxes, Icon-Boxes, Badges — alles kantiger Brutalismus.
+- **Mono für Timestamps**: JetBrains Mono für Uhrzeiten und Datumsangaben — Tool-Interface-Vibe.
+- **Uppercase + Tracking**: Alle Labels, Section-Headers, Badges — durchgehend uppercase mit letter-spacing. Militant einheitlich.
+
+### Visueller Review
+- ✅ Dev-Server gestartet (Port 5180, .env.local mit Dummy-Convex-URL)
+- ✅ Static HTML Preview erstellt (Dashboard mit Sidebar, Stats, Pipeline, Shoots, Activity)
+- ✅ Full-Page Screenshot gemacht und analysiert
+- ✅ Background-Farben korrekt (surface-0 main, surface-1 cards)
+- ✅ Text-Farben korrekt (primary, secondary, tertiary, muted — richtige Hierarchie)
+- ✅ Green #00DC82 durchgängig als Accent
+- ✅ Space Grotesk NUR für Name, Stat-Values, Shoot-Day-Numbers
+- ✅ Poppins für ALLE Labels, Buttons, Body-Text
+- ✅ JetBrains Mono für Timestamps
+- ✅ 0px border-radius überall — keine rounded corners
+- ✅ 2px Borders durchgängig (border-strong)
+- ✅ Brutal shadows korrekt (translate + offset)
+- ✅ Green accent bars bei Section Headers
+- ✅ "Veröffentlicht" Card grün hervorgehoben
+- ✅ Pipeline-Bar square, Legend square dots
+- ✅ Status-Badges square mit farbiger Border
+- ✅ "Heute" Drehtermin mit grünem Date-Block
+- ✅ Stacked Items (Shoots + Activity) korrekt zusammenhängend
+- ✅ TypeScript Build: Zero errors (npx tsc --noEmit clean)
+- ✅ Preview-HTML und .env.local gelöscht
+- ✅ Dev-Server gestoppt
