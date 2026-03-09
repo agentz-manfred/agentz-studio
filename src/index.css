@@ -441,13 +441,13 @@ button:not(:disabled):hover,
     radial-gradient(at 50% 50%, rgba(77, 255, 171, 0.03) 0%, transparent 70%);
 }
 
-/* ─── Sidebar active nav item ─── */
+/* ─── Sidebar active nav item (legacy class, kept for compat) ─── */
 .nav-item-active {
   position: relative;
   background: var(--color-green);
   color: #0A0A0A;
   font-weight: 600;
-  box-shadow: var(--shadow-brutal-dark);
+  box-shadow: 3px 3px 0px #0A0A0A;
 }
 
 /* ─── Nav active indicator (right bar) ─── */

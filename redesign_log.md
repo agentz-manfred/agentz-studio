@@ -113,3 +113,64 @@
 - ✅ Favicon: Neues brutales "A"-Mark statt altem Blue-Z
 - ✅ Keine alten blauen Styles mehr sichtbar
 - ✅ .env.local nach Review gelöscht
+
+## Phase 3: Sidebar + Navigation + MobileHeader (09.03.2026, 23:00)
+
+### Was wurde gemacht
+
+**Sidebar.tsx — Komplett-Redesign:**
+- Background: `surface-0` (#0A0A0A) statt `surface-1` — dunklere, brutalere Base
+- Border-right: 2px `border-strong` statt 1px `border-subtle` — härtere Kante
+- Brand-Mark: Border auf 2px hochgezogen, Shadow 3px offset mit `green-dark`
+- Search Bar: Brutale Border (1px solid), kein border-radius, font-mono kbd
+- **Green Accent Dividers**: Neue Sektions-Trenner mit grünem Akzent-Block (links oben, rechts unten)
+- **Active Nav State**: Green background + 3px brutal dark shadow offset — Item "springt" visuell nach vorne
+- **Hover Nav State**: Green-subtle background + grüne 2px Left-Bar (animiert ein), Icon wird grün
+- **Icon Stroke**: Active = 2.25 (dicker), Inactive = 1.75 (normal)
+- Footer-Buttons: Uppercase, tracked (0.06em), 12px — einheitlich tool-like
+- **User Card**: Eigener Container mit border + surface-1 background, separiert vom Rest
+- **User Role**: Uppercase + 0.08em tracking, muted color
+- **Logout Button**: Hover → Error-Red statt generic
+- **Notification Badge**: Square (kein border-radius), brutal shadow 1px 1px
+- **Notification Panel**: Redesigned — 2px green right-border, brutale header, mono timestamps, square unread-dots, hover → green-subtle + green title
+- Theme Toggle: Uppercase label, tracked, icon goes green on hover
+- Client Filter Dropdown: Brutale Border, shadow auf Dropdown, uppercase labels
+- Alle rounded corners entfernt → sharp 0px überall
+
+**MobileHeader.tsx — Redesign:**
+- Background: `surface-0` (darkest)
+- Border-bottom: 2px `border-strong`
+- **Green Accent Lines**: Zwei 12px grüne Balken an den unteren Ecken (links + rechts)
+- Hamburger + Search: Border on hover mit `border-green`, green-subtle background
+- Icon strokeWidth: 2 (crisp)
+- Brand-Mark: 2px border, 2px brutal shadow offset (green-dark)
+- "STUDIO" Label: 0.2em tracking, 10px, muted
+
+**CSS Updates (index.css):**
+- `.nav-item-active` shadow aktualisiert: `3px 3px 0px #0A0A0A` (konsistent mit inline styles)
+
+### Design-Entscheidungen
+- **Surface-0 als Sidebar-Base**: Maximaler Kontrast zum Content-Bereich (surface-0 + dot-grid)
+- **Brutale Dividers mit Green Accent**: Bricht die vertikale Monotonie, zeigt Brand-Farbe in kleinen Dosen
+- **Active = Brutal Shadow + Full Green**: Sofort sichtbar, welche Seite aktiv ist — kein subtiles Highlight, sondern klares Statement
+- **Hover = Subtle + Indicator Bar**: Feedback ohne zu schreien — grüne Left-Bar zeigt "hier kannst du klicken"
+- **Square Everything**: Konsequent brutalist — keine rounded corners, auch nicht bei Badges oder Dropdowns
+- **Uppercase Footer**: Tool-Interface-Vibe, nicht App-Vibe — passt zum Brutalist-Ansatz
+
+### Visueller Review
+- ✅ Dev-Server gestartet (Port 5180)
+- ✅ Static HTML Preview erstellt (Sidebar + MobileHeader isoliert)
+- ✅ Desktop Screenshot: Sidebar mit allen Nav-Items, Active State (Dashboard), Dividers, Footer
+- ✅ Hover States getestet: Green-subtle background + left-bar indicator funktioniert
+- ✅ Mobile Screenshot (375px): MobileHeader mit Brand, Hamburger, Search, Green Accent Lines
+- ✅ Sidebar hidden on mobile ✅
+- ✅ TypeScript Build: Zero errors (`npx tsc --noEmit` clean)
+- ✅ Background-Farben korrekt (surface-0 Sidebar, surface-0 MobileHeader)
+- ✅ Text-Farben korrekt (primary, secondary, tertiary, muted — richtige Hierarchie)
+- ✅ Green (#00DC82) durchgängig als Accent
+- ✅ Space Grotesk NUR für Brand-Mark und Logo-Text
+- ✅ Poppins für ALLE Nav-Items, Labels, Buttons, Footer
+- ✅ Brutal Shadows + Sharp Corners konsistent
+- ✅ Keine alten rounded-corner Styles mehr
+- ✅ Cleanup: Preview-HTML und .env.local gelöscht
+- ✅ Dev-Server gestoppt

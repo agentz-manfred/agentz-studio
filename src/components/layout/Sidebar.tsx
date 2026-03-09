@@ -86,38 +86,44 @@ function NotificationPanel({
   return (
     <div
       ref={panelRef}
-      className="absolute left-[240px] top-0 bottom-0 w-[320px] bg-[var(--color-surface-1)] border-r border-[var(--color-border-subtle)] shadow-[var(--shadow-lg)] z-50 flex flex-col animate-in"
+      className="absolute left-[240px] top-0 bottom-0 w-[320px] bg-[var(--color-surface-0)] border-r-2 border-[var(--color-green)] z-50 flex flex-col"
+      style={{ animation: 'slideInLeft 0.25s var(--ease-brutal) both' }}
     >
-      <div className="h-16 flex items-center justify-between px-5 border-b border-[var(--color-border-subtle)]">
-        <span className="text-[14px] font-semibold">Benachrichtigungen</span>
-        <div className="flex items-center gap-1">
+      {/* Header */}
+      <div className="h-14 flex items-center justify-between px-4 border-b-2 border-[var(--color-border-strong)] bg-[var(--color-surface-1)]">
+        <div className="flex items-center gap-2">
+          <Bell className="w-4 h-4 text-[var(--color-green)]" strokeWidth={2} />
+          <span className="text-[13px] font-semibold uppercase tracking-[0.08em]">Benachrichtigungen</span>
+        </div>
+        <div className="flex items-center gap-0">
           {hasUnread && (
             <button
               onClick={() => markAllRead({ token })}
-              className="p-1.5 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-accent-surface)] transition-colors"
+              className="p-2 text-[var(--color-text-tertiary)] hover:text-[var(--color-green)] hover:bg-[var(--color-green-subtle)] transition-all duration-100"
               title="Alle als gelesen markieren"
             >
-              <Check className="w-4 h-4" />
+              <Check className="w-4 h-4" strokeWidth={2} />
             </button>
           )}
           <button
             onClick={onClose}
-            className="p-1.5 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-accent-surface)] transition-colors"
+            className="p-2 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-3)] transition-all duration-100"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4" strokeWidth={2} />
           </button>
         </div>
       </div>
 
+      {/* Content */}
       <div className="flex-1 overflow-auto">
         {!notifications || notifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-[var(--color-text-tertiary)]">
-            <Bell className="w-8 h-8 mb-2 opacity-30" />
-            <p className="text-[13px]">Keine Benachrichtigungen</p>
+          <div className="flex flex-col items-center justify-center py-16 text-[var(--color-text-muted)]">
+            <Bell className="w-8 h-8 mb-3 opacity-20" />
+            <p className="text-[12px] uppercase tracking-[0.1em]">Keine Benachrichtigungen</p>
           </div>
         ) : (
-          <div className="py-1">
-            {notifications.map((n) => (
+          <div>
+            {notifications.map((n, i) => (
               <button
                 key={n._id}
                 onClick={() => {
@@ -128,20 +134,20 @@ function NotificationPanel({
                   }
                 }}
                 className={cn(
-                  "w-full text-left px-5 py-3 border-b border-[var(--color-border-subtle)] transition-colors hover:bg-[var(--color-accent-surface)]",
-                  !n.read && "bg-[var(--color-surface-2)]/50"
+                  "w-full text-left px-4 py-3 border-b border-[var(--color-border)] transition-all duration-100 hover:bg-[var(--color-green-subtle)] group",
+                  !n.read && "bg-[var(--color-surface-1)]"
                 )}
               >
-                <div className="flex items-start gap-2">
+                <div className="flex items-start gap-2.5">
                   {!n.read && (
-                    <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] mt-1.5 flex-shrink-0" />
+                    <div className="w-2 h-2 bg-[var(--color-green)] mt-1.5 flex-shrink-0" />
                   )}
-                  <div className="min-w-0">
-                    <p className="text-[13px] font-medium truncate">{n.title}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[13px] font-medium truncate group-hover:text-[var(--color-green)] transition-colors">{n.title}</p>
                     <p className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5 line-clamp-2">
                       {n.message}
                     </p>
-                    <p className="text-[11px] text-[var(--color-text-tertiary)] mt-1 tabular-nums">
+                    <p className="text-[11px] text-[var(--color-text-muted)] mt-1.5 tabular-nums font-mono">
                       {new Date(n.createdAt).toLocaleDateString("de-DE", {
                         day: "2-digit",
                         month: "2-digit",
@@ -170,15 +176,17 @@ function ThemeToggle() {
   return (
     <button
       onClick={cycle}
-      className="w-full flex items-center gap-3 px-3 h-9 rounded-[var(--radius-sm)] text-[14px] text-[var(--color-text-secondary)] hover:bg-[var(--color-accent-surface)] hover:text-[var(--color-text-primary)] transition-all duration-150 ease-[var(--ease-out)]"
+      className="w-full flex items-center gap-3 px-3 h-9 text-[13px] text-[var(--color-text-tertiary)] hover:bg-[var(--color-green-subtle)] hover:text-[var(--color-text-secondary)] transition-all duration-100 group"
       title={`Theme: ${theme === "system" ? "System" : theme === "dark" ? "Dunkel" : "Hell"}`}
     >
       {resolvedTheme === "dark" ? (
-        <Moon className="w-[18px] h-[18px]" strokeWidth={1.75} />
+        <Moon className="w-4 h-4 group-hover:text-[var(--color-green)]" strokeWidth={1.75} />
       ) : (
-        <Sun className="w-[18px] h-[18px]" strokeWidth={1.75} />
+        <Sun className="w-4 h-4 group-hover:text-[var(--color-green)]" strokeWidth={1.75} />
       )}
-      {theme === "system" ? "System" : resolvedTheme === "dark" ? "Dunkel" : "Hell"}
+      <span className="uppercase tracking-[0.06em] text-[12px]">
+        {theme === "system" ? "System" : resolvedTheme === "dark" ? "Dunkel" : "Hell"}
+      </span>
     </button>
   );
 }
@@ -201,29 +209,29 @@ function ClientFilterDropdown() {
   const selectedClient = (clients || []).find(c => c._id === selectedClientId);
 
   return (
-    <div className="px-3 pb-1" ref={ref}>
+    <div className="px-3 pb-2" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
         className={cn(
-          "w-full flex items-center gap-2 px-3 h-8 rounded-[var(--radius-sm)] text-[13px] transition-all duration-150",
+          "w-full flex items-center gap-2.5 px-3 h-8 text-[12px] uppercase tracking-[0.06em] transition-all duration-100 border",
           selectedClientId
-            ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium border border-[var(--color-accent)]/20"
-            : "text-[var(--color-text-tertiary)] hover:bg-[var(--color-accent-surface)] border border-transparent"
+            ? "bg-[var(--color-green-subtle)] text-[var(--color-green)] font-semibold border-[var(--color-border-green)]"
+            : "text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-2)] border-[var(--color-border)]"
         )}
       >
-        <Users className="w-3.5 h-3.5 flex-shrink-0" />
+        <Users className="w-3.5 h-3.5 flex-shrink-0" strokeWidth={2} />
         <span className="flex-1 text-left truncate">
           {selectedClient ? selectedClient.name : "Alle Kunden"}
         </span>
-        <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", open && "rotate-180")} />
+        <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-100", open && "rotate-180")} />
       </button>
       {open && (
-        <div className="mt-1 py-1 rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] shadow-[var(--shadow-lg)] max-h-[240px] overflow-auto z-50 relative">
+        <div className="mt-1 py-1 border-2 border-[var(--color-border-strong)] bg-[var(--color-surface-0)] shadow-[var(--shadow-brutal-sm)] max-h-[240px] overflow-auto z-50 relative">
           <button
             onClick={() => { setSelectedClientId(null); setOpen(false); }}
             className={cn(
-              "w-full text-left px-3 py-1.5 text-[13px] hover:bg-[var(--color-accent-surface)] transition-colors",
-              !selectedClientId && "text-[var(--color-accent)] font-medium"
+              "w-full text-left px-3 py-2 text-[12px] uppercase tracking-[0.04em] hover:bg-[var(--color-green-subtle)] transition-colors duration-100",
+              !selectedClientId && "text-[var(--color-green)] font-semibold bg-[var(--color-green-subtle)]"
             )}
           >
             Alle Kunden
@@ -233,8 +241,8 @@ function ClientFilterDropdown() {
               key={c._id}
               onClick={() => { setSelectedClientId(c._id); setOpen(false); }}
               className={cn(
-                "w-full text-left px-3 py-1.5 text-[13px] hover:bg-[var(--color-accent-surface)] transition-colors truncate",
-                selectedClientId === c._id && "text-[var(--color-accent)] font-medium"
+                "w-full text-left px-3 py-2 text-[12px] hover:bg-[var(--color-green-subtle)] transition-colors duration-100 truncate",
+                selectedClientId === c._id && "text-[var(--color-green)] font-semibold bg-[var(--color-green-subtle)]"
               )}
             >
               {c.name}
@@ -256,47 +264,59 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
   );
 
   return (
-    <aside className="w-[240px] h-dvh flex flex-col border-r border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] relative overflow-y-auto sidebar-texture gradient-edge-right">
+    <aside className="w-[240px] h-dvh flex flex-col bg-[var(--color-surface-0)] relative overflow-y-auto border-r-2 border-[var(--color-border-strong)]">
+      {/* Subtle noise texture */}
+      <div className="absolute inset-0 sidebar-texture pointer-events-none" />
+
+      {/* Green edge glow */}
+      <div className="absolute right-0 top-0 bottom-0 w-[1px] gradient-edge-right z-10 pointer-events-none" />
+
       {/* Brand */}
-      <div className="h-16 flex items-center px-5 border-b border-[var(--color-border-subtle)] relative overflow-hidden">
-        <div className="flex items-center gap-3 relative z-10">
-          <div className="w-8 h-8 flex items-center justify-center border border-[var(--color-green)]" style={{
-            background: 'var(--color-surface-0)',
-            boxShadow: '2px 2px 0px var(--color-green)',
+      <div className="h-14 flex items-center px-4 border-b-2 border-[var(--color-border-strong)] relative z-10 bg-[var(--color-surface-0)]">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 flex items-center justify-center border-2 border-[var(--color-green)] bg-[var(--color-surface-0)]" style={{
+            boxShadow: '3px 3px 0px var(--color-green-dark)',
           }}>
-            <span className="text-[16px] font-bold text-[var(--color-green)]" style={{ fontFamily: 'var(--font-display)' }}>A</span>
+            <span className="text-[15px] font-bold text-[var(--color-green)]" style={{ fontFamily: 'var(--font-display)' }}>A</span>
           </div>
           <div className="flex items-baseline gap-0">
-            <span className="text-[15px] font-bold tracking-[-0.02em] uppercase" style={{ fontFamily: 'var(--font-display)' }}>Agent</span>
+            <span className="text-[15px] font-bold tracking-[-0.02em] uppercase text-[var(--color-text-primary)]" style={{ fontFamily: 'var(--font-display)' }}>Agent</span>
             <span className="text-[15px] font-bold tracking-[-0.02em] text-[var(--color-green)] uppercase" style={{ fontFamily: 'var(--font-display)' }}>Z</span>
-            <span className="text-[11px] font-medium text-[var(--color-text-muted)] ml-2 tracking-[0.15em] uppercase">Studio</span>
+            <span className="text-[10px] font-semibold text-[var(--color-text-muted)] ml-2 tracking-[0.2em] uppercase">Studio</span>
           </div>
         </div>
       </div>
 
       {/* Search trigger */}
-      <div className="px-3 pt-3 pb-1">
+      <div className="px-3 pt-3 pb-1 relative z-10">
         <button
           onClick={() => {
             const e = new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true });
             document.dispatchEvent(e);
           }}
-          className="w-full flex items-center gap-3 px-3 h-9 rounded-[var(--radius-sm)] text-[14px] text-[var(--color-text-tertiary)] hover:bg-[var(--color-accent-surface)] hover:text-[var(--color-text-secondary)] transition-all duration-150 ease-[var(--ease-out)] group border border-[var(--color-border-subtle)] bg-[var(--color-surface-2)]/50"
+          className="w-full flex items-center gap-3 px-3 h-9 text-[13px] text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:border-[var(--color-border-strong)] transition-all duration-100 group border border-[var(--color-border)] bg-[var(--color-surface-1)]"
         >
-          <Search className="w-[16px] h-[16px]" strokeWidth={1.75} />
-          <span className="flex-1 text-left text-[13px]">Suchen…</span>
-          <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 h-5 rounded bg-[var(--color-surface-0)] text-[10px] font-medium border border-[var(--color-border-subtle)]">
+          <Search className="w-4 h-4 group-hover:text-[var(--color-green)]" strokeWidth={2} />
+          <span className="flex-1 text-left text-[12px] tracking-[0.03em]">Suchen…</span>
+          <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 h-5 bg-[var(--color-surface-0)] text-[10px] font-mono font-medium border border-[var(--color-border)]">
             ⌘K
           </kbd>
         </button>
       </div>
 
       {/* Client filter (Admin only) */}
-      {user?.role === "admin" && <ClientFilterDropdown />}
+      <div className="relative z-10">
+        {user?.role === "admin" && <ClientFilterDropdown />}
+      </div>
+
+      {/* Section divider */}
+      <div className="mx-3 h-[2px] bg-[var(--color-border)] relative z-10">
+        <div className="absolute left-0 top-0 w-6 h-full bg-[var(--color-green)] opacity-60" />
+      </div>
 
       {/* Navigation */}
       <nav
-        className="flex-1 px-3 py-4 space-y-0.5"
+        className="flex-1 px-3 py-3 space-y-0.5 relative z-10"
         role="navigation"
         aria-label="Hauptnavigation"
         onKeyDown={(e) => {
@@ -324,21 +344,35 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
               data-nav
               onClick={() => onNavigate(item.id)}
               className={cn(
-                "w-full flex items-center gap-3 px-3 h-9 rounded-[var(--radius-sm)] text-[14px] transition-all duration-150 ease-[var(--ease-out)]",
+                "w-full flex items-center gap-3 px-3 h-9 text-[13px] transition-all duration-100 relative group",
                 isActive
-                  ? "nav-item-active text-white font-medium"
-                  : "text-[var(--color-text-secondary)] hover:bg-[var(--color-accent-surface)] hover:text-[var(--color-text-primary)]"
+                  ? "bg-[var(--color-green)] text-[#0A0A0A] font-semibold"
+                  : "text-[var(--color-text-secondary)] hover:bg-[var(--color-green-subtle)] hover:text-[var(--color-text-primary)]"
               )}
+              style={isActive ? { boxShadow: '3px 3px 0px #0A0A0A' } : undefined}
             >
-              <item.icon className="w-[18px] h-[18px]" strokeWidth={1.75} />
-              {item.label}
+              {/* Active indicator bar */}
+              {isActive && (
+                <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#0A0A0A]" />
+              )}
+              {/* Hover indicator bar */}
+              {!isActive && (
+                <div className="absolute left-0 top-2 bottom-2 w-[2px] bg-[var(--color-green)] opacity-0 group-hover:opacity-100 transition-opacity duration-100" />
+              )}
+              <item.icon className={cn("w-[18px] h-[18px]", isActive ? "text-[#0A0A0A]" : "group-hover:text-[var(--color-green)]")} strokeWidth={isActive ? 2.25 : 1.75} />
+              <span className="tracking-[0.02em]">{item.label}</span>
             </button>
           );
         })}
       </nav>
 
-      {/* User + Notifications */}
-      <div className="px-3 py-4 border-t border-[var(--color-border-subtle)]">
+      {/* Bottom section divider */}
+      <div className="mx-3 h-[2px] bg-[var(--color-border)] relative z-10">
+        <div className="absolute right-0 top-0 w-6 h-full bg-[var(--color-green)] opacity-60" />
+      </div>
+
+      {/* Footer: Theme, Notifications, User */}
+      <div className="py-2 relative z-10">
         {/* Theme toggle */}
         <ThemeToggle />
 
@@ -346,37 +380,38 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
         <button
           onClick={() => setShowNotifications(!showNotifications)}
           className={cn(
-            "w-full flex items-center gap-3 px-3 h-9 rounded-[var(--radius-sm)] text-[14px] transition-all duration-150 ease-[var(--ease-out)] mb-2",
+            "w-full flex items-center gap-3 px-3 h-9 text-[13px] transition-all duration-100 group",
             showNotifications
-              ? "bg-[var(--color-accent-surface)] text-[var(--color-text-primary)]"
-              : "text-[var(--color-text-secondary)] hover:bg-[var(--color-accent-surface)] hover:text-[var(--color-text-primary)]"
+              ? "bg-[var(--color-green-subtle)] text-[var(--color-green)]"
+              : "text-[var(--color-text-tertiary)] hover:bg-[var(--color-green-subtle)] hover:text-[var(--color-text-secondary)]"
           )}
         >
           <div className="relative">
-            <Bell className="w-[18px] h-[18px]" strokeWidth={1.75} />
+            <Bell className={cn("w-4 h-4", showNotifications ? "text-[var(--color-green)]" : "group-hover:text-[var(--color-green)]")} strokeWidth={1.75} />
             {(unreadCount ?? 0) > 0 && (
-              <span className="absolute -top-1 -right-1.5 min-w-[14px] h-[14px] rounded-full bg-[var(--color-error)] text-white text-[9px] font-bold flex items-center justify-center px-0.5">
+              <span className="absolute -top-1 -right-1.5 min-w-[14px] h-[14px] bg-[var(--color-error)] text-white text-[9px] font-bold flex items-center justify-center px-0.5"
+                style={{ boxShadow: '1px 1px 0px #0A0A0A' }}>
                 {unreadCount}
               </span>
             )}
           </div>
-          Benachrichtigungen
+          <span className="uppercase tracking-[0.06em] text-[12px]">Benachrichtigungen</span>
         </button>
 
         {/* User info */}
-        <div className="flex items-center justify-between px-3">
+        <div className="flex items-center justify-between px-3 py-2 mt-1 mx-3 border border-[var(--color-border)] bg-[var(--color-surface-1)]">
           <div className="min-w-0">
-            <p className="text-[13px] font-medium truncate">{user?.name}</p>
-            <p className="text-[12px] text-[var(--color-text-tertiary)] truncate">
+            <p className="text-[12px] font-semibold truncate tracking-[0.02em]">{user?.name}</p>
+            <p className="text-[11px] text-[var(--color-text-muted)] truncate uppercase tracking-[0.08em]">
               {user?.role === "admin" ? "Admin" : "Kunde"}
             </p>
           </div>
           <button
             onClick={logout}
-            className="p-1.5 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-accent-surface)] transition-colors"
+            className="p-1.5 text-[var(--color-text-muted)] hover:text-[var(--color-error)] hover:bg-[var(--color-surface-3)] transition-all duration-100"
             title="Abmelden"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-4 h-4" strokeWidth={2} />
           </button>
         </div>
       </div>
