@@ -56,3 +56,60 @@
 - ✅ Alle Tokens korrekt angewendet: Farben, Fonts, Shadows, Spacing
 - ✅ Space Grotesk nur für Display, Poppins für alles andere
 - ✅ Brutale Shadows + Green Glow sichtbar und on-brand
+
+## Phase 2: Login Page + Favicon + Logo (09.03.2026, 22:00)
+
+### Was wurde gemacht
+
+**Login.tsx — Komplett-Redesign:**
+- Linke Seite: Branding-Panel mit Grid-Pattern, Green Glow, Scanline-Overlay
+- Grüne vertikale Trennlinie (3px) zwischen Branding und Login
+- Logo-Mark: "A" in Box mit Green Border + Brutal Shadow
+- "AGENTZ Studio" Typografie: Space Grotesk uppercase + Poppins "Studio"
+- Hero-Text: "VIDEO PRODUCTION, VEREINFACHT." — Space Grotesk, Green Accent
+- Feature-Tags: Brutalist-Style, Sharp Corners, Green-Highlight auf "Pipeline"
+- Dekorativer Green Divider unten links
+- Rechte Seite: Login-Form in brutaler Card (border, keine rounded corners)
+- "WILLKOMMEN" als Space Grotesk H2 + Green Underscore
+- Input-Felder: Dunkler Background, Green Left-Border bei Focus
+- Labels: Uppercase, Tracked, Poppins
+- ANMELDEN Button: Green, Brutal Shadow, Hover-Translate-Effekt
+- Error-State: Red Left-Border Accent
+- Footer: Uppercase, tracked, Copyright + Legal Links
+- Mobile: Eigene Logo-Darstellung (zentriert), responsive Layout
+
+**Favicon (favicon.svg) — Neu:**
+- Komplett neu gestaltet, Brutalist-Stil
+- Schwarzer Background (#0A0A0A) statt Blue-Gradient
+- Green Border (2px #00DC82)
+- Geometrisches "A" als AgentZ-Mark (weiß)
+- Green Underscore-Accent unter dem A
+- Kein rundlicher Border-Radius mehr
+
+**Sidebar Logo/Branding — Neu:**
+- Alten blauen Gradient entfernt
+- Neue "A"-Box mit Green Border + Brutal Shadow (2px 2px)
+- "AGENTZ" in Space Grotesk, uppercase, "Z" in Green
+- "STUDIO" als Poppins, tracked, muted
+- Clean, lesbar, professionell
+
+**MobileHeader Logo — Neu:**
+- Gleiche Designsprache wie Sidebar (kleinere Variante)
+- "A"-Box mit Green Border + Mini Brutal Shadow
+- Konsistentes Branding auf allen Viewports
+
+### Visueller Review
+- ✅ Dev-Server gestartet (Port 5180, .env.local mit Dummy-Convex-URL)
+- ✅ Login-Seite Screenshot gemacht und analysiert
+- ✅ Background-Farben korrekt (#0A0A0A / #111111)
+- ✅ Text-Farben korrekt (#FAFAFA primary, #888 tertiary)
+- ✅ AgentZ Green (#00DC82) durchgängig als Accent
+- ✅ Space Grotesk NUR für Headlines (WILLKOMMEN, VIDEO PRODUCTION, AGENTZ)
+- ✅ Poppins für Body, Labels, Buttons, Tags
+- ✅ Brutal Shadows + Sharp Corners konsistent
+- ✅ Green Focus-States auf Inputs
+- ✅ Button Hover-Effekt (translate + shadow-change)
+- ✅ Grid-Pattern, Glow-Effekte, Scanlines subtil im Hintergrund
+- ✅ Favicon: Neues brutales "A"-Mark statt altem Blue-Z
+- ✅ Keine alten blauen Styles mehr sichtbar
+- ✅ .env.local nach Review gelöscht

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../lib/auth";
-import { Loader2, ArrowRight, Play } from "lucide-react";
+import { Loader2, ArrowRight } from "lucide-react";
 
 export function LoginPage() {
   const { login } = useAuth();
@@ -24,94 +24,124 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex relative overflow-hidden">
-      {/* Left side — Branding */}
-      <div className="hidden lg:flex lg:w-[55%] relative items-center justify-center" style={{
-        background: "linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e40af 100%)",
-      }}>
-        {/* Decorative elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-[10%] left-[15%] w-[300px] h-[300px] rounded-full opacity-10"
-            style={{ background: "radial-gradient(circle, #fff 0%, transparent 70%)" }} />
-          <div className="absolute bottom-[15%] right-[10%] w-[400px] h-[400px] rounded-full opacity-[0.07]"
-            style={{ background: "radial-gradient(circle, #fff 0%, transparent 70%)" }} />
-          {/* Grid pattern */}
-          <div className="absolute inset-0 opacity-[0.04]" style={{
-            backgroundImage: "linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)",
-            backgroundSize: "60px 60px",
-          }} />
-        </div>
+    <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden" style={{ background: 'var(--color-surface-0)' }}>
+      
+      {/* ─── Left: Branding Panel ─── */}
+      <div className="hidden lg:flex lg:w-[55%] relative items-center justify-center" style={{ background: 'var(--color-surface-1)' }}>
+        {/* Grid pattern overlay */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{
+          backgroundImage: 'linear-gradient(rgba(0, 220, 130, 0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 220, 130, 0.6) 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
+        }} />
 
-        <div className="relative z-10 max-w-[420px] px-12">
-          {/* Logo */}
-          <div className="flex items-center gap-4 mb-10">
-            <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center border border-white/20 p-2.5 relative">
-              <div className="absolute inset-0 rounded-2xl animate-pulse opacity-20" style={{ background: 'radial-gradient(circle, #60a5fa 0%, transparent 70%)' }} />
-              <img src="/agentz-logo.svg" alt="AgentZ" className="w-full h-full object-contain relative z-10" />
+        {/* Green glow — top left */}
+        <div className="absolute top-[-10%] left-[-5%] w-[400px] h-[400px] rounded-full pointer-events-none" style={{
+          background: 'radial-gradient(circle, rgba(0, 220, 130, 0.08) 0%, transparent 70%)',
+        }} />
+
+        {/* Scanline overlay */}
+        <div className="absolute inset-0 pointer-events-none scanlines opacity-[0.02]" />
+
+        {/* Border-right brutal green line */}
+        <div className="absolute right-0 top-0 bottom-0 w-[3px]" style={{ background: 'var(--color-green)' }} />
+
+        <div className="relative z-10 max-w-[440px] px-12">
+          {/* Logo mark */}
+          <div className="flex items-center gap-4 mb-12">
+            <div className="w-14 h-14 flex items-center justify-center border-2 border-[var(--color-green)]" style={{
+              background: 'var(--color-surface-0)',
+              boxShadow: '4px 4px 0px var(--color-green)',
+            }}>
+              <span className="text-[28px] font-bold text-[var(--color-green)]" style={{ fontFamily: 'var(--font-display)' }}>A</span>
             </div>
             <div>
-              <h1 className="text-[28px] font-bold text-white tracking-[-0.03em]">
-                agent<span className="text-blue-300">Z</span>
+              <h1 className="text-[26px] font-bold tracking-[-0.03em] text-[var(--color-text-primary)]" style={{ fontFamily: 'var(--font-display)' }}>
+                AGENT<span className="text-[var(--color-green)]">Z</span>
               </h1>
-              <p className="text-[14px] text-blue-200/80 tracking-[0.2em] uppercase font-medium">Studio</p>
+              <p className="text-[12px] font-medium tracking-[0.3em] uppercase text-[var(--color-text-tertiary)]" style={{ fontFamily: 'var(--font-body)' }}>
+                Studio
+              </p>
             </div>
           </div>
 
-          <h2 className="text-[36px] font-bold text-white leading-[1.15] tracking-[-0.03em] mb-4">
-            Video Production,<br />
-            <span className="text-blue-200">vereinfacht.</span>
+          <h2 className="text-[40px] font-bold leading-[1.05] tracking-[-0.03em] text-[var(--color-text-primary)] mb-5" style={{ fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>
+            Video<br/>
+            Production,<br/>
+            <span className="text-[var(--color-green)]">vereinfacht.</span>
           </h2>
-          <p className="text-[16px] text-blue-100/80 leading-relaxed">
-            Verwalte Ideen, Drehtermine, Skripte und Videos — alles an einem Ort. 
+
+          <p className="text-[15px] leading-relaxed text-[var(--color-text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
+            Ideen, Drehtermine, Skripte und Videos — alles an einem Ort. 
             Von der ersten Idee bis zur Veröffentlichung.
           </p>
 
-          {/* Feature pills */}
-          <div className="flex flex-wrap gap-2 mt-8">
-            {["Pipeline", "Kunden", "Drehplanung", "Video-Review"].map((f) => (
-              <span key={f} className="px-3 py-1.5 rounded-full bg-white/10 text-white/90 text-[13px] border border-white/10 backdrop-blur-sm">
+          {/* Feature tags — brutal style */}
+          <div className="flex flex-wrap gap-2 mt-10">
+            {["Pipeline", "Kunden", "Drehplanung", "Video-Review"].map((f, i) => (
+              <span
+                key={f}
+                className="px-3 py-1.5 text-[12px] font-medium uppercase tracking-wide border border-[var(--color-border-strong)] text-[var(--color-text-secondary)]"
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  background: i === 0 ? 'var(--color-green-subtle)' : 'var(--color-surface-2)',
+                  color: i === 0 ? 'var(--color-green)' : undefined,
+                  borderColor: i === 0 ? 'var(--color-border-green)' : undefined,
+                }}
+              >
                 {f}
               </span>
             ))}
           </div>
+
+          {/* Decorative brutal line */}
+          <div className="mt-12 w-24 h-[3px]" style={{ background: 'var(--color-green)' }} />
         </div>
       </div>
 
-      {/* Right side — Login Form */}
-      <div className="flex-1 flex items-center justify-center bg-[var(--color-surface-0)] relative login-mesh">
-        {/* Subtle accent glow */}
-        <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full opacity-[0.06] pointer-events-none"
-          style={{ background: "radial-gradient(circle, var(--color-accent) 0%, transparent 70%)" }} />
+      {/* ─── Right: Login Form ─── */}
+      <div className="flex-1 flex items-center justify-center relative" style={{ background: 'var(--color-surface-0)' }}>
+        {/* Subtle glow */}
+        <div className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] rounded-full opacity-[0.04] pointer-events-none" style={{
+          background: 'radial-gradient(circle, var(--color-green) 0%, transparent 70%)',
+        }} />
 
-        <div className="animate-in w-full max-w-[380px] px-6 relative z-10">
-          {/* Mobile logo (hidden on lg) */}
+        <div className="w-full max-w-[400px] px-6 relative z-10 animate-in">
+
+          {/* Mobile logo */}
           <div className="text-center mb-10 lg:hidden">
-            <div className="w-14 h-14 mx-auto mb-5 bg-[var(--color-accent)] rounded-[14px] flex items-center justify-center shadow-[var(--shadow-md)] p-2">
-              <img src="/agentz-logo.svg" alt="AgentZ" className="w-full h-full object-contain" />
+            <div className="w-16 h-16 mx-auto mb-5 flex items-center justify-center border-2 border-[var(--color-green)]" style={{
+              background: 'var(--color-surface-1)',
+              boxShadow: '4px 4px 0px var(--color-green)',
+            }}>
+              <span className="text-[32px] font-bold text-[var(--color-green)]" style={{ fontFamily: 'var(--font-display)' }}>A</span>
             </div>
-            <h1 className="text-[28px] font-bold tracking-[-0.03em] text-[var(--color-text-primary)]">
-              AgentZ Studio
+            <h1 className="text-[28px] font-bold tracking-[-0.03em] text-[var(--color-text-primary)]" style={{ fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>
+              AGENT<span className="text-[var(--color-green)]">Z</span> Studio
             </h1>
-            <p className="mt-2 text-[15px] text-[var(--color-text-tertiary)]">
+            <p className="mt-2 text-[13px] text-[var(--color-text-tertiary)] uppercase tracking-[0.15em]" style={{ fontFamily: 'var(--font-body)' }}>
               Video Production Management
             </p>
           </div>
 
           {/* Desktop heading */}
           <div className="hidden lg:block mb-8">
-            <h2 className="text-[24px] font-semibold tracking-[-0.03em] text-[var(--color-text-primary)]">
-              Willkommen zurück
+            <h2 className="text-[28px] font-bold tracking-[-0.03em] text-[var(--color-text-primary)]" style={{ fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>
+              Willkommen
             </h2>
-            <p className="mt-1.5 text-[15px] text-[var(--color-text-tertiary)]">
+            <div className="w-12 h-[3px] mt-2 mb-3" style={{ background: 'var(--color-green)' }} />
+            <p className="text-[14px] text-[var(--color-text-tertiary)]" style={{ fontFamily: 'var(--font-body)' }}>
               Melde dich in deinem Account an
             </p>
           </div>
 
-          {/* Form Card */}
-          <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] p-6 shadow-[var(--shadow-sm)]">
-            <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Form card — brutal */}
+          <div className="border border-[var(--color-border-strong)] p-6" style={{
+            background: 'var(--color-surface-1)',
+            boxShadow: '6px 6px 0px rgba(0, 220, 130, 0.15)',
+          }}>
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">
+                <label className="block text-[12px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-secondary)] mb-2" style={{ fontFamily: 'var(--font-body)' }}>
                   E-Mail
                 </label>
                 <input
@@ -120,10 +150,12 @@ export function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   onFocus={() => setFocused("email")}
                   onBlur={() => setFocused(null)}
-                  className="w-full h-11 px-3.5 rounded-[var(--radius-md)] border bg-[var(--color-surface-0)] text-[15px] text-[var(--color-text-primary)] transition-all duration-200 ease-[var(--ease-out)] focus:ring-0 focus:outline-none placeholder:text-[var(--color-text-tertiary)]"
+                  className="w-full h-12 px-4 text-[15px] text-[var(--color-text-primary)] border-0 focus:ring-0 focus:outline-none placeholder:text-[var(--color-text-muted)]"
                   style={{
-                    borderColor: focused === "email" ? "var(--color-accent)" : "var(--color-border)",
-                    boxShadow: focused === "email" ? "0 0 0 3px rgba(37,99,235,0.12)" : "none",
+                    fontFamily: 'var(--font-body)',
+                    background: 'var(--color-surface-0)',
+                    borderLeft: focused === "email" ? '3px solid var(--color-green)' : '3px solid var(--color-surface-3)',
+                    transition: 'border-color 0.15s ease',
                   }}
                   placeholder="mail@beispiel.de"
                   required
@@ -132,7 +164,7 @@ export function LoginPage() {
               </div>
 
               <div>
-                <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">
+                <label className="block text-[12px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-secondary)] mb-2" style={{ fontFamily: 'var(--font-body)' }}>
                   Passwort
                 </label>
                 <input
@@ -141,10 +173,12 @@ export function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   onFocus={() => setFocused("password")}
                   onBlur={() => setFocused(null)}
-                  className="w-full h-11 px-3.5 rounded-[var(--radius-md)] border bg-[var(--color-surface-0)] text-[15px] text-[var(--color-text-primary)] transition-all duration-200 ease-[var(--ease-out)] focus:ring-0 focus:outline-none placeholder:text-[var(--color-text-tertiary)]"
+                  className="w-full h-12 px-4 text-[15px] text-[var(--color-text-primary)] border-0 focus:ring-0 focus:outline-none placeholder:text-[var(--color-text-muted)]"
                   style={{
-                    borderColor: focused === "password" ? "var(--color-accent)" : "var(--color-border)",
-                    boxShadow: focused === "password" ? "0 0 0 3px rgba(37,99,235,0.12)" : "none",
+                    fontFamily: 'var(--font-body)',
+                    background: 'var(--color-surface-0)',
+                    borderLeft: focused === "password" ? '3px solid var(--color-green)' : '3px solid var(--color-surface-3)',
+                    transition: 'border-color 0.15s ease',
                   }}
                   placeholder="••••••••"
                   required
@@ -154,32 +188,54 @@ export function LoginPage() {
               </div>
 
               {error && (
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-[var(--radius-md)] bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 animate-in">
-                  <p className="text-[13px] text-[var(--color-error)]">{error}</p>
+                <div className="flex items-center gap-2 px-3 py-2.5 border-l-3 animate-in" style={{
+                  background: 'rgba(255, 51, 51, 0.08)',
+                  borderLeft: '3px solid var(--color-error)',
+                }}>
+                  <p className="text-[13px] text-[var(--color-error)]" style={{ fontFamily: 'var(--font-body)' }}>{error}</p>
                 </div>
               )}
 
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full h-11 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[15px] font-medium transition-all duration-200 ease-[var(--ease-out)] hover:bg-[var(--color-accent-hover)] disabled:opacity-50 flex items-center justify-center gap-2 group mt-2"
+                className="w-full h-12 text-[14px] font-semibold uppercase tracking-[0.1em] text-[var(--color-surface-0)] flex items-center justify-center gap-2 group disabled:opacity-50 transition-all duration-150"
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  background: 'var(--color-green)',
+                  boxShadow: '4px 4px 0px var(--color-surface-0)',
+                  border: 'none',
+                }}
+                onMouseEnter={(e) => {
+                  if (!submitting) {
+                    e.currentTarget.style.transform = 'translate(-2px, -2px)';
+                    e.currentTarget.style.boxShadow = '6px 6px 0px var(--color-green-dark)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translate(0, 0)';
+                  e.currentTarget.style.boxShadow = '4px 4px 0px var(--color-surface-0)';
+                }}
               >
                 {submitting ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   <>
                     Anmelden
-                    <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+                    <ArrowRight className="w-4 h-4 transition-transform duration-150 group-hover:translate-x-1" />
                   </>
                 )}
               </button>
             </form>
           </div>
 
-          <div className="mt-8 text-center text-[12px] text-[var(--color-text-tertiary)] space-x-3">
+          {/* Footer */}
+          <div className="mt-10 flex items-center justify-between text-[11px] text-[var(--color-text-muted)] uppercase tracking-[0.05em]" style={{ fontFamily: 'var(--font-body)' }}>
             <span>© {new Date().getFullYear()} AgentZ Media</span>
-            <a href="#/impressum" className="hover:text-[var(--color-text-secondary)] transition-colors">Impressum</a>
-            <a href="#/datenschutz" className="hover:text-[var(--color-text-secondary)] transition-colors">Datenschutz</a>
+            <div className="flex gap-4">
+              <a href="#/impressum" className="hover:text-[var(--color-text-secondary)] transition-colors">Impressum</a>
+              <a href="#/datenschutz" className="hover:text-[var(--color-text-secondary)] transition-colors">Datenschutz</a>
+            </div>
           </div>
         </div>
       </div>

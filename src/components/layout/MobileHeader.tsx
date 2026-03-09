@@ -9,11 +9,14 @@ export function MobileHeader({ onMenuClick }: { onMenuClick: () => void }) {
       >
         <Menu className="w-5 h-5 text-[var(--color-text-secondary)]" />
       </button>
-      <div className="ml-3 flex-1 flex items-center gap-2">
-        <div className="w-6 h-6 rounded-[6px] flex items-center justify-center p-[2px]" style={{ background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)' }}>
-          <img src="/agentz-logo.svg" alt="AgentZ" className="w-full h-full object-contain" />
+      <div className="ml-3 flex-1 flex items-center gap-2.5">
+        <div className="w-6 h-6 flex items-center justify-center border border-[var(--color-green)]" style={{
+          background: 'var(--color-surface-0)',
+          boxShadow: '1.5px 1.5px 0px var(--color-green)',
+        }}>
+          <span className="text-[12px] font-bold text-[var(--color-green)]" style={{ fontFamily: 'var(--font-display)' }}>A</span>
         </div>
-        <span className="text-[15px] font-semibold tracking-[-0.01em]">agent<span className="font-bold text-[var(--color-accent)]">Z</span> <span className="text-[var(--color-text-tertiary)] text-[13px] font-medium uppercase tracking-wide">Studio</span></span>
+        <span className="text-[14px] font-bold tracking-[-0.01em] uppercase" style={{ fontFamily: 'var(--font-display)' }}>Agent<span className="text-[var(--color-green)]">Z</span> <span className="text-[var(--color-text-muted)] text-[11px] font-medium tracking-[0.15em]">Studio</span></span>
       </div>
       <button
         onClick={() => {
