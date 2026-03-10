@@ -818,3 +818,145 @@ Rein visuelle Änderungen — alle Hooks, State, Mutations, Queries und Logik un
 - ✅ TypeScript Build: Zero errors (npx tsc --noEmit clean)
 - ✅ .env.local gelöscht
 - ✅ Dev-Server gestoppt
+
+## Phase 10: Final Review + CSS Cleanup (10.03.2026, 06:00)
+
+### Was wurde gemacht
+
+**Visueller Komplett-Check:**
+- ✅ Login-Seite (Desktop 1280×900 + Mobile 375×812)
+- ✅ Impressum-Seite (Volltext, alle Sektionen)
+- ✅ Datenschutz-Seite (Volltext, alle Sektionen)
+- ✅ Invite-Seite (Loading State)
+- ✅ Cookie Banner (korrekt auf allen Seiten)
+- ✅ Alle öffentlichen Routen visuell einwandfrei
+
+**Code-Audit aller TSX-Dateien:**
+- ✅ `rounded-*` Tailwind-Klassen: Nur 2 Vorkommen in Login.tsx für dekorative Gradient-Kreise (korrekt, brauchen rounded-full)
+- ✅ `border-radius` Inline-Styles: Nur Kommentare + Print-Export (nicht user-facing)
+- ✅ Keine generischen Tailwind-Shadows (shadow-lg, shadow-xl, etc.) mehr in TSX
+- ✅ Status-Farben (emerald, violet, blue) werden korrekt für semantische Differenzierung genutzt — Brand-Accent bleibt #00DC82
+
+**index.css Cleanup — 276 Zeilen entfernt (945 → 669):**
+22 ungenutzte CSS-Klassen entfernt, die in Phase 1 als Utility-Klassen definiert, aber in den nachfolgenden Phasen durch Inline-Styles in den Komponenten ersetzt wurden:
+- `brand-glow`, `hero-gradient`, `stat-card`, `accent-left`, `quick-action`
+- `client-card`, `glass-card`, `install-banner`, `kanban-header`, `title-accent`
+- `kanban-card-accent`, `login-mesh`, `nav-item-active`, `nav-active-indicator`
+- `modal-backdrop`, `tooltip-animate`
+- `input-brutal`, `card-brutal`, `badge-green`
+- `hover-brutal`, `hover-brutal-sm`, `hover-green`
+
+**TipTap Pre-Block Fix:**
+- Doppelte `border-left` Deklaration in `.tiptap-editor .tiptap pre` bereinigt
+
+**Build-Verifizierung:**
+- ✅ TypeScript: `npx tsc --noEmit` — Zero errors
+- ✅ Vite Build: `npx vite build` — Erfolgreich, alle Assets generiert
+- ✅ Dev-Server: Kein CSS-Fehler nach Cleanup + Reload
+- ✅ Keine visuellen Regressionen nach CSS-Cleanup
+
+### Keine Funktionalität geändert
+Rein Cleanup und Verifizierung — keine Logik, Hooks, State oder Queries verändert.
+
+---
+
+## Redesign-Zusammenfassung (09./10. März 2026)
+
+### Überblick
+Komplettes visuelles Redesign des AgentZ Studio von einem generischen Dark-Theme auf einen einheitlichen **Brutalist / Raw** Stil mit AgentZ Brand Colors.
+
+**Aesthetic Direction:** Brutalist / Raw
+**Differentiator:** Brutal offset shadows + green glow + sharp geometry
+
+### Designsprache
+| Element | Vorher | Nachher |
+|---|---|---|
+| Corners | rounded-md/lg/full | 0px überall |
+| Shadows | Tailwind shadow-lg | Brutal offset (4px 4px 0px #00DC82) |
+| Primary Color | Blau/Indigo-Gradient | #00DC82 (AgentZ Green) |
+| Typography | System/Inter | Space Grotesk (Display) + Poppins (Body) |
+| Borders | 1px subtle | 2px solid #3A3A3A |
+| Labels | Mixed case | UPPERCASE + letter-spacing |
+| Timestamps | Normal font | JetBrains Mono, tabular-nums |
+| Avatare | Rounded-full | Square |
+| Badges | Rounded-full/pill | Square mit Border |
+| Cards | Gap/separated | Stacked (-2px margin) |
+
+### Geänderte Dateien (28 Dateien)
+
+**Core:**
+- `src/index.css` — Design System Tokens + Component Helpers (669 Zeilen)
+- `index.html` — Google Fonts (Space Grotesk, Poppins)
+- `public/favicon.svg` — Neues Brutalist "A"-Mark
+
+**Layout:**
+- `src/components/layout/Sidebar.tsx`
+- `src/components/layout/MobileHeader.tsx`
+- `src/components/layout/CommandPalette.tsx`
+- `src/components/layout/KeyboardShortcuts.tsx` (Dialog)
+- `src/components/layout/PageTransition.tsx`
+
+**Shared Components:**
+- `src/components/ui/ClientAvatar.tsx`
+- `src/components/ui/RichTextEditor.tsx`
+- `src/components/ui/Skeleton.tsx`
+- `src/components/ui/Toast.tsx`
+- `src/components/ui/kanban.tsx`
+- `src/components/CookieBanner.tsx`
+- `src/components/ErrorBoundary.tsx`
+- `src/components/ideas/IdeaDrawer.tsx`
+- `src/components/kanban/KanbanBoard.tsx`
+- `src/components/video/VideoPlayer.tsx`
+- `src/components/video/VideoUpload.tsx`
+
+**Pages (18):**
+- `src/pages/Login.tsx`
+- `src/pages/AdminDashboard.tsx`
+- `src/pages/ClientsPage.tsx`
+- `src/pages/ClientDetail.tsx`
+- `src/pages/ClientDashboard.tsx`
+- `src/pages/VideosPage.tsx`
+- `src/pages/VideoReview.tsx`
+- `src/pages/PipelinePage.tsx`
+- `src/pages/CalendarPage.tsx`
+- `src/pages/IdeasPage.tsx`
+- `src/pages/IdeaDetail.tsx`
+- `src/pages/LibraryPage.tsx`
+- `src/pages/TeamPage.tsx`
+- `src/pages/SettingsPage.tsx`
+- `src/pages/AuditLogPage.tsx`
+- `src/pages/InvitePage.tsx`
+- `src/pages/SharePage.tsx`
+- `src/pages/LegalPages.tsx`
+
+### Design-Entscheidungen (Zusammenfassung)
+1. **Square Everything**: Konsequent 0px border-radius. Keine Ausnahmen (außer dekorative Gradient-Kreise).
+2. **Stacked Elements**: Cards, Items, Columns — alle mit -2px margin für zusammenhängendes Terminal-Feeling.
+3. **Green Accent Bars**: 3px × 20px grüne Balken bei Section Headers als visuelles Leitmotiv.
+4. **Mono für Daten**: JetBrains Mono konsequent für Timestamps, Emails, URLs, Counts, File-Sizes.
+5. **Uppercase + Tracking**: Alle Labels, Badges, Buttons — militant einheitlich uppercase mit letter-spacing.
+6. **isGreen statt bunte Accents**: Binäres System (normal oder green-highlighted) statt 4+ verschiedene Akzentfarben.
+7. **Status-Farben bleiben funktional**: Emerald, Violet, Blue für semantische Status-Differenzierung — Brand-Accent bleibt Green.
+8. **Hover = Translate + Shadow**: Konsistent translate(-2px, -2px) + brutal shadow offset für Cards/Items.
+9. **Focus = Green Ring**: WCAG 2.1 AA konforme Focus-States mit grünem Outline + Ring.
+10. **Touch-Targets 44px**: Alle interaktiven Elemente mindestens 44×44px auf Touch-Devices.
+
+### Offene Punkte
+- **Kein Live-Backend-Test möglich**: Interne Seiten (Dashboard, Clients, Videos, etc.) konnten nur per Code-Review und Static-Preview geprüft werden, da kein Convex-Backend verfügbar. Empfehlung: Nach Deploy mit echten Daten nochmal visuell durchgehen.
+- **Status-Farben**: AuditLogPage und IdeasPage nutzen direkte Tailwind-Farben (text-emerald-600, bg-blue-500, etc.) statt CSS Custom Properties. Funktional korrekt, aber bei Bedarf auf Token-System migrierbar.
+- **export.ts**: Print-Export-Button hat border-radius:8px — nicht user-facing, daher belassen.
+
+### Git-History
+```
+f7b820d (pre-redesign baseline)
+a86179b redesign phase 1: design system tokens
+7789cc0 redesign phase 2: login + favicon + logo
+0b8fa19 redesign phase 3: sidebar + navigation
+6316a84 redesign phase 4: admin dashboard
+31dc965 redesign phase 5: client pages
+7fc640d redesign phase 6: video + pipeline pages
+e82ad73 redesign phase 7: remaining pages
+84a0b62 redesign phase 8: modals + overlays
+489aba4 redesign phase 9: polish + micro-interactions
+[next]  redesign phase 10: final review + cleanup
+```
