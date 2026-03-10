@@ -6,19 +6,23 @@ function LegalLayout({ title, children, onBack }: { title: string; children: Rea
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <button
           onClick={onBack}
-          className="flex items-center gap-1.5 text-[13px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors mb-6"
+          className="flex items-center gap-1.5 text-[11px] font-bold uppercase text-[var(--color-text-tertiary)] hover:text-[var(--color-green)] transition-colors mb-6 border-2 border-[var(--color-border-strong)] px-3 py-1.5 hover:border-[var(--color-green)]"
+          style={{ borderRadius: 0, letterSpacing: '0.06em' }}
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
+          <ArrowLeft className="w-3.5 h-3.5" strokeWidth={2} />
           Zurück
         </button>
-        <h1 className="text-[28px] font-semibold tracking-[-0.02em] mb-2">{title}</h1>
-        <p className="text-[13px] text-[var(--color-text-tertiary)] mb-10">Stand: 07. März 2026</p>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-[3px] h-[24px] bg-[var(--color-green)]" />
+          <h1 className="text-[28px] font-bold uppercase" style={{ fontFamily: 'var(--font-display)', letterSpacing: '0.02em' }}>{title}</h1>
+        </div>
+        <p className="text-[11px] text-[var(--color-text-tertiary)] uppercase font-bold mb-10 ml-[15px]" style={{ letterSpacing: '0.08em' }}>Stand: 07. März 2026</p>
         <div className="space-y-8 text-[15px] leading-relaxed text-[var(--color-text-secondary)]">
           {children}
         </div>
-        <div className="mt-12 pt-6 border-t border-[var(--color-border-subtle)] flex gap-4 text-[13px] text-[var(--color-text-tertiary)]">
-          <a href="#/impressum" className="hover:text-[var(--color-text-primary)] transition-colors">Impressum</a>
-          <a href="#/datenschutz" className="hover:text-[var(--color-text-primary)] transition-colors">Datenschutz</a>
+        <div className="mt-12 pt-6 border-t-2 border-[var(--color-border-strong)] flex gap-4 text-[11px] font-bold uppercase text-[var(--color-text-tertiary)]" style={{ letterSpacing: '0.06em' }}>
+          <a href="#/impressum" className="hover:text-[var(--color-green)] transition-colors">Impressum</a>
+          <a href="#/datenschutz" className="hover:text-[var(--color-green)] transition-colors">Datenschutz</a>
         </div>
       </div>
     </div>
@@ -28,7 +32,10 @@ function LegalLayout({ title, children, onBack }: { title: string; children: Rea
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section>
-      <h2 className="text-[18px] font-semibold text-[var(--color-text-primary)] mb-3">{title}</h2>
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-[2px] h-[16px] bg-[var(--color-green)]" />
+        <h2 className="text-[16px] font-bold uppercase text-[var(--color-text-primary)]" style={{ letterSpacing: '0.04em' }}>{title}</h2>
+      </div>
       <div className="space-y-3">{children}</div>
     </section>
   );
@@ -36,7 +43,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function InfoBox({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-[var(--color-surface-1)] border border-[var(--color-border-subtle)] rounded-[var(--radius-md)] p-5 space-y-1">
+    <div className="bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] p-5 space-y-1" style={{ borderRadius: 0 }}>
       {children}
     </div>
   );

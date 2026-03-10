@@ -12,8 +12,8 @@ export function StatusBadge({ status }: { status: string }) {
   const s = STATUS_BADGE_STYLES[status] || { bg: "rgba(163,163,163,0.12)", color: "#737373" };
   return (
     <span
-      className="inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-medium"
-      style={{ background: s.bg, color: s.color }}
+      className="inline-flex items-center px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.1em]"
+      style={{ background: s.bg, color: s.color, border: `2px solid ${s.color}`, borderRadius: 0 }}
     >
       {STATUS_LABELS[status] || status}
     </span>
@@ -26,7 +26,7 @@ export function StatusSelector({ current, onChange }: { current: string; onChang
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 px-3 h-8 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[13px] font-medium hover:bg-[var(--color-surface-2)] transition-colors"
+        className="flex items-center gap-1.5 px-3 h-8 border-2 border-[#3A3A3A] text-[12px] font-bold uppercase tracking-[0.08em] hover:border-[#00DC82] transition-colors"
       >
         Status ändern
         <ChevronDown className="w-3.5 h-3.5" />
@@ -34,13 +34,13 @@ export function StatusSelector({ current, onChange }: { current: string; onChang
       {open && (
         <>
           <div className="fixed inset-0 z-[90]" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 sm:right-0 sm:left-auto top-full mt-1 w-48 bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border)] shadow-[var(--shadow-md)] z-[100] py-1">
+          <div className="absolute left-0 sm:right-0 sm:left-auto top-full mt-1 w-48 bg-[#111111] border-2 border-[#3A3A3A] z-[100] py-1" style={{ boxShadow: "4px 4px 0px #00DC82" }}>
             {STATUS_ORDER.map((s) => (
               <button
                 key={s}
                 onClick={() => { onChange(s); setOpen(false); }}
-                className={`w-full text-left px-3 py-1.5 text-[13px] hover:bg-[var(--color-surface-2)] transition-colors flex items-center gap-2 ${
-                  s === current ? "font-medium text-[var(--color-accent)]" : "text-[var(--color-text-secondary)]"
+                className={`w-full text-left px-3 py-1.5 text-[12px] font-bold uppercase tracking-[0.06em] hover:bg-[#1A1A1A] hover:text-[#00DC82] transition-colors flex items-center gap-2 ${
+                  s === current ? "text-[#00DC82]" : "text-[var(--color-text-secondary)]"
                 }`}
               >
                 {s === current && <Check className="w-3 h-3" />}
@@ -118,13 +118,15 @@ export function ScriptEditor({ ideaId, ideaTitle, ideaDescription, clientName, c
   };
 
   return (
-    <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--color-border-subtle)]">
-        <div className="flex items-center gap-2">
+    <div className="bg-[#111111] border-2 border-[#3A3A3A] overflow-hidden">
+      {/* Header with green accent bar */}
+      <div className="flex items-center justify-between px-4 py-3 border-b-2 border-[#3A3A3A]">
+        <div className="flex items-center gap-3">
+          <div className="w-[3px] h-5 bg-[#00DC82] flex-shrink-0" />
           <FileText className="w-4 h-4 text-[var(--color-text-secondary)]" />
-          <h3 className="text-[14px] font-medium">Skript</h3>
+          <h3 className="text-[13px] font-bold uppercase tracking-[0.08em]">Skript</h3>
           {latestScript && (
-            <span className="text-[12px] text-[var(--color-text-tertiary)]">
+            <span className="text-[11px] font-mono text-[#00DC82] border border-[#00DC82] px-1.5 py-0.5">
               v{latestScript.version}
             </span>
           )}
@@ -133,7 +135,7 @@ export function ScriptEditor({ ideaId, ideaTitle, ideaDescription, clientName, c
           {user?.role === "admin" && !editing && (
             <button
               onClick={handleStartEdit}
-              className="flex items-center gap-1.5 h-7 px-3 rounded-[var(--radius-sm)] text-[12px] font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] transition-colors"
+              className="flex items-center gap-1.5 h-7 px-3 border-2 border-[#3A3A3A] text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--color-text-secondary)] hover:border-[#00DC82] hover:text-[#00DC82] transition-colors"
             >
               {latestScript ? "Bearbeiten" : <><Plus className="w-3 h-3" /> Skript erstellen</>}
             </button>
@@ -150,12 +152,12 @@ export function ScriptEditor({ ideaId, ideaTitle, ideaDescription, clientName, c
           />
           {/* AI Buttons */}
           {user?.role === "admin" && (
-            <div className="flex items-center gap-2 mt-3 pb-3 border-b border-[var(--color-border-subtle)]">
-              <span className="text-[11px] text-[var(--color-text-tertiary)] uppercase tracking-wider font-medium">KI</span>
+            <div className="flex items-center gap-0 mt-3 pb-3 border-b-2 border-[#3A3A3A]">
+              <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)] mr-2">KI</span>
               <button
                 onClick={() => handleAI("generate")}
                 disabled={aiLoading}
-                className="flex items-center gap-1.5 h-7 px-3 rounded-full text-[12px] font-medium bg-gradient-to-r from-violet-500/10 to-indigo-500/10 text-violet-700 dark:text-violet-300 hover:from-violet-500/20 hover:to-indigo-500/20 border border-violet-200/50 dark:border-violet-500/20 transition-all disabled:opacity-50"
+                className="flex items-center gap-1.5 h-7 px-3 text-[12px] font-bold uppercase tracking-[0.06em] bg-gradient-to-r from-violet-500/10 to-indigo-500/10 text-violet-300 border-2 border-violet-500/30 hover:border-violet-500 disabled:opacity-50 transition-all -mr-[2px]"
               >
                 <Sparkles className={`w-3 h-3 ${aiMode === "generate" ? "animate-spin" : ""}`} />
                 {aiMode === "generate" ? "Generiert…" : "Generieren"}
@@ -165,7 +167,7 @@ export function ScriptEditor({ ideaId, ideaTitle, ideaDescription, clientName, c
                   <button
                     onClick={() => handleAI("improve")}
                     disabled={aiLoading}
-                    className="flex items-center gap-1.5 h-7 px-3 rounded-full text-[12px] font-medium bg-gradient-to-r from-amber-500/10 to-orange-500/10 text-amber-700 dark:text-amber-300 hover:from-amber-500/20 hover:to-orange-500/20 border border-amber-200/50 dark:border-amber-500/20 transition-all disabled:opacity-50"
+                    className="flex items-center gap-1.5 h-7 px-3 text-[12px] font-bold uppercase tracking-[0.06em] bg-gradient-to-r from-amber-500/10 to-orange-500/10 text-amber-300 border-2 border-amber-500/30 hover:border-amber-500 disabled:opacity-50 transition-all -mr-[2px]"
                   >
                     <Wand2 className={`w-3 h-3 ${aiMode === "improve" ? "animate-spin" : ""}`} />
                     {aiMode === "improve" ? "Verbessert…" : "Verbessern"}
@@ -173,7 +175,7 @@ export function ScriptEditor({ ideaId, ideaTitle, ideaDescription, clientName, c
                   <button
                     onClick={() => handleAI("shorten")}
                     disabled={aiLoading}
-                    className="flex items-center gap-1.5 h-7 px-3 rounded-full text-[12px] font-medium bg-gradient-to-r from-emerald-500/10 to-teal-500/10 text-emerald-700 dark:text-emerald-300 hover:from-emerald-500/20 hover:to-teal-500/20 border border-emerald-200/50 dark:border-emerald-500/20 transition-all disabled:opacity-50"
+                    className="flex items-center gap-1.5 h-7 px-3 text-[12px] font-bold uppercase tracking-[0.06em] bg-gradient-to-r from-emerald-500/10 to-teal-500/10 text-emerald-300 border-2 border-emerald-500/30 hover:border-emerald-500 disabled:opacity-50 transition-all"
                   >
                     <Scissors className={`w-3 h-3 ${aiMode === "shorten" ? "animate-spin" : ""}`} />
                     {aiMode === "shorten" ? "Kürzt…" : "Kürzen"}
@@ -182,17 +184,17 @@ export function ScriptEditor({ ideaId, ideaTitle, ideaDescription, clientName, c
               )}
             </div>
           )}
-          <div className="flex justify-end gap-2 mt-3">
+          <div className="flex justify-end gap-0 mt-3">
             <button
               onClick={() => setEditing(false)}
-              className="h-8 px-4 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[13px] font-medium hover:bg-[var(--color-surface-2)] transition-colors"
+              className="h-8 px-4 border-2 border-[#3A3A3A] text-[12px] font-bold uppercase tracking-[0.06em] hover:border-[#00DC82] transition-colors -mr-[2px]"
             >
               Abbrechen
             </button>
             <button
               onClick={handleSave}
               disabled={saving || !content.trim()}
-              className="flex items-center gap-1.5 h-8 px-4 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[13px] font-medium hover:bg-[var(--color-accent-hover)] disabled:opacity-50 transition-colors"
+              className="flex items-center gap-1.5 h-8 px-4 bg-[#00DC82] text-[#0A0A0A] text-[12px] font-bold uppercase tracking-[0.08em] border-2 border-[#00DC82] hover:-translate-x-0.5 hover:-translate-y-0.5 disabled:opacity-50 transition-all"
             >
               <Save className="w-3.5 h-3.5" />
               Speichern
@@ -202,19 +204,21 @@ export function ScriptEditor({ ideaId, ideaTitle, ideaDescription, clientName, c
       ) : latestScript ? (
         <div className="p-4">
           <RichTextDisplay content={latestScript.content} className="text-[var(--color-text-secondary)]" />
-          <p className="text-[11px] text-[var(--color-text-tertiary)] mt-3">
-            Zuletzt bearbeitet: {new Date(latestScript.createdAt).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+          <p className="text-[11px] font-mono text-[var(--color-text-tertiary)] mt-3">
+            Zuletzt: {new Date(latestScript.createdAt).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
           </p>
         </div>
       ) : (
         <div className="px-4 py-8 text-center">
-          <FileText className="w-6 h-6 mx-auto mb-2 text-[var(--color-text-tertiary)] opacity-40" />
-          <p className="text-[13px] text-[var(--color-text-tertiary)]">Noch kein Skript vorhanden</p>
+          <div className="w-10 h-10 border-2 border-[#3A3A3A] flex items-center justify-center mx-auto mb-3">
+            <FileText className="w-5 h-5 text-[var(--color-text-tertiary)] opacity-40" />
+          </div>
+          <p className="text-[12px] font-mono text-[var(--color-text-tertiary)] uppercase tracking-[0.08em]">Noch kein Skript vorhanden</p>
           {user?.role === "admin" && (
             <button
               onClick={() => handleAI("generate")}
               disabled={aiLoading}
-              className="mt-3 inline-flex items-center gap-1.5 h-8 px-4 rounded-full text-[13px] font-medium bg-gradient-to-r from-violet-500/10 to-indigo-500/10 text-violet-700 dark:text-violet-300 hover:from-violet-500/20 hover:to-indigo-500/20 border border-violet-200/50 dark:border-violet-500/20 transition-all disabled:opacity-50"
+              className="mt-3 inline-flex items-center gap-1.5 h-8 px-4 text-[13px] font-bold uppercase tracking-[0.06em] bg-gradient-to-r from-violet-500/10 to-indigo-500/10 text-violet-300 border-2 border-violet-500/30 hover:border-violet-500 disabled:opacity-50 transition-all"
             >
               <Sparkles className={`w-3.5 h-3.5 ${aiLoading ? "animate-spin" : ""}`} />
               {aiLoading ? "KI generiert Skript…" : "Mit KI generieren"}
@@ -255,33 +259,36 @@ export function CommentSection({ ideaId }: { ideaId: string }) {
 
   return (
     <div>
-      <h3 className="text-[15px] font-medium mb-4 flex items-center gap-2">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-[3px] h-5 bg-[#00DC82] flex-shrink-0" />
         <MessageSquare className="w-4 h-4" />
-        Kommentare
-        {(comments || []).length > 0 && (
-          <span className="text-[12px] text-[var(--color-text-tertiary)] font-normal">
-            ({comments!.length})
-          </span>
-        )}
-      </h3>
+        <h3 className="text-[14px] font-bold uppercase tracking-[0.08em]">
+          Kommentare
+          {(comments || []).length > 0 && (
+            <span className="ml-2 text-[11px] font-mono text-[var(--color-text-tertiary)]">
+              ({comments!.length})
+            </span>
+          )}
+        </h3>
+      </div>
 
-      <div className="space-y-3 mb-4">
+      <div className="flex flex-col mb-4">
         {pendingComments.map((pc) => (
           <div
             key={pc.id}
-            className="rounded-[var(--radius-md)] border border-[var(--color-accent)]/20 bg-[var(--color-accent-surface)] p-3 animate-pulse"
+            className="border-2 border-[#00DC82] bg-[#0A0A0A] p-3 animate-pulse -mb-[2px]"
           >
             <p className="text-[14px] leading-relaxed">{pc.content}</p>
-            <p className="text-[11px] text-[var(--color-text-tertiary)] mt-2">Wird gesendet…</p>
+            <p className="text-[11px] font-mono text-[var(--color-text-tertiary)] mt-2">Wird gesendet…</p>
           </div>
         ))}
         {(comments || []).filter(c => !c.parentId).map((comment) => (
           <div
             key={comment._id}
-            className={`rounded-[var(--radius-md)] border p-3 transition-colors ${
+            className={`border-2 p-3 transition-colors -mb-[2px] last:mb-0 ${
               comment.resolved
-                ? "border-[var(--color-border-subtle)] bg-[var(--color-surface-0)] opacity-60"
-                : "border-[var(--color-border-subtle)] bg-[var(--color-surface-1)]"
+                ? "border-[#3A3A3A] bg-[#0A0A0A] opacity-60"
+                : "border-[#3A3A3A] bg-[#111111] hover:border-[#00DC82]"
             }`}
           >
             <div className="flex items-start justify-between gap-2">
@@ -289,14 +296,14 @@ export function CommentSection({ ideaId }: { ideaId: string }) {
               {!comment.resolved && user?.role === "admin" && (
                 <button
                   onClick={() => { if (token) resolveComment({ token, commentId: comment._id }); }}
-                  className="p-1 rounded hover:bg-[var(--color-surface-2)] text-[var(--color-text-tertiary)] hover:text-[var(--color-success)] transition-colors flex-shrink-0"
+                  className="p-1 border-2 border-transparent hover:border-emerald-500 text-[var(--color-text-tertiary)] hover:text-emerald-400 transition-colors flex-shrink-0"
                   title="Erledigt"
                 >
                   <Check className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
-            <p className="text-[11px] text-[var(--color-text-tertiary)] mt-2">
+            <p className="text-[11px] font-mono text-[var(--color-text-tertiary)] mt-2">
               {new Date(comment.createdAt).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
               {comment.resolved && " · ✓ Erledigt"}
             </p>
@@ -304,17 +311,17 @@ export function CommentSection({ ideaId }: { ideaId: string }) {
         ))}
       </div>
 
-      <form onSubmit={handleSubmit} className="flex gap-2">
+      <form onSubmit={handleSubmit} className="flex gap-0">
         <input
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
-          className="flex-1 h-9 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-1)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none transition-colors"
+          className="flex-1 h-9 px-3 border-2 border-[#3A3A3A] bg-[#111111] text-[14px] focus:border-[#00DC82] focus:outline-none transition-colors -mr-[2px]"
           placeholder="Kommentar schreiben…"
         />
         <button
           type="submit"
           disabled={!newComment.trim()}
-          className="h-9 w-9 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white flex items-center justify-center hover:bg-[var(--color-accent-hover)] disabled:opacity-30 transition-all"
+          className="h-9 w-9 bg-[#00DC82] text-[#0A0A0A] flex items-center justify-center border-2 border-[#00DC82] hover:-translate-x-0.5 hover:-translate-y-0.5 disabled:opacity-30 transition-all"
         >
           <Send className="w-4 h-4" />
         </button>
@@ -330,28 +337,31 @@ export function VideoSection({ ideaId, onNavigate }: { ideaId: string; onNavigat
 
   return (
     <div>
-      <h3 className="text-[15px] font-medium mb-4 flex items-center gap-2">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-[3px] h-5 bg-[#00DC82] flex-shrink-0" />
         <Film className="w-4 h-4" />
-        Videos
-        {(videos || []).length > 0 && (
-          <span className="text-[12px] text-[var(--color-text-tertiary)] font-normal">
-            ({videos!.length})
-          </span>
-        )}
-      </h3>
+        <h3 className="text-[14px] font-bold uppercase tracking-[0.08em]">
+          Videos
+          {(videos || []).length > 0 && (
+            <span className="ml-2 text-[11px] font-mono text-[var(--color-text-tertiary)]">
+              ({videos!.length})
+            </span>
+          )}
+        </h3>
+      </div>
 
       {/* Video list */}
       {(videos || []).length > 0 && (
-        <div className="space-y-2 mb-4">
+        <div className="flex flex-col mb-4">
           {(videos || []).map((video) => {
             const thumb = video.thumbnailUrl || (video.bunnyVideoId && cdnHost ? `https://${cdnHost}/${video.bunnyVideoId}/thumbnail.jpg` : null);
             return (
               <button
                 key={video._id}
                 onClick={() => onNavigate?.("video", video._id)}
-                className="w-full flex items-center gap-3 p-3 rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] hover:border-[var(--color-border)] hover:shadow-[var(--shadow-xs)] transition-all text-left group"
+                className="w-full flex items-center gap-3 p-3 border-2 border-[#3A3A3A] bg-[#111111] hover:border-[#00DC82] hover:shadow-[4px_4px_0px_#00DC82] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all text-left group -mb-[2px] last:mb-0"
               >
-                <div className="relative w-20 h-12 rounded-[var(--radius-sm)] overflow-hidden bg-black flex-shrink-0">
+                <div className="relative w-20 h-12 overflow-hidden bg-black flex-shrink-0 border border-[#3A3A3A]">
                   {thumb ? (
                     <img src={thumb} alt="" className="w-full h-full object-cover" />
                   ) : (
@@ -360,13 +370,15 @@ export function VideoSection({ ideaId, onNavigate }: { ideaId: string; onNavigat
                     </div>
                   )}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
-                    <Play className="w-4 h-4 text-white" />
+                    <div className="w-8 h-8 bg-[#00DC82] flex items-center justify-center">
+                      <Play className="w-4 h-4 text-[#0A0A0A] ml-0.5" />
+                    </div>
                   </div>
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-[14px] font-medium truncate">{video.title}</p>
-                  <p className="text-[12px] text-[var(--color-text-tertiary)]">
-                    {new Date(video.createdAt).toLocaleDateString("de-DE")} · {video.status}
+                  <p className="text-[11px] font-mono text-[var(--color-text-tertiary)]">
+                    {new Date(video.createdAt).toLocaleDateString("de-DE")} · {video.status.toUpperCase()}
                   </p>
                 </div>
               </button>
@@ -402,11 +414,11 @@ export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onB
     const isLoading = ideas === undefined;
     return (
       <div className="p-8">
-        <button onClick={onBack} className="flex items-center gap-1.5 text-[14px] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors mb-4">
+        <button onClick={onBack} className="flex items-center gap-1.5 text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--color-text-secondary)] hover:text-[#00DC82] transition-colors mb-4 border-2 border-transparent hover:border-[#00DC82] px-2 py-1">
           <ArrowLeft className="w-4 h-4" />
           Zurück
         </button>
-        <p className="text-[14px] text-[var(--color-text-tertiary)]">
+        <p className="text-[14px] font-mono text-[var(--color-text-tertiary)]">
           {isLoading ? "Idee wird geladen…" : "Idee nicht gefunden"}
         </p>
       </div>
@@ -425,22 +437,22 @@ export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onB
   return (
     <div className="max-w-[720px] mx-auto px-6 lg:px-8 py-6">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1 text-[13px] mb-6 animate-in">
+      <nav className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.1em] mb-6 animate-in">
         <button
           onClick={() => onNavigate?.("dashboard")}
-          className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors"
+          className="text-[var(--color-text-tertiary)] hover:text-[#00DC82] transition-colors"
         >
           Dashboard
         </button>
         <ChevronRight className="w-3 h-3 text-[var(--color-text-tertiary)]" />
         <button
           onClick={onBack}
-          className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors"
+          className="text-[var(--color-text-tertiary)] hover:text-[#00DC82] transition-colors"
         >
           Ideen
         </button>
         <ChevronRight className="w-3 h-3 text-[var(--color-text-tertiary)]" />
-        <span className="text-[var(--color-text-primary)] font-medium truncate max-w-[200px]">
+        <span className="text-[var(--color-text-primary)] truncate max-w-[200px]">
           {idea.title}
         </span>
       </nav>
@@ -448,11 +460,11 @@ export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onB
       {/* Header */}
       <div className="animate-in flex items-start justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-[24px] font-semibold tracking-[-0.02em] leading-tight">
+          <h1 className="text-[24px] font-bold uppercase leading-tight">
             {idea.title}
           </h1>
           {client && (
-            <p className="text-[14px] text-[var(--color-text-secondary)] mt-1">{client.name}{client.company ? ` · ${client.company}` : ""}</p>
+            <p className="text-[14px] font-mono text-[var(--color-text-secondary)] mt-1">{client.name}{client.company ? ` · ${client.company}` : ""}</p>
           )}
         </div>
         <StatusBadge status={idea.status} />
@@ -460,27 +472,29 @@ export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onB
 
       {/* Description */}
       {idea.description && (
-        <div className="animate-in stagger-1 bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-4 mb-6">
+        <div className="animate-in stagger-1 bg-[#111111] border-2 border-[#3A3A3A] p-4 mb-6">
           <RichTextDisplay content={idea.description} className="text-[var(--color-text-secondary)]" />
         </div>
       )}
 
       {/* Status change + meta (admin only) */}
       {user?.role === "admin" && (
-        <div className="animate-in stagger-2 flex items-center gap-3 mb-6">
+        <div className="animate-in stagger-2 flex items-center gap-3 mb-6 flex-wrap">
           <StatusSelector current={idea.status} onChange={handleStatusChange} />
-          <span className="text-[12px] text-[var(--color-text-tertiary)]">
-            Erstellt am {new Date(idea.createdAt).toLocaleDateString("de-DE")}
+          <span className="text-[11px] font-mono text-[var(--color-text-tertiary)]">
+            {new Date(idea.createdAt).toLocaleDateString("de-DE")}
           </span>
-          <div className="ml-auto flex items-center gap-2">
-            <Send className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
-            <input
-              type="date"
-              value={idea.scheduledPublishDate || ""}
-              onChange={(e) => { if (token) updateIdea({ token, ideaId: idea._id as Id<"ideas">, scheduledPublishDate: e.target.value || undefined }); }}
-              className="h-7 px-2 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[12px] focus:border-[var(--color-accent)] focus:outline-none"
-              title="Geplante Veröffentlichung"
-            />
+          <div className="ml-auto flex items-center gap-0">
+            <div className="flex items-center gap-2 h-7 px-2 border-2 border-[#3A3A3A] -mr-[2px]">
+              <Send className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
+              <input
+                type="date"
+                value={idea.scheduledPublishDate || ""}
+                onChange={(e) => { if (token) updateIdea({ token, ideaId: idea._id as Id<"ideas">, scheduledPublishDate: e.target.value || undefined }); }}
+                className="h-full bg-transparent text-[12px] font-mono focus:outline-none text-[var(--color-text-secondary)]"
+                title="Geplante Veröffentlichung"
+              />
+            </div>
             <button
               onClick={async () => {
                 if (!token) return;
@@ -488,7 +502,7 @@ export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onB
                 await archiveIdea({ token, ideaId: idea._id as Id<"ideas">, archived: newState });
                 if (newState) onBack();
               }}
-              className="h-7 px-2.5 rounded-[var(--radius-sm)] border border-[var(--color-border)] text-[12px] hover:bg-[var(--color-surface-2)] transition-colors flex items-center gap-1 text-[var(--color-text-tertiary)]"
+              className="h-7 px-2.5 border-2 border-[#3A3A3A] text-[11px] font-bold uppercase tracking-[0.06em] hover:border-[#00DC82] transition-colors flex items-center gap-1 text-[var(--color-text-tertiary)]"
               title={idea.archived ? "Wiederherstellen" : "Archivieren"}
             >
               {idea.archived ? <ArchiveRestore className="w-3 h-3" /> : <Archive className="w-3 h-3" />}
@@ -501,17 +515,19 @@ export function IdeaDetail({ ideaId, onBack, onNavigate }: { ideaId: string; onB
       {/* Shoot dates */}
       {ideaShootDates.length > 0 && (
         <div className="animate-in stagger-2 mb-6">
-          <div className="space-y-2">
+          <div className="flex flex-col">
             {ideaShootDates.map((sd) => (
-              <div key={sd._id} className="flex items-center gap-3 bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] px-4 py-3">
-                <Clock className="w-4 h-4 text-[var(--color-text-tertiary)]" />
+              <div key={sd._id} className="flex items-center gap-3 bg-[#111111] border-2 border-[#3A3A3A] px-4 py-3 -mb-[2px] last:mb-0">
+                <div className="w-8 h-8 border-2 border-[#3A3A3A] flex items-center justify-center flex-shrink-0">
+                  <Clock className="w-4 h-4 text-[#00DC82]" />
+                </div>
                 <div>
                   <p className="text-[14px] font-medium">
                     {new Date(sd.date + "T00:00:00").toLocaleDateString("de-DE", { weekday: "short", day: "2-digit", month: "long", year: "numeric" })}
                     {sd.time && ` · ${sd.time}`}
                   </p>
                   {sd.location && (
-                    <p className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5">{sd.location}</p>
+                    <p className="text-[12px] font-mono text-[var(--color-text-tertiary)] mt-0.5">{sd.location}</p>
                   )}
                 </div>
               </div>

@@ -8,9 +8,9 @@ import { useState, useEffect, useRef } from "react";
 
 function InfoRow({ label, value, mono }: { label: string; value: string | number; mono?: boolean }) {
   return (
-    <div className="flex items-center justify-between py-2.5 border-b border-[var(--color-border-subtle)] last:border-0">
-      <span className="text-[13px] text-[var(--color-text-secondary)]">{label}</span>
-      <span className={`text-[13px] font-medium ${mono ? "font-mono text-[12px]" : ""}`}>{value}</span>
+    <div className="flex items-center justify-between py-2.5 border-b-2 border-[var(--color-border-subtle)] last:border-0">
+      <span className="text-[12px] text-[var(--color-text-secondary)] uppercase font-bold" style={{ letterSpacing: '0.06em' }}>{label}</span>
+      <span className={`text-[13px] font-medium ${mono ? "font-mono text-[12px]" : ""}`} style={{ fontVariantNumeric: 'tabular-nums' }}>{value}</span>
     </div>
   );
 }
@@ -57,47 +57,50 @@ function PasswordChangeSection() {
   return (
     <form onSubmit={handleSubmit} className="px-5 py-4 space-y-3">
       <div>
-        <label className="block text-[12px] font-medium text-[var(--color-text-tertiary)] mb-1">Aktuelles Passwort</label>
+        <label className="block text-[11px] font-bold text-[var(--color-text-muted)] uppercase mb-1" style={{ letterSpacing: '0.08em' }}>Aktuelles Passwort</label>
         <input
           type="password"
           value={current}
           onChange={(e) => setCurrent(e.target.value)}
-          className="w-full h-9 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none transition-colors"
+          className="w-full h-9 px-3 border-2 border-[var(--color-border-strong)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-green)] focus:shadow-[var(--shadow-brutal-sm)] focus:outline-none transition-colors"
           required
+          style={{ borderRadius: 0 }}
         />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-[12px] font-medium text-[var(--color-text-tertiary)] mb-1">Neues Passwort</label>
+          <label className="block text-[11px] font-bold text-[var(--color-text-muted)] uppercase mb-1" style={{ letterSpacing: '0.08em' }}>Neues Passwort</label>
           <input
             type="password"
             value={newPw}
             onChange={(e) => setNewPw(e.target.value)}
-            className="w-full h-9 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none transition-colors"
+            className="w-full h-9 px-3 border-2 border-[var(--color-border-strong)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-green)] focus:shadow-[var(--shadow-brutal-sm)] focus:outline-none transition-colors"
             required
             minLength={6}
+            style={{ borderRadius: 0 }}
           />
         </div>
         <div>
-          <label className="block text-[12px] font-medium text-[var(--color-text-tertiary)] mb-1">Bestätigen</label>
+          <label className="block text-[11px] font-bold text-[var(--color-text-muted)] uppercase mb-1" style={{ letterSpacing: '0.08em' }}>Bestätigen</label>
           <input
             type="password"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
-            className="w-full h-9 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none transition-colors"
+            className="w-full h-9 px-3 border-2 border-[var(--color-border-strong)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-green)] focus:shadow-[var(--shadow-brutal-sm)] focus:outline-none transition-colors"
             required
             minLength={6}
+            style={{ borderRadius: 0 }}
           />
         </div>
       </div>
       {error && (
-        <div className="flex items-center gap-2 text-[12px] font-medium" style={{ color: "#ef4444" }}>
+        <div className="flex items-center gap-2 text-[12px] font-bold uppercase border-l-3 pl-2" style={{ color: "#ef4444", borderLeftColor: "#ef4444", letterSpacing: '0.04em' }}>
           <AlertCircle className="w-3.5 h-3.5" />
           {error}
         </div>
       )}
       {success && (
-        <div className="flex items-center gap-2 text-[12px] font-medium" style={{ color: "#16a34a" }}>
+        <div className="flex items-center gap-2 text-[12px] font-bold uppercase border-l-3 pl-2" style={{ color: "var(--color-green)", borderLeftColor: "var(--color-green)", letterSpacing: '0.04em' }}>
           <Check className="w-3.5 h-3.5" />
           Passwort geändert
         </div>
@@ -105,7 +108,8 @@ function PasswordChangeSection() {
       <button
         type="submit"
         disabled={loading || !current || !newPw || !confirm}
-        className="h-8 px-4 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[13px] font-medium hover:bg-[var(--color-accent-hover)] disabled:opacity-40 transition-colors"
+        className="h-8 px-4 bg-[var(--color-green)] text-[#0A0A0A] text-[12px] font-bold uppercase border-2 border-[var(--color-green-dark)] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[var(--shadow-brutal-sm)] disabled:opacity-40 transition-all"
+        style={{ borderRadius: 0, letterSpacing: '0.06em' }}
       >
         Passwort ändern
       </button>
@@ -124,21 +128,22 @@ function ThemeSection() {
 
   return (
     <div className="px-5 py-4">
-      <div className="flex gap-2">
-        {options.map((opt) => {
+      <div className="flex gap-0">
+        {options.map((opt, i) => {
           const Icon = opt.icon;
           const active = theme === opt.value;
           return (
             <button
               key={opt.value}
               onClick={() => setTheme(opt.value)}
-              className={`flex-1 flex items-center justify-center gap-2 h-10 rounded-[var(--radius-md)] text-[13px] font-medium transition-all ${
+              className={`flex-1 flex items-center justify-center gap-2 h-10 text-[12px] font-bold uppercase border-2 transition-all ${
                 active
-                  ? "bg-[var(--color-accent)] text-white shadow-sm"
-                  : "bg-[var(--color-surface-2)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-3)]"
+                  ? "bg-[var(--color-green)] text-[#0A0A0A] border-[var(--color-green-dark)]"
+                  : "bg-[var(--color-surface-2)] text-[var(--color-text-secondary)] border-[var(--color-border-strong)] hover:border-[var(--color-green)] hover:text-[var(--color-green)]"
               }`}
+              style={{ borderRadius: 0, letterSpacing: '0.06em', marginLeft: i > 0 ? '-2px' : 0 }}
             >
-              <Icon className="w-3.5 h-3.5" />
+              <Icon className="w-3.5 h-3.5" strokeWidth={2} />
               {opt.label}
             </button>
           );
@@ -156,10 +161,12 @@ function PWAInstallSection() {
 
   if (isIOS) {
     return (
-      <div className="animate-in stagger-1 bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] overflow-hidden">
-        <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-[var(--color-border-subtle)]">
-          <Smartphone className="w-4 h-4 text-[var(--color-text-tertiary)]" strokeWidth={1.75} />
-          <span className="text-[14px] font-semibold">App installieren</span>
+      <div className="animate-in stagger-1 bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] overflow-hidden" style={{ borderRadius: 0 }}>
+        <div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2 border-[var(--color-border-strong)]">
+          <div className="w-7 h-7 flex items-center justify-center border-2 border-[var(--color-border-strong)]" style={{ borderRadius: 0 }}>
+            <Smartphone className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" strokeWidth={2} />
+          </div>
+          <span className="text-[13px] font-bold uppercase" style={{ letterSpacing: '0.06em' }}>App installieren</span>
         </div>
         <div className="px-5 py-4">
           <p className="text-[13px] text-[var(--color-text-secondary)] mb-4 leading-relaxed">
@@ -167,8 +174,8 @@ function PWAInstallSection() {
           </p>
           <div className="space-y-3">
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-[var(--color-accent-surface)] flex items-center justify-center">
-                <Share className="w-3.5 h-3.5 text-[var(--color-accent)]" />
+              <div className="flex-shrink-0 w-7 h-7 flex items-center justify-center border-2 border-[var(--color-green)] bg-[var(--color-green-subtle)]" style={{ borderRadius: 0 }}>
+                <Share className="w-3.5 h-3.5 text-[var(--color-green)]" />
               </div>
               <div>
                 <p className="text-[13px] font-medium">1. Teilen-Button antippen</p>
@@ -176,8 +183,8 @@ function PWAInstallSection() {
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-[var(--color-accent-surface)] flex items-center justify-center">
-                <Plus className="w-3.5 h-3.5 text-[var(--color-accent)]" />
+              <div className="flex-shrink-0 w-7 h-7 flex items-center justify-center border-2 border-[var(--color-green)] bg-[var(--color-green-subtle)]" style={{ borderRadius: 0 }}>
+                <Plus className="w-3.5 h-3.5 text-[var(--color-green)]" />
               </div>
               <div>
                 <p className="text-[13px] font-medium">2. „Zum Home-Bildschirm"</p>
@@ -185,8 +192,8 @@ function PWAInstallSection() {
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-[var(--color-accent-surface)] flex items-center justify-center">
-                <Check className="w-3.5 h-3.5 text-[var(--color-accent)]" />
+              <div className="flex-shrink-0 w-7 h-7 flex items-center justify-center border-2 border-[var(--color-green)] bg-[var(--color-green-subtle)]" style={{ borderRadius: 0 }}>
+                <Check className="w-3.5 h-3.5 text-[var(--color-green)]" />
               </div>
               <div>
                 <p className="text-[13px] font-medium">3. „Hinzufügen" bestätigen</p>
@@ -208,10 +215,12 @@ function PWAInstallSection() {
   };
 
   return (
-    <div className="animate-in stagger-1 bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] overflow-hidden">
-      <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-[var(--color-border-subtle)]">
-        <Download className="w-4 h-4 text-[var(--color-text-tertiary)]" strokeWidth={1.75} />
-        <span className="text-[14px] font-semibold">App installieren</span>
+    <div className="animate-in stagger-1 bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] overflow-hidden" style={{ borderRadius: 0 }}>
+      <div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2 border-[var(--color-border-strong)]">
+        <div className="w-7 h-7 flex items-center justify-center border-2 border-[var(--color-border-strong)]" style={{ borderRadius: 0 }}>
+          <Download className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" strokeWidth={2} />
+        </div>
+        <span className="text-[13px] font-bold uppercase" style={{ letterSpacing: '0.06em' }}>App installieren</span>
       </div>
       <div className="px-5 py-4">
         <p className="text-[13px] text-[var(--color-text-secondary)] mb-4 leading-relaxed">
@@ -220,8 +229,8 @@ function PWAInstallSection() {
         <button
           onClick={handleInstall}
           disabled={installing}
-          className="h-10 px-5 rounded-[var(--radius-md)] text-white text-[13px] font-medium transition-all duration-200 hover:brightness-110 disabled:opacity-50 flex items-center gap-2"
-          style={{ background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)' }}
+          className="h-10 px-5 bg-[var(--color-green)] text-[#0A0A0A] text-[12px] font-bold uppercase border-2 border-[var(--color-green-dark)] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[var(--shadow-brutal-sm)] disabled:opacity-50 transition-all flex items-center gap-2"
+          style={{ borderRadius: 0, letterSpacing: '0.06em' }}
         >
           <Download className="w-4 h-4" />
           App installieren
@@ -307,19 +316,22 @@ function AiModelSection() {
   };
 
   return (
-    <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] overflow-hidden">
-      <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-[var(--color-border-subtle)]">
-        <Sparkles className="w-4 h-4 text-[var(--color-text-tertiary)]" strokeWidth={1.75} />
-        <span className="text-[14px] font-semibold">KI-Modell</span>
+    <div className="animate-in bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] overflow-hidden" style={{ borderRadius: 0 }}>
+      <div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2 border-[var(--color-border-strong)]">
+        <div className="w-7 h-7 flex items-center justify-center border-2 border-[var(--color-border-strong)]" style={{ borderRadius: 0 }}>
+          <Sparkles className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" strokeWidth={2} />
+        </div>
+        <span className="text-[13px] font-bold uppercase" style={{ letterSpacing: '0.06em' }}>KI-Modell</span>
       </div>
       <div className="px-5 py-4" ref={dropdownRef}>
-        <p className="text-[12px] text-[var(--color-text-tertiary)] mb-2">
+        <p className="text-[11px] text-[var(--color-text-tertiary)] uppercase font-bold mb-2" style={{ letterSpacing: '0.06em' }}>
           Aktuelles Modell für Skript- und Ideen-Generierung
         </p>
         <button
           onClick={fetchModels}
           disabled={loading}
-          className="w-full flex items-center justify-between h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[13px] font-mono hover:border-[var(--color-accent)] transition-colors text-left"
+          className="w-full flex items-center justify-between h-10 px-3 border-2 border-[var(--color-border-strong)] bg-[var(--color-surface-0)] text-[13px] font-mono hover:border-[var(--color-green)] transition-colors text-left"
+          style={{ borderRadius: 0 }}
         >
           <span className="truncate">{displayModel}</span>
           {loading ? (
@@ -330,14 +342,15 @@ function AiModelSection() {
         </button>
 
         {open && (
-          <div className="mt-2 border border-[var(--color-border)] rounded-[var(--radius-md)] bg-[var(--color-surface-1)] shadow-[var(--shadow-lg)] overflow-hidden">
-            <div className="p-2 border-b border-[var(--color-border-subtle)]">
+          <div className="mt-2 border-2 border-[var(--color-border-strong)] bg-[var(--color-surface-1)] shadow-[var(--shadow-brutal)] overflow-hidden" style={{ borderRadius: 0 }}>
+            <div className="p-2 border-b-2 border-[var(--color-border-strong)]">
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Modell suchen…"
-                className="w-full h-8 px-2 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none"
+                className="w-full h-8 px-2 border-2 border-[var(--color-border-strong)] bg-[var(--color-surface-0)] text-[13px] font-mono focus:border-[var(--color-green)] focus:outline-none"
                 autoFocus
+                style={{ borderRadius: 0 }}
               />
             </div>
             <div className="max-h-[280px] overflow-y-auto">
@@ -411,10 +424,12 @@ function AiPromptsSection() {
   };
 
   return (
-    <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] overflow-hidden">
-      <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-[var(--color-border-subtle)]">
-        <Sparkles className="w-4 h-4 text-[var(--color-text-tertiary)]" strokeWidth={1.75} />
-        <span className="text-[14px] font-semibold">KI-Prompts</span>
+    <div className="animate-in bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] overflow-hidden" style={{ borderRadius: 0 }}>
+      <div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2 border-[var(--color-border-strong)]">
+        <div className="w-7 h-7 flex items-center justify-center border-2 border-[var(--color-border-strong)]" style={{ borderRadius: 0 }}>
+          <Sparkles className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" strokeWidth={2} />
+        </div>
+        <span className="text-[13px] font-bold uppercase" style={{ letterSpacing: '0.06em' }}>KI-Prompts</span>
       </div>
       <div className="px-5 py-4 space-y-4">
         <p className="text-[12px] text-[var(--color-text-tertiary)]">
@@ -442,19 +457,22 @@ function AiPromptsSection() {
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   rows={6}
-                  className="w-full px-3 py-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[13px] font-mono resize-y"
+                  className="w-full px-3 py-2 border-2 border-[var(--color-border-strong)] bg-[var(--color-surface-0)] text-[13px] font-mono resize-y focus:border-[var(--color-green)] focus:outline-none"
+                  style={{ borderRadius: 0 }}
                   placeholder="Prompt eingeben… (leer = Standard)"
                 />
                 <div className="flex gap-2">
                   <button
                     onClick={() => save(key)}
-                    className="h-8 px-3 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[13px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors"
+                    className="h-8 px-3 bg-[var(--color-green)] text-[#0A0A0A] text-[12px] font-bold uppercase border-2 border-[var(--color-green-dark)] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[var(--shadow-brutal-sm)] transition-all"
+                    style={{ borderRadius: 0, letterSpacing: '0.06em' }}
                   >
                     Speichern
                   </button>
                   <button
                     onClick={() => setEditing(null)}
-                    className="h-8 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[13px] hover:bg-[var(--color-surface-2)] transition-colors"
+                    className="h-8 px-3 border-2 border-[var(--color-border-strong)] text-[12px] font-bold uppercase hover:bg-[var(--color-surface-2)] transition-colors"
+                    style={{ borderRadius: 0, letterSpacing: '0.06em' }}
                   >
                     Abbrechen
                   </button>
@@ -462,7 +480,7 @@ function AiPromptsSection() {
               </div>
             ) : value ? (
               <div className="flex items-center gap-2">
-                <div className="flex-1 px-3 py-2 rounded-[var(--radius-md)] bg-[var(--color-surface-2)] text-[12px] font-mono text-[var(--color-text-secondary)] line-clamp-2">
+                <div className="flex-1 px-3 py-2 bg-[var(--color-surface-2)] border-2 border-[var(--color-border-subtle)] text-[12px] font-mono text-[var(--color-text-secondary)] line-clamp-2" style={{ borderRadius: 0 }}>
                   {value}
                 </div>
                 {saved === key && (
@@ -491,22 +509,27 @@ export function SettingsPage() {
 
   return (
     <div className="max-w-[720px] mx-auto pb-12">
-      <div className="px-6 lg:px-8 pt-8 pb-6">
+      <div className="px-6 lg:px-8 pt-8 pb-6 border-b-2 border-[var(--color-border-strong)]">
         <div className="animate-in">
-          <h1 className="text-[26px] font-semibold tracking-[-0.03em] title-accent">Einstellungen</h1>
-          <p className="text-[13px] text-[var(--color-text-tertiary)] mt-1">Konto, Darstellung & System</p>
+          <div className="flex items-center gap-3 mb-1">
+            <div className="w-[3px] h-[20px] bg-[var(--color-green)]" />
+            <span className="text-[11px] font-bold text-[var(--color-text-muted)] uppercase" style={{ letterSpacing: '0.12em' }}>Konfiguration</span>
+          </div>
+          <h1 className="text-[24px] font-bold uppercase" style={{ fontFamily: 'var(--font-display)', letterSpacing: '0.02em' }}>Einstellungen</h1>
         </div>
       </div>
 
-      <div className="px-6 lg:px-8 space-y-5">
+      <div className="px-6 lg:px-8 pt-6 space-y-5">
         {/* PWA Install */}
         <PWAInstallSection />
 
         {/* Account */}
-        <div className="animate-in stagger-1 bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] overflow-hidden">
-          <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-[var(--color-border-subtle)]">
-            <Shield className="w-4 h-4 text-[var(--color-text-tertiary)]" strokeWidth={1.75} />
-            <span className="text-[14px] font-semibold">Account</span>
+        <div className="animate-in stagger-1 bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] overflow-hidden" style={{ borderRadius: 0 }}>
+          <div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2 border-[var(--color-border-strong)]">
+            <div className="w-7 h-7 flex items-center justify-center border-2 border-[var(--color-border-strong)]" style={{ borderRadius: 0 }}>
+              <Shield className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" strokeWidth={2} />
+            </div>
+            <span className="text-[13px] font-bold uppercase" style={{ letterSpacing: '0.06em' }}>Account</span>
           </div>
           <div className="px-5 py-1">
             <InfoRow label="Name" value={user?.name || "–"} />
@@ -516,28 +539,34 @@ export function SettingsPage() {
         </div>
 
         {/* Theme */}
-        <div className="animate-in stagger-2 bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] overflow-hidden">
-          <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-[var(--color-border-subtle)]">
-            <Palette className="w-4 h-4 text-[var(--color-text-tertiary)]" strokeWidth={1.75} />
-            <span className="text-[14px] font-semibold">Darstellung</span>
+        <div className="animate-in stagger-2 bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] overflow-hidden" style={{ borderRadius: 0 }}>
+          <div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2 border-[var(--color-border-strong)]">
+            <div className="w-7 h-7 flex items-center justify-center border-2 border-[var(--color-border-strong)]" style={{ borderRadius: 0 }}>
+              <Palette className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" strokeWidth={2} />
+            </div>
+            <span className="text-[13px] font-bold uppercase" style={{ letterSpacing: '0.06em' }}>Darstellung</span>
           </div>
           <ThemeSection />
         </div>
 
         {/* Password */}
-        <div className="animate-in stagger-3 bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] overflow-hidden">
-          <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-[var(--color-border-subtle)]">
-            <Lock className="w-4 h-4 text-[var(--color-text-tertiary)]" strokeWidth={1.75} />
-            <span className="text-[14px] font-semibold">Passwort ändern</span>
+        <div className="animate-in stagger-3 bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] overflow-hidden" style={{ borderRadius: 0 }}>
+          <div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2 border-[var(--color-border-strong)]">
+            <div className="w-7 h-7 flex items-center justify-center border-2 border-[var(--color-border-strong)]" style={{ borderRadius: 0 }}>
+              <Lock className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" strokeWidth={2} />
+            </div>
+            <span className="text-[13px] font-bold uppercase" style={{ letterSpacing: '0.06em' }}>Passwort ändern</span>
           </div>
           <PasswordChangeSection />
         </div>
 
         {/* Statistics */}
-        <div className="animate-in stagger-4 bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] overflow-hidden">
-          <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-[var(--color-border-subtle)]">
-            <BarChart3 className="w-4 h-4 text-[var(--color-text-tertiary)]" strokeWidth={1.75} />
-            <span className="text-[14px] font-semibold">Statistiken</span>
+        <div className="animate-in stagger-4 bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] overflow-hidden" style={{ borderRadius: 0 }}>
+          <div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2 border-[var(--color-border-strong)]">
+            <div className="w-7 h-7 flex items-center justify-center border-2 border-[var(--color-border-strong)]" style={{ borderRadius: 0 }}>
+              <BarChart3 className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" strokeWidth={2} />
+            </div>
+            <span className="text-[13px] font-bold uppercase" style={{ letterSpacing: '0.06em' }}>Statistiken</span>
           </div>
           <div className="px-5 py-1">
             <InfoRow label="Kunden" value={(clients || []).length} />
@@ -551,23 +580,25 @@ export function SettingsPage() {
 
         {/* Team */}
         {user?.role === "admin" && (
-          <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] overflow-hidden">
-            <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-[var(--color-border-subtle)]">
-              <Users className="w-4 h-4 text-[var(--color-text-tertiary)]" strokeWidth={1.75} />
-              <span className="text-[14px] font-semibold">Team & Zugänge</span>
+          <div className="animate-in bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] overflow-hidden" style={{ borderRadius: 0 }}>
+            <div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2 border-[var(--color-border-strong)]">
+              <div className="w-7 h-7 flex items-center justify-center border-2 border-[var(--color-border-strong)]" style={{ borderRadius: 0 }}>
+                <Users className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" strokeWidth={2} />
+              </div>
+              <span className="text-[13px] font-bold uppercase" style={{ letterSpacing: '0.06em' }}>Team & Zugänge</span>
             </div>
             <div className="px-5 py-2">
               {(users || []).map((u) => (
-                <div key={u._id} className="flex items-center justify-between py-2.5 border-b border-[var(--color-border-subtle)] last:border-0">
+                <div key={u._id} className="flex items-center justify-between py-2.5 border-b-2 border-[var(--color-border-subtle)] last:border-0">
                   <div>
-                    <p className="text-[13px] font-medium">{u.name}</p>
-                    <p className="text-[12px] text-[var(--color-text-tertiary)]">{u.email}</p>
+                    <p className="text-[13px] font-bold uppercase" style={{ letterSpacing: '0.02em' }}>{u.name}</p>
+                    <p className="text-[11px] text-[var(--color-text-tertiary)] font-mono">{u.email}</p>
                   </div>
-                  <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${
+                  <span className={`text-[10px] font-bold uppercase px-2 py-0.5 border ${
                     u.role === "admin"
-                      ? "bg-[var(--color-accent)] text-white"
-                      : "bg-[var(--color-surface-2)] text-[var(--color-text-secondary)]"
-                  }`}>
+                      ? "bg-[var(--color-green)] text-[#0A0A0A] border-[var(--color-green-dark)]"
+                      : "bg-[var(--color-surface-2)] text-[var(--color-text-secondary)] border-[var(--color-border-strong)]"
+                  }`} style={{ borderRadius: 0, letterSpacing: '0.06em' }}>
                     {u.role === "admin" ? "Admin" : "Kunde"}
                   </span>
                 </div>
@@ -583,10 +614,12 @@ export function SettingsPage() {
         {user?.role === "admin" && <AiPromptsSection />}
 
         {/* System */}
-        <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] overflow-hidden">
-          <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-[var(--color-border-subtle)]">
-            <Settings className="w-4 h-4 text-[var(--color-text-tertiary)]" strokeWidth={1.75} />
-            <span className="text-[14px] font-semibold">System</span>
+        <div className="animate-in bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] overflow-hidden" style={{ borderRadius: 0 }}>
+          <div className="flex items-center gap-2.5 px-5 py-3.5 border-b-2 border-[var(--color-border-strong)]">
+            <div className="w-7 h-7 flex items-center justify-center border-2 border-[var(--color-border-strong)]" style={{ borderRadius: 0 }}>
+              <Settings className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" strokeWidth={2} />
+            </div>
+            <span className="text-[13px] font-bold uppercase" style={{ letterSpacing: '0.06em' }}>System</span>
           </div>
           <div className="px-5 py-1">
             <InfoRow label="Version" value={__APP_VERSION__} />
@@ -600,7 +633,8 @@ export function SettingsPage() {
                 href="https://dashboard.convex.dev/t/manfred-bellmann/agentz-studio"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-[12px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors"
+                className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase text-[var(--color-text-tertiary)] hover:text-[var(--color-green)] transition-colors"
+                style={{ letterSpacing: '0.06em' }}
               >
                 Convex Dashboard <ExternalLink className="w-3 h-3" />
               </a>

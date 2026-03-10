@@ -23,7 +23,12 @@ function StatusDot({ status }: { status: string }) {
     review: "bg-rose-500",
     "veröffentlicht": "bg-green-600",
   };
-  return <div className={`w-2 h-2 rounded-full ${colors[status] || "bg-neutral-400"}`} />;
+  return (
+    <div
+      className={`w-2.5 h-2.5 flex-shrink-0 border border-current ${colors[status] || "bg-neutral-400"}`}
+      style={{ borderRadius: 0 }}
+    />
+  );
 }
 
 function NewIdeaModal({ onClose }: { onClose: () => void }) {
@@ -56,21 +61,32 @@ function NewIdeaModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div ref={trapRef} className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] w-full max-w-[440px] mx-4">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border-subtle)]">
-          <h3 className="text-[17px] font-semibold">Neue Idee</h3>
-          <button onClick={onClose} className="p-1 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60">
+      <div
+        ref={trapRef}
+        className="animate-in bg-[#111111] w-full max-w-[440px] mx-4 border-2 border-[#3A3A3A]"
+        style={{ boxShadow: "4px 4px 0px #00DC82" }}
+      >
+        {/* Modal header with green accent bar */}
+        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-[#3A3A3A]">
+          <div className="flex items-center gap-3">
+            <div className="w-[3px] h-5 bg-[#00DC82] flex-shrink-0" />
+            <h3 className="text-[15px] font-bold uppercase tracking-[0.08em]">Neue Idee</h3>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1 border-2 border-transparent hover:border-red-500 transition-colors"
+          >
             <X className="w-4 h-4 text-[var(--color-text-tertiary)]" />
           </button>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Kunde *</label>
+            <label className="block text-[11px] font-bold uppercase tracking-[0.1em] text-[#00DC82] mb-1.5">Kunde *</label>
             <select
               value={clientId}
               onChange={(e) => setClientId(e.target.value)}
-              className="w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none transition-colors"
+              className="w-full h-10 px-3 border-2 border-[#3A3A3A] bg-[#0A0A0A] text-[14px] focus:border-[#00DC82] focus:outline-none transition-colors"
               required
             >
               <option value="">Kunde wählen…</option>
@@ -81,15 +97,15 @@ function NewIdeaModal({ onClose }: { onClose: () => void }) {
           </div>
           {clientId && categories && categories.length > 0 && (
             <div>
-              <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Kategorie</label>
-              <div className="flex flex-wrap gap-1.5">
+              <label className="block text-[11px] font-bold uppercase tracking-[0.1em] text-[#00DC82] mb-1.5">Kategorie</label>
+              <div className="flex flex-wrap gap-0">
                 <button
                   type="button"
                   onClick={() => setCategoryId("")}
-                  className={`h-7 px-3 rounded-full text-[12px] font-medium border transition-colors ${
+                  className={`h-7 px-3 text-[12px] font-medium border-2 transition-colors -mr-[2px] ${
                     !categoryId
-                      ? "bg-[var(--color-surface-3)] border-[var(--color-border)] text-[var(--color-text-primary)]"
-                      : "border-[var(--color-border-subtle)] text-[var(--color-text-tertiary)] hover:border-[var(--color-border)]"
+                      ? "border-[#00DC82] bg-[#00DC82] text-[#0A0A0A]"
+                      : "border-[#3A3A3A] text-[var(--color-text-tertiary)] hover:border-[#00DC82]"
                   }`}
                 >
                   Keine
@@ -99,14 +115,14 @@ function NewIdeaModal({ onClose }: { onClose: () => void }) {
                     key={cat._id}
                     type="button"
                     onClick={() => setCategoryId(cat._id)}
-                    className={`h-7 px-3 rounded-full text-[12px] font-medium border transition-colors flex items-center gap-1.5 ${
+                    className={`h-7 px-3 text-[12px] font-medium border-2 transition-colors flex items-center gap-1.5 -mr-[2px] ${
                       categoryId === cat._id
-                        ? "border-current"
-                        : "border-[var(--color-border-subtle)] hover:border-[var(--color-border)]"
+                        ? "border-current bg-[#1A1A1A]"
+                        : "border-[#3A3A3A] hover:border-[#00DC82]"
                     }`}
                     style={{ color: cat.color }}
                   >
-                    <span className="w-2 h-2 rounded-full" style={{ background: cat.color }} />
+                    <span className="w-2 h-2" style={{ background: cat.color }} />
                     {cat.name}
                   </button>
                 ))}
@@ -114,32 +130,37 @@ function NewIdeaModal({ onClose }: { onClose: () => void }) {
             </div>
           )}
           <div>
-            <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Titel *</label>
+            <label className="block text-[11px] font-bold uppercase tracking-[0.1em] text-[#00DC82] mb-1.5">Titel *</label>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none transition-colors"
+              className="w-full h-10 px-3 border-2 border-[#3A3A3A] bg-[#0A0A0A] text-[14px] focus:border-[#00DC82] focus:outline-none transition-colors font-mono placeholder:font-sans"
               placeholder="Video-Idee…"
               required
             />
           </div>
           <div>
-            <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Beschreibung</label>
+            <label className="block text-[11px] font-bold uppercase tracking-[0.1em] text-[#00DC82] mb-1.5">Beschreibung</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full h-24 px-3 py-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none transition-colors resize-none"
+              className="w-full h-24 px-3 py-2 border-2 border-[#3A3A3A] bg-[#0A0A0A] text-[14px] focus:border-[#00DC82] focus:outline-none transition-colors resize-none"
               placeholder="Worum geht's?"
             />
           </div>
-          <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="flex-1 h-10 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[14px] font-medium hover:bg-[var(--color-surface-2)] transition-colors">
+          <div className="flex gap-0 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 h-10 border-2 border-[#3A3A3A] text-[14px] font-bold uppercase tracking-[0.08em] hover:border-[#00DC82] transition-colors -mr-[2px]"
+            >
               Abbrechen
             </button>
             <button
               type="submit"
               disabled={submitting || !clientId || !title}
-              className="flex-1 h-10 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[14px] font-medium hover:bg-[var(--color-accent-hover)] disabled:opacity-50 transition-colors"
+              className="flex-1 h-10 border-2 border-[#00DC82] bg-[#00DC82] text-[#0A0A0A] text-[14px] font-bold uppercase tracking-[0.08em] hover:-translate-x-0.5 hover:-translate-y-0.5 disabled:opacity-50 transition-all"
+              style={{ "--tw-shadow": "4px 4px 0px #0A0A0A" } as any}
             >
               Erstellen
             </button>
@@ -204,25 +225,30 @@ export function AiSuggestModal({ onClose, onAccept, preselectedClientId }: { onC
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div ref={trapRef} className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] w-full max-w-[520px] mx-4 max-h-[80vh] overflow-hidden flex flex-col">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border-subtle)]">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-violet-500" />
-            <h3 className="text-[17px] font-semibold">KI-Ideen Vorschläge</h3>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60">
+      <div
+        ref={trapRef}
+        className="animate-in bg-[#111111] w-full max-w-[520px] mx-4 max-h-[80vh] overflow-hidden flex flex-col border-2 border-[#3A3A3A]"
+        style={{ boxShadow: "4px 4px 0px #00DC82" }}
+      >
+        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-[#3A3A3A]">
+          <div className="flex items-center gap-3">
+            <div className="w-[3px] h-5 bg-[#00DC82] flex-shrink-0" />
+            <Sparkles className="w-4 h-4 text-violet-400" />
+            <h3 className="text-[15px] font-bold uppercase tracking-[0.08em]">KI-Ideen Vorschläge</h3>
           </div>
-          <button onClick={onClose} className="p-1 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors">
+          <button onClick={onClose} className="p-1 border-2 border-transparent hover:border-red-500 transition-colors">
             <X className="w-4 h-4 text-[var(--color-text-tertiary)]" />
           </button>
         </div>
         <div className="p-6 overflow-y-auto flex-1">
           <div className="mb-4 space-y-3">
             <div>
-              <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Kunde</label>
+              <label className="block text-[11px] font-bold uppercase tracking-[0.1em] text-[#00DC82] mb-1.5">Kunde</label>
               <select
                 value={clientId}
                 onChange={(e) => { setClientId(e.target.value); setSuggestions([]); }}
-                className="w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none"
+                className="w-full h-10 px-3 border-2 border-[#3A3A3A] bg-[#0A0A0A] text-[14px] focus:border-[#00DC82] focus:outline-none"
               >
                 <option value="">Kunde wählen…</option>
                 {(clients || []).map((c) => (
@@ -230,28 +256,29 @@ export function AiSuggestModal({ onClose, onAccept, preselectedClientId }: { onC
                 ))}
               </select>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-0">
               <div className="flex-1">
-                <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Monat</label>
+                <label className="block text-[11px] font-bold uppercase tracking-[0.1em] text-[#00DC82] mb-1.5">Monat</label>
                 <input
                   type="month"
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(e.target.value)}
-                  className="w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none"
+                  className="w-full h-10 px-3 border-2 border-[#3A3A3A] bg-[#0A0A0A] text-[14px] focus:border-[#00DC82] focus:outline-none -mr-[2px]"
                 />
               </div>
-              <div className="w-24">
-                <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Anzahl</label>
-                <div className="h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] flex items-center text-[var(--color-text-secondary)]">
+              <div className="w-28">
+                <label className="block text-[11px] font-bold uppercase tracking-[0.1em] text-[#00DC82] mb-1.5">Anzahl</label>
+                <div className="h-10 px-3 border-2 border-[#3A3A3A] bg-[#0A0A0A] text-[14px] flex items-center text-[var(--color-text-secondary)] font-mono">
                   {videosPerMonth}
                 </div>
-                <p className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5">{videosPerWeek}/Woche × ~4,33</p>
+                <p className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5 font-mono">{videosPerWeek}/Wo × ~4.33</p>
               </div>
             </div>
             <button
               onClick={handleGenerate}
               disabled={!clientId || loading}
-              className="flex items-center justify-center gap-2 w-full h-10 rounded-[var(--radius-md)] bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-[14px] font-medium hover:from-violet-700 hover:to-indigo-700 disabled:opacity-50 transition-all"
+              className="flex items-center justify-center gap-2 w-full h-10 bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-[14px] font-bold uppercase tracking-[0.08em] hover:-translate-x-0.5 hover:-translate-y-0.5 disabled:opacity-50 transition-all border-2 border-violet-500"
+              style={{ boxShadow: loading ? "none" : "2px 2px 0px #0A0A0A" }}
             >
               <Sparkles className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
               {loading ? "Generiert Ideen…" : `${videosPerMonth} Ideen für ${monthLabel} generieren`}
@@ -259,20 +286,23 @@ export function AiSuggestModal({ onClose, onAccept, preselectedClientId }: { onC
           </div>
 
           {suggestions.length > 0 && (
-            <div className="space-y-2">
+            <div className="space-y-0">
               {suggestions.map((s, i) => (
-                <div key={i} className="bg-[var(--color-surface-0)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-4 group hover:border-[var(--color-border)] transition-colors">
+                <div
+                  key={i}
+                  className="bg-[#0A0A0A] border-2 border-[#3A3A3A] p-4 group hover:border-[#00DC82] transition-all -mb-[2px] last:mb-0"
+                >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="text-[14px] font-medium">{s.title}</p>
                       {s.category && (
-                        <span className="inline-block mt-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-[var(--color-surface-2)] text-[var(--color-text-tertiary)]">{s.category}</span>
+                        <span className="inline-block mt-1 text-[11px] font-bold uppercase tracking-[0.08em] px-2 py-0.5 border border-[#3A3A3A] text-[var(--color-text-tertiary)]">{s.category}</span>
                       )}
                       <p className="text-[13px] text-[var(--color-text-secondary)] mt-1 leading-relaxed">{s.description}</p>
                     </div>
                     <button
                       onClick={() => onAccept(s.title, s.description, clientId, s.category)}
-                      className="flex-shrink-0 flex items-center gap-1 h-7 px-3 rounded-[var(--radius-sm)] text-[12px] font-medium bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] opacity-0 group-hover:opacity-100 transition-all"
+                      className="flex-shrink-0 flex items-center gap-1 h-7 px-3 text-[12px] font-bold uppercase tracking-[0.08em] bg-[#00DC82] text-[#0A0A0A] border-2 border-[#00DC82] opacity-0 group-hover:opacity-100 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all"
                     >
                       <Check className="w-3 h-3" />
                       Übernehmen
@@ -284,8 +314,8 @@ export function AiSuggestModal({ onClose, onAccept, preselectedClientId }: { onC
           )}
 
           {!loading && suggestions.length === 0 && clientId && (
-            <p className="text-center text-[13px] text-[var(--color-text-tertiary)] py-8">
-              Klicke auf "Generieren" für KI-Vorschläge
+            <p className="text-center text-[13px] text-[var(--color-text-tertiary)] py-8 font-mono">
+              → Klicke auf "Generieren" für KI-Vorschläge
             </p>
           )}
         </div>
@@ -359,54 +389,61 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
 
   return (
     <div className="max-w-[960px] mx-auto">
-      <div className="px-6 lg:px-8 py-6 border-b border-[var(--color-border-subtle)]">
+      {/* Header */}
+      <div className="px-6 lg:px-8 py-6 border-b-2 border-[#3A3A3A]">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-[22px] font-semibold tracking-[-0.02em] title-accent">Ideen</h1>
-            <p className="text-[14px] text-[var(--color-text-tertiary)] mt-0.5">
-              {(ideas || []).length} Ideen insgesamt
-            </p>
-          </div>
-          {user?.role === "admin" && (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowAiSuggest(true)}
-                className="flex items-center gap-1.5 h-9 px-4 rounded-[var(--radius-md)] bg-gradient-to-r from-violet-500/10 to-indigo-500/10 text-violet-700 dark:text-violet-300 border border-violet-200/50 dark:border-violet-500/20 text-[14px] font-medium hover:from-violet-500/20 hover:to-indigo-500/20 transition-all"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span className="hidden sm:inline">KI-Ideen</span>
-              </button>
-              <button
-                onClick={() => setShowNewIdea(true)}
-                className="flex items-center gap-2 h-9 px-4 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[14px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">Neue Idee</span>
-              </button>
+          <div className="flex items-center gap-3">
+            <div className="w-[3px] h-8 bg-[#00DC82] flex-shrink-0" />
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#00DC82]">IDEENVERWALTUNG</p>
+              <h1 className="text-[22px] font-bold uppercase tracking-[-0.01em]">Ideen</h1>
             </div>
-          )}
+          </div>
+          <div className="flex items-center gap-0">
+            <p className="text-[12px] font-mono text-[var(--color-text-tertiary)] mr-4">
+              {(ideas || []).length} TOTAL
+            </p>
+            {user?.role === "admin" && (
+              <>
+                <button
+                  onClick={() => setShowAiSuggest(true)}
+                  className="flex items-center gap-1.5 h-9 px-4 border-2 border-violet-500 bg-violet-500/10 text-violet-300 text-[13px] font-bold uppercase tracking-[0.06em] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-violet-500/20 transition-all -mr-[2px]"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span className="hidden sm:inline">KI-Ideen</span>
+                </button>
+                <button
+                  onClick={() => setShowNewIdea(true)}
+                  className="btn-brutal flex items-center gap-2 h-9 px-4"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline">Neue Idee</span>
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="px-6 lg:px-8 py-4 flex flex-col sm:flex-row gap-3">
+      <div className="px-6 lg:px-8 py-4 flex flex-col sm:flex-row gap-0">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-tertiary)]" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-9 pl-9 pr-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-1)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none transition-colors"
-            placeholder="Suchen…"
+            className="w-full h-9 pl-9 pr-3 border-2 border-[#3A3A3A] bg-[#111111] text-[14px] focus:border-[#00DC82] focus:outline-none transition-colors font-mono placeholder:text-[var(--color-text-tertiary)] sm:-mr-[2px]"
+            placeholder="SUCHEN…"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="h-9 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-1)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none"
+          className="h-9 px-3 border-2 border-[#3A3A3A] bg-[#111111] text-[13px] focus:border-[#00DC82] focus:outline-none uppercase tracking-[0.04em] -mr-[2px]"
         >
           {statuses.map((s) => (
             <option key={s} value={s}>
-              {s === "all" ? "Alle Status" : STATUS_LABELS[s]}
+              {s === "all" ? "ALLE STATUS" : STATUS_LABELS[s].toUpperCase()}
             </option>
           ))}
         </select>
@@ -420,7 +457,7 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
                 }))
               )
             }
-            className="h-9 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-1)] text-[13px] hover:bg-[var(--color-surface-2)] transition-colors flex items-center gap-1.5"
+            className="h-9 px-3 border-2 border-[#3A3A3A] bg-[#111111] text-[13px] font-bold uppercase tracking-[0.06em] hover:border-[#00DC82] transition-colors flex items-center gap-1.5 -mr-[2px]"
             title="Als CSV exportieren"
           >
             <Download className="w-3.5 h-3.5" />
@@ -430,10 +467,10 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
         {user?.role === "admin" && (
           <button
             onClick={() => setShowArchived(!showArchived)}
-            className={`h-9 px-3 rounded-[var(--radius-md)] border text-[13px] transition-colors flex items-center gap-1.5 ${
+            className={`h-9 px-3 border-2 text-[13px] font-bold uppercase tracking-[0.06em] transition-all flex items-center gap-1.5 ${
               showArchived
-                ? "border-[var(--color-accent)] bg-[var(--color-accent-surface)] text-[var(--color-accent)]"
-                : "border-[var(--color-border)] bg-[var(--color-surface-1)] hover:bg-[var(--color-surface-2)]"
+                ? "border-[#00DC82] bg-[#00DC82] text-[#0A0A0A]"
+                : "border-[#3A3A3A] bg-[#111111] hover:border-[#00DC82]"
             }`}
             title="Archiv anzeigen"
           >
@@ -446,24 +483,25 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
       {/* Bulk action bar */}
       {selectedIds.size > 0 && user?.role === "admin" && (
         <div className="px-6 lg:px-8 pb-2">
-          <div className="flex items-center gap-3 px-4 py-2.5 rounded-[var(--radius-md)] bg-[var(--color-accent-surface)] border border-[var(--color-accent)]/20">
-            <span className="text-[13px] font-medium text-[var(--color-accent)]">
-              {selectedIds.size} ausgewählt
+          <div className="flex items-center gap-3 px-4 py-2.5 border-2 border-[#00DC82] bg-[#0A0A0A]">
+            <div className="w-[3px] h-5 bg-[#00DC82] flex-shrink-0" />
+            <span className="text-[13px] font-bold uppercase tracking-[0.08em] text-[#00DC82]">
+              {selectedIds.size} AUSGEWÄHLT
             </span>
             <select
               value={bulkStatus}
               onChange={(e) => setBulkStatus(e.target.value)}
-              className="h-7 px-2 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-1)] text-[12px] focus:outline-none"
+              className="h-7 px-2 border-2 border-[#3A3A3A] bg-[#111111] text-[12px] focus:outline-none uppercase"
             >
-              <option value="">Status ändern…</option>
+              <option value="">STATUS ÄNDERN…</option>
               {Object.entries(STATUS_LABELS).map(([k, v]) => (
-                <option key={k} value={k}>{v}</option>
+                <option key={k} value={k}>{v.toUpperCase()}</option>
               ))}
             </select>
             <button
               onClick={handleBulkStatusChange}
               disabled={!bulkStatus}
-              className="h-7 px-3 rounded-[var(--radius-sm)] bg-[var(--color-accent)] text-white text-[12px] font-medium disabled:opacity-40 hover:bg-[var(--color-accent-hover)] transition-colors"
+              className="h-7 px-3 bg-[#00DC82] text-[#0A0A0A] text-[12px] font-bold uppercase tracking-[0.08em] border-2 border-[#00DC82] disabled:opacity-40 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all"
             >
               Anwenden
             </button>
@@ -475,93 +513,102 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
                 toast(`${count} Idee${count > 1 ? "n" : ""} archiviert`);
                 setSelectedIds(new Set());
               }}
-              className="h-7 px-3 rounded-[var(--radius-sm)] border border-[var(--color-border)] text-[12px] font-medium hover:bg-[var(--color-surface-2)] transition-colors flex items-center gap-1"
+              className="h-7 px-3 border-2 border-[#3A3A3A] text-[12px] font-bold uppercase tracking-[0.06em] hover:border-[#00DC82] transition-colors flex items-center gap-1"
             >
               <Archive className="w-3 h-3" />
               Archivieren
             </button>
             <button
               onClick={() => setSelectedIds(new Set())}
-              className="ml-auto text-[12px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
+              className="ml-auto text-[12px] font-mono text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
             >
-              Auswahl aufheben
+              aufheben
             </button>
           </div>
         </div>
       )}
 
       {/* Idea list */}
-      <div className="px-6 lg:px-8 pb-8 space-y-1.5">
+      <div className="px-6 lg:px-8 pb-8">
         {user?.role === "admin" && filtered.length > 0 && (
           <button
             onClick={selectAll}
-            className="flex items-center gap-2 text-[12px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] mb-1 px-1"
+            className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-tertiary)] hover:text-[#00DC82] mb-2 px-1 transition-colors"
           >
             {selectedIds.size === filtered.length ? (
-              <CheckSquare className="w-3.5 h-3.5 text-[var(--color-accent)]" />
+              <CheckSquare className="w-3.5 h-3.5 text-[#00DC82]" />
             ) : (
               <Square className="w-3.5 h-3.5" />
             )}
             Alle auswählen
           </button>
         )}
-        {filtered.map((idea, i) => {
-          const isSelected = selectedIds.has(idea._id);
-          return (
-          <div
-            key={idea._id}
-            className={`animate-in stagger-${Math.min(i + 1, 4)} flex items-center gap-2`}
-          >
-            {user?.role === "admin" && (
-              <button
-                onClick={(e) => { e.stopPropagation(); toggleSelect(idea._id); }}
-                className="flex-shrink-0 p-1"
+        <div className="flex flex-col">
+          {filtered.map((idea, i) => {
+            const isSelected = selectedIds.has(idea._id);
+            return (
+              <div
+                key={idea._id}
+                className={`animate-in stagger-${Math.min(i + 1, 4)} flex items-center gap-2 -mb-[2px] last:mb-0`}
               >
-                {isSelected ? (
-                  <CheckSquare className="w-4 h-4 text-[var(--color-accent)]" />
-                ) : (
-                  <Square className="w-4 h-4 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]" />
+                {user?.role === "admin" && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); toggleSelect(idea._id); }}
+                    className="flex-shrink-0 p-1"
+                  >
+                    {isSelected ? (
+                      <CheckSquare className="w-4 h-4 text-[#00DC82]" />
+                    ) : (
+                      <Square className="w-4 h-4 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]" />
+                    )}
+                  </button>
                 )}
-              </button>
-            )}
-            <button
-              onClick={() => onNavigate("idea", idea._id)}
-              className={`flex-1 text-left bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border p-4 hover:shadow-[var(--shadow-sm)] transition-all group ${
-                isSelected ? "border-[var(--color-accent)]/30 bg-[var(--color-accent-surface)]" : "border-[var(--color-border-subtle)]"
-              }`}
-            >
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <StatusDot status={idea.status} />
-                  <div className="min-w-0">
-                    <p className="text-[14px] font-medium truncate">{idea.title}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[12px] text-[var(--color-text-tertiary)]">
-                        {STATUS_LABELS[idea.status]}
-                      </span>
-                      {clientMap[idea.clientId] && (
-                        <>
-                          <span className="text-[var(--color-text-tertiary)]">·</span>
-                          <span className="text-[12px] text-[var(--color-text-tertiary)]">
-                            {clientMap[idea.clientId].name}
+                <button
+                  onClick={() => onNavigate("idea", idea._id)}
+                  className={`flex-1 text-left bg-[#111111] border-2 p-4 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all group ${
+                    isSelected
+                      ? "border-[#00DC82] bg-[#0A0A0A]"
+                      : "border-[#3A3A3A] hover:border-[#00DC82] hover:shadow-[4px_4px_0px_#00DC82]"
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <StatusDot status={idea.status} />
+                      <div className="min-w-0">
+                        <p className="text-[14px] font-medium truncate">{idea.title}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--color-text-tertiary)]">
+                            {STATUS_LABELS[idea.status]}
                           </span>
-                        </>
-                      )}
+                          {clientMap[idea.clientId] && (
+                            <>
+                              <span className="text-[var(--color-text-tertiary)]">·</span>
+                              <span className="text-[12px] text-[var(--color-text-tertiary)]">
+                                {clientMap[idea.clientId].name}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     </div>
+                    <ChevronRight className="w-4 h-4 text-[var(--color-text-tertiary)] group-hover:text-[#00DC82] transition-colors flex-shrink-0" />
                   </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-[var(--color-text-tertiary)] group-hover:text-[var(--color-text-secondary)] transition-colors flex-shrink-0" />
+                </button>
               </div>
-            </button>
-          </div>
-          );
-        })}
+            );
+          })}
+        </div>
 
         {filtered.length === 0 && (
-          <div className="text-center py-16">
+          <div className="relative text-center py-16 border-2 border-dashed border-[#3A3A3A] mt-4">
+            {/* Corner marks */}
+            <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#00DC82] -translate-x-[2px] -translate-y-[2px]" />
+            <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[#00DC82] translate-x-[2px] -translate-y-[2px]" />
+            <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#00DC82] -translate-x-[2px] translate-y-[2px]" />
+            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#00DC82] translate-x-[2px] translate-y-[2px]" />
             <Lightbulb className="w-10 h-10 mx-auto mb-3 text-[var(--color-text-tertiary)] opacity-40" />
-            <p className="text-[14px] text-[var(--color-text-tertiary)]">
-              {search || statusFilter !== "all" ? "Keine Ideen gefunden" : "Noch keine Ideen"}
+            <p className="text-[13px] font-mono text-[var(--color-text-tertiary)]">
+              {search || statusFilter !== "all" ? "KEINE IDEEN GEFUNDEN" : "NOCH KEINE IDEEN"}
             </p>
           </div>
         )}
@@ -570,17 +617,20 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
       {/* Archived ideas */}
       {showArchived && archivedIdeas && archivedIdeas.length > 0 && (
         <div className="px-6 lg:px-8 pb-8">
-          <div className="border-t border-[var(--color-border-subtle)] pt-6 mt-2">
-            <p className="text-[11px] font-medium text-[var(--color-text-tertiary)] uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <Archive className="w-3 h-3" />
-              Archiv ({archivedIdeas.length})
-            </p>
-            <div className="space-y-1.5">
+          <div className="border-t-2 border-[#3A3A3A] pt-6 mt-2">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-[3px] h-5 bg-[#00DC82] flex-shrink-0" />
+              <p className="text-[11px] font-bold text-[var(--color-text-tertiary)] uppercase tracking-[0.1em] flex items-center gap-1.5">
+                <Archive className="w-3 h-3" />
+                Archiv ({archivedIdeas.length})
+              </p>
+            </div>
+            <div className="flex flex-col">
               {archivedIdeas.map((idea) => (
-                <div key={idea._id} className="flex items-center gap-2">
+                <div key={idea._id} className="flex items-center gap-2 -mb-[2px] last:mb-0">
                   <button
                     onClick={() => onNavigate("idea", idea._id)}
-                    className="flex-1 text-left bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-4 hover:shadow-[var(--shadow-sm)] transition-all group opacity-60 hover:opacity-100"
+                    className="flex-1 text-left bg-[#111111] border-2 border-[#3A3A3A] p-4 hover:border-[#00DC82] hover:shadow-[4px_4px_0px_#00DC82] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all group opacity-60 hover:opacity-100"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0">
@@ -588,13 +638,13 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
                         <div className="min-w-0">
                           <p className="text-[14px] font-medium truncate">{idea.title}</p>
                           <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[12px] text-[var(--color-text-tertiary)]">
+                            <span className="text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--color-text-tertiary)]">
                               {STATUS_LABELS[idea.status]}
                             </span>
                             {idea.archivedAt && (
                               <>
                                 <span className="text-[var(--color-text-tertiary)]">·</span>
-                                <span className="text-[12px] text-[var(--color-text-tertiary)]">
+                                <span className="text-[12px] font-mono text-[var(--color-text-tertiary)]">
                                   Archiviert {new Date(idea.archivedAt).toLocaleDateString("de-DE")}
                                 </span>
                               </>
@@ -609,7 +659,7 @@ export function IdeasPage({ onNavigate }: { onNavigate: (page: string, id?: stri
                           await archiveIdea({ token, ideaId: idea._id as Id<"ideas">, archived: false });
                           toast("Idee wiederhergestellt");
                         }}
-                        className="flex-shrink-0 p-2 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-accent)] hover:bg-[var(--color-accent-surface)] transition-colors"
+                        className="flex-shrink-0 p-2 border-2 border-transparent hover:border-[#00DC82] text-[var(--color-text-tertiary)] hover:text-[#00DC82] transition-all"
                         title="Wiederherstellen"
                       >
                         <ArchiveRestore className="w-4 h-4" />

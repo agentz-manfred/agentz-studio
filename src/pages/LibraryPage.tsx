@@ -81,10 +81,10 @@ function FolderCard({
 
   return (
     <div
-      className={`group relative bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border hover:shadow-[var(--shadow-md)] transition-all duration-200 cursor-pointer ${
+      className={`group relative bg-[#111111] border-2 hover:shadow-[4px_4px_0px_#00DC82] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer ${
         isDragOver
-          ? "border-[var(--color-accent)] bg-[var(--color-accent-surface)] ring-2 ring-[var(--color-accent)]/20"
-          : "border-[var(--color-border-subtle)] hover:border-[var(--color-border)]"
+          ? "border-[#00DC82] bg-[#0A0A0A]"
+          : "border-[#3A3A3A] hover:border-[#00DC82]"
       }`}
       draggable
       onClick={onOpen}
@@ -95,19 +95,19 @@ function FolderCard({
     >
       <div className="p-4 flex items-center gap-3">
         <div
-          className="w-10 h-10 rounded-[10px] flex items-center justify-center flex-shrink-0"
-          style={{ background: `${accentColor}18` }}
+          className="w-10 h-10 flex items-center justify-center flex-shrink-0 border-2"
+          style={{ background: `${accentColor}18`, borderColor: `${accentColor}40` }}
         >
           <Folder className="w-5 h-5" style={{ color: accentColor }} />
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-[14px] font-medium truncate">{folder.name}</p>
           <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-[11px] text-[var(--color-text-tertiary)]">
+            <span className="text-[11px] font-mono text-[var(--color-text-tertiary)]">
               {new Date(folder.createdAt).toLocaleDateString("de-DE")}
             </span>
             {clientName && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--color-surface-2)] text-[var(--color-text-tertiary)]">
+              <span className="text-[10px] font-bold uppercase tracking-[0.06em] px-1.5 py-0.5 border border-[#3A3A3A] text-[var(--color-text-tertiary)]">
                 {clientName}
               </span>
             )}
@@ -118,29 +118,29 @@ function FolderCard({
         </div>
         <button
           onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }}
-          className="p-1.5 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] opacity-0 group-hover:opacity-100 hover:bg-[var(--color-surface-2)] transition-all"
+          className="p-1.5 border-2 border-transparent text-[var(--color-text-tertiary)] opacity-0 group-hover:opacity-100 hover:border-[#3A3A3A] transition-all"
         >
           <MoreHorizontal className="w-4 h-4" />
         </button>
       </div>
 
       {showMenu && (
-        <div ref={menuRef} className="absolute right-2 top-12 z-20 w-48 bg-[var(--color-surface-1)] border border-[var(--color-border-subtle)] rounded-[var(--radius-md)] shadow-[var(--shadow-lg)] py-1">
-          <button onClick={(e) => { e.stopPropagation(); setShowMenu(false); onRename(); }} className="w-full flex items-center gap-2 px-3 py-2 text-[13px] hover:bg-[var(--color-accent-surface)] transition-colors">
+        <div ref={menuRef} className="absolute right-2 top-12 z-20 w-48 bg-[#111111] border-2 border-[#3A3A3A] py-1" style={{ boxShadow: "4px 4px 0px #00DC82" }}>
+          <button onClick={(e) => { e.stopPropagation(); setShowMenu(false); onRename(); }} className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-bold uppercase tracking-[0.06em] hover:bg-[#1A1A1A] hover:text-[#00DC82] transition-colors">
             <Pencil className="w-3.5 h-3.5" /> Umbenennen
           </button>
           {isAdmin && onAssignClient && (
-            <button onClick={(e) => { e.stopPropagation(); setShowMenu(false); onAssignClient(); }} className="w-full flex items-center gap-2 px-3 py-2 text-[13px] hover:bg-[var(--color-accent-surface)] transition-colors">
+            <button onClick={(e) => { e.stopPropagation(); setShowMenu(false); onAssignClient(); }} className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-bold uppercase tracking-[0.06em] hover:bg-[#1A1A1A] hover:text-[#00DC82] transition-colors">
               <Users className="w-3.5 h-3.5" /> Kunde zuordnen
             </button>
           )}
           {isAdmin && folder.clientId && onToggleVisibility && (
-            <button onClick={(e) => { e.stopPropagation(); setShowMenu(false); onToggleVisibility(); }} className="w-full flex items-center gap-2 px-3 py-2 text-[13px] hover:bg-[var(--color-accent-surface)] transition-colors">
+            <button onClick={(e) => { e.stopPropagation(); setShowMenu(false); onToggleVisibility(); }} className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-bold uppercase tracking-[0.06em] hover:bg-[#1A1A1A] hover:text-[#00DC82] transition-colors">
               {folder.clientVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
               {folder.clientVisible ? "Vor Kunde verbergen" : "Für Kunde sichtbar"}
             </button>
           )}
-          <button onClick={(e) => { e.stopPropagation(); setShowMenu(false); onDelete(); }} className="w-full flex items-center gap-2 px-3 py-2 text-[13px] text-[var(--color-error)] hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors">
+          <button onClick={(e) => { e.stopPropagation(); setShowMenu(false); onDelete(); }} className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-bold uppercase tracking-[0.06em] text-red-400 hover:bg-red-950/20 hover:border-red-500 transition-colors">
             <Trash2 className="w-3.5 h-3.5" /> Löschen
           </button>
         </div>
@@ -172,18 +172,18 @@ function VideoFileCard({
         onClick={onOpen}
         draggable
         onDragStart={onDragStart}
-        className="w-full flex items-center gap-3 px-4 py-3 bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] hover:border-[var(--color-border)] hover:shadow-[var(--shadow-sm)] transition-all duration-200 group text-left"
+        className="w-full flex items-center gap-3 px-4 py-3 bg-[#111111] border-2 border-[#3A3A3A] hover:border-[#00DC82] hover:shadow-[4px_4px_0px_#00DC82] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200 group text-left"
       >
-        <div className="w-12 h-8 rounded bg-black flex-shrink-0 overflow-hidden">
+        <div className="w-12 h-8 bg-black flex-shrink-0 overflow-hidden border border-[#3A3A3A]">
           {thumb ? <img src={thumb} alt="" className="w-full h-full object-cover" /> : <Film className="w-4 h-4 text-neutral-600 m-auto mt-2" />}
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-[13px] font-medium truncate">{video.title}</p>
         </div>
-        <span className="text-[11px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0" style={{ background: badge.bg, color: badge.color }}>
+        <span className="text-[10px] font-bold uppercase tracking-[0.08em] px-1.5 py-0.5 border flex-shrink-0" style={{ background: badge.bg, color: badge.color, borderColor: badge.color }}>
           {VIDEO_STATUS_LABELS[video.status] || video.status}
         </span>
-        <span className="text-[11px] text-[var(--color-text-tertiary)] tabular-nums flex-shrink-0">
+        <span className="text-[11px] font-mono text-[var(--color-text-tertiary)] tabular-nums flex-shrink-0">
           {new Date(video.createdAt).toLocaleDateString("de-DE")}
         </span>
       </button>
@@ -195,7 +195,7 @@ function VideoFileCard({
       onClick={onOpen}
       draggable
       onDragStart={onDragStart}
-      className="group text-left bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] overflow-hidden hover:shadow-[var(--shadow-md)] hover:border-[var(--color-border)] transition-all duration-200"
+      className="group text-left bg-[#111111] border-2 border-[#3A3A3A] overflow-hidden hover:shadow-[4px_4px_0px_#00DC82] hover:border-[#00DC82] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200"
     >
       <div className="relative aspect-video bg-black">
         {thumb ? (
@@ -205,22 +205,22 @@ function VideoFileCard({
             <Film className="w-8 h-8 text-neutral-600" />
           </div>
         )}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
-          <div className="w-9 h-9 rounded-full bg-white/90 flex items-center justify-center">
-            <Play className="w-4 h-4 text-[#0a0a0a] ml-0.5" />
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
+          <div className="w-10 h-10 bg-[#00DC82] flex items-center justify-center">
+            <Play className="w-5 h-5 text-[#0a0a0a] ml-0.5" />
           </div>
         </div>
       </div>
       <div className="p-3">
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-[13px] font-medium truncate">{video.title}</h3>
-          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0" style={{ background: badge.bg, color: badge.color }}>
+          <span className="text-[10px] font-bold uppercase tracking-[0.08em] px-1.5 py-0.5 border flex-shrink-0" style={{ background: badge.bg, color: badge.color, borderColor: badge.color }}>
             {VIDEO_STATUS_LABELS[video.status] || video.status}
           </span>
         </div>
         <div className="flex items-center gap-1 mt-1.5">
           <Clock className="w-3 h-3 text-[var(--color-text-tertiary)]" />
-          <span className="text-[11px] text-[var(--color-text-tertiary)]">
+          <span className="text-[11px] font-mono text-[var(--color-text-tertiary)]">
             {new Date(video.createdAt).toLocaleDateString("de-DE")}
           </span>
         </div>
@@ -234,19 +234,22 @@ function RenameDialog({ initialName, onSave, onCancel }: { initialName: string; 
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => { inputRef.current?.select(); }, []);
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={onCancel}>
-      <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] shadow-[var(--shadow-lg)] p-5 w-[360px]" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-[15px] font-semibold mb-3">Umbenennen</h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onCancel}>
+      <div className="bg-[#111111] border-2 border-[#3A3A3A] p-5 w-[360px]" style={{ boxShadow: "4px 4px 0px #00DC82" }} onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-[3px] h-5 bg-[#00DC82] flex-shrink-0" />
+          <h3 className="text-[14px] font-bold uppercase tracking-[0.08em]">Umbenennen</h3>
+        </div>
         <input
           ref={inputRef}
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter" && name.trim()) onSave(name.trim()); if (e.key === "Escape") onCancel(); }}
-          className="w-full h-9 px-3 rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none"
+          className="w-full h-9 px-3 border-2 border-[#3A3A3A] bg-[#0A0A0A] text-[13px] focus:border-[#00DC82] focus:outline-none"
         />
-        <div className="flex justify-end gap-2 mt-4">
-          <button onClick={onCancel} className="h-8 px-3 rounded-[var(--radius-md)] text-[13px] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] transition-colors">Abbrechen</button>
-          <button onClick={() => name.trim() && onSave(name.trim())} className="h-8 px-3 rounded-[var(--radius-md)] text-[13px] bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] transition-colors font-medium">Speichern</button>
+        <div className="flex justify-end gap-0 mt-4">
+          <button onClick={onCancel} className="h-8 px-3 border-2 border-[#3A3A3A] text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--color-text-secondary)] hover:border-[#00DC82] transition-colors -mr-[2px]">Abbrechen</button>
+          <button onClick={() => name.trim() && onSave(name.trim())} className="h-8 px-3 border-2 border-[#00DC82] bg-[#00DC82] text-[#0A0A0A] text-[13px] font-bold uppercase tracking-[0.06em] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">Speichern</button>
         </div>
       </div>
     </div>
@@ -258,20 +261,23 @@ function NewFolderDialog({ onSave, onCancel }: { onSave: (name: string) => void;
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => { inputRef.current?.focus(); }, []);
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={onCancel}>
-      <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] shadow-[var(--shadow-lg)] p-5 w-[360px]" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-[15px] font-semibold mb-3">Neuer Ordner</h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onCancel}>
+      <div className="bg-[#111111] border-2 border-[#3A3A3A] p-5 w-[360px]" style={{ boxShadow: "4px 4px 0px #00DC82" }} onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-[3px] h-5 bg-[#00DC82] flex-shrink-0" />
+          <h3 className="text-[14px] font-bold uppercase tracking-[0.08em]">Neuer Ordner</h3>
+        </div>
         <input
           ref={inputRef}
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter" && name.trim()) onSave(name.trim()); if (e.key === "Escape") onCancel(); }}
-          placeholder="Ordnername…"
-          className="w-full h-9 px-3 rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none"
+          placeholder="ORDNERNAME…"
+          className="w-full h-9 px-3 border-2 border-[#3A3A3A] bg-[#0A0A0A] text-[13px] font-mono placeholder:font-sans focus:border-[#00DC82] focus:outline-none"
         />
-        <div className="flex justify-end gap-2 mt-4">
-          <button onClick={onCancel} className="h-8 px-3 rounded-[var(--radius-md)] text-[13px] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] transition-colors">Abbrechen</button>
-          <button onClick={() => name.trim() && onSave(name.trim())} className="h-8 px-3 rounded-[var(--radius-md)] text-[13px] bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] transition-colors font-medium">Erstellen</button>
+        <div className="flex justify-end gap-0 mt-4">
+          <button onClick={onCancel} className="h-8 px-3 border-2 border-[#3A3A3A] text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--color-text-secondary)] hover:border-[#00DC82] transition-colors -mr-[2px]">Abbrechen</button>
+          <button onClick={() => name.trim() && onSave(name.trim())} className="h-8 px-3 border-2 border-[#00DC82] bg-[#00DC82] text-[#0A0A0A] text-[13px] font-bold uppercase tracking-[0.06em] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">Erstellen</button>
         </div>
       </div>
     </div>
@@ -292,22 +298,25 @@ function ClientAssignDialog({
   const [selected, setSelected] = useState(currentClientId || "");
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={onCancel}>
-      <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] shadow-[var(--shadow-lg)] p-5 w-[360px]" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-[15px] font-semibold mb-3">Kunde zuordnen</h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onCancel}>
+      <div className="bg-[#111111] border-2 border-[#3A3A3A] p-5 w-[360px]" style={{ boxShadow: "4px 4px 0px #00DC82" }} onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-[3px] h-5 bg-[#00DC82] flex-shrink-0" />
+          <h3 className="text-[14px] font-bold uppercase tracking-[0.08em]">Kunde zuordnen</h3>
+        </div>
         <select
           value={selected}
           onChange={(e) => setSelected(e.target.value)}
-          className="w-full h-9 px-3 rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none"
+          className="w-full h-9 px-3 border-2 border-[#3A3A3A] bg-[#0A0A0A] text-[13px] focus:border-[#00DC82] focus:outline-none"
         >
           <option value="">Kein Kunde</option>
           {(clients || []).map((c) => (
             <option key={c._id} value={c._id}>{c.name}{c.company ? ` (${c.company})` : ""}</option>
           ))}
         </select>
-        <div className="flex justify-end gap-2 mt-4">
-          <button onClick={onCancel} className="h-8 px-3 rounded-[var(--radius-md)] text-[13px] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] transition-colors">Abbrechen</button>
-          <button onClick={() => onSave(selected || undefined)} className="h-8 px-3 rounded-[var(--radius-md)] text-[13px] bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] transition-colors font-medium">Speichern</button>
+        <div className="flex justify-end gap-0 mt-4">
+          <button onClick={onCancel} className="h-8 px-3 border-2 border-[#3A3A3A] text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--color-text-secondary)] hover:border-[#00DC82] transition-colors -mr-[2px]">Abbrechen</button>
+          <button onClick={() => onSave(selected || undefined)} className="h-8 px-3 border-2 border-[#00DC82] bg-[#00DC82] text-[#0A0A0A] text-[13px] font-bold uppercase tracking-[0.06em] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">Speichern</button>
         </div>
       </div>
     </div>
@@ -464,16 +473,17 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
     <div className="max-w-[960px] mx-auto px-6 lg:px-8 py-6">
       {/* Header */}
       <div className="animate-in mb-5 flex items-start justify-between">
-        <div>
-          <h1 className="text-[24px] font-semibold tracking-[-0.02em] title-accent">Mediathek</h1>
-          <p className="text-[14px] text-[var(--color-text-tertiary)] mt-1">
-            Videos und Ordner verwalten
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="w-[3px] h-8 bg-[#00DC82] flex-shrink-0" />
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#00DC82]">MEDIATHEK</p>
+            <h1 className="text-[22px] font-bold uppercase tracking-[-0.01em]">Mediathek</h1>
+          </div>
         </div>
         {user?.role === "admin" && (
           <button
             onClick={() => setShowNewFolder(true)}
-            className="flex items-center gap-2 h-9 px-3 sm:px-4 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[13px] sm:text-[14px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors flex-shrink-0"
+            className="btn-brutal flex items-center gap-2 h-9 px-3 sm:px-4"
           >
             <FolderPlus className="w-4 h-4" />
             <span className="hidden sm:inline">Neuer Ordner</span>
@@ -482,20 +492,20 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
       </div>
 
       {/* Breadcrumbs */}
-      <div className="animate-in stagger-1 flex items-center gap-1.5 mb-4 text-[13px] flex-wrap">
+      <div className="animate-in stagger-1 flex items-center gap-0 mb-4 text-[11px] font-bold uppercase tracking-[0.08em] flex-wrap">
         <button
           onClick={() => setCurrentFolderId(undefined)}
-          className={`flex items-center gap-1 px-2 py-1 rounded-[var(--radius-sm)] transition-colors ${!currentFolderId ? "text-[var(--color-text-primary)] font-medium" : "text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-2)]"}`}
+          className={`flex items-center gap-1 px-2 py-1 border-2 transition-colors -mr-[2px] ${!currentFolderId ? "text-[#00DC82] border-[#00DC82]" : "text-[var(--color-text-tertiary)] border-[#3A3A3A] hover:border-[#00DC82] hover:text-[#00DC82]"}`}
         >
           <Home className="w-3.5 h-3.5" />
           Mediathek
         </button>
         {(breadcrumbs || []).map((crumb) => (
-          <div key={crumb._id} className="flex items-center gap-1.5">
-            <ChevronRight className="w-3 h-3 text-[var(--color-text-tertiary)]" />
+          <div key={crumb._id} className="flex items-center gap-0">
+            <ChevronRight className="w-3 h-3 text-[var(--color-text-tertiary)] mx-1" />
             <button
               onClick={() => setCurrentFolderId(crumb._id as Id<"folders">)}
-              className="px-2 py-1 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-2)] transition-colors"
+              className="px-2 py-1 border-2 border-[#3A3A3A] text-[var(--color-text-tertiary)] hover:text-[#00DC82] hover:border-[#00DC82] transition-colors"
             >
               {crumb.name}
             </button>
@@ -504,49 +514,49 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
       </div>
 
       {/* Toolbar */}
-      <div className="animate-in stagger-1 flex items-center gap-3 mb-5">
+      <div className="animate-in stagger-1 flex items-center gap-0 mb-5">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-tertiary)]" />
           <input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Suchen…"
-            className="w-full h-9 pl-9 pr-3 rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] text-[13px] focus:border-[var(--color-border)] focus:outline-none transition-colors"
+            placeholder="SUCHEN…"
+            className="w-full h-9 pl-9 pr-3 border-2 border-[#3A3A3A] bg-[#111111] text-[13px] font-mono placeholder:font-sans focus:border-[#00DC82] focus:outline-none transition-colors -mr-[2px]"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="h-9 px-2 pr-7 rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] text-[12px] appearance-none cursor-pointer"
+          className="h-9 px-2 pr-7 border-2 border-[#3A3A3A] bg-[#111111] text-[12px] font-bold uppercase appearance-none cursor-pointer -mr-[2px]"
           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 6px center" }}
         >
-          <option value="all">Alle Status</option>
-          <option value="hochgeladen">Hochgeladen</option>
-          <option value="review">Review</option>
-          <option value="korrektur">Korrektur</option>
-          <option value="freigegeben">Freigegeben</option>
-          <option value="final">Final</option>
+          <option value="all">ALLE STATUS</option>
+          <option value="hochgeladen">HOCHGELADEN</option>
+          <option value="review">REVIEW</option>
+          <option value="korrektur">KORREKTUR</option>
+          <option value="freigegeben">FREIGEGEBEN</option>
+          <option value="final">FINAL</option>
         </select>
         <select
           value={sortMode}
           onChange={(e) => setSortMode(e.target.value as SortMode)}
-          className="h-9 px-2 pr-7 rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] text-[12px] appearance-none cursor-pointer"
+          className="h-9 px-2 pr-7 border-2 border-[#3A3A3A] bg-[#111111] text-[12px] font-bold uppercase appearance-none cursor-pointer -mr-[2px]"
           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 6px center" }}
         >
           <option value="name">A→Z</option>
-          <option value="date">Neueste</option>
-          <option value="status">Status</option>
+          <option value="date">NEUESTE</option>
+          <option value="status">STATUS</option>
         </select>
-        <div className="flex gap-0.5 bg-[var(--color-surface-2)] rounded-[var(--radius-md)] p-0.5">
+        <div className="flex gap-0 border-2 border-[#3A3A3A]">
           <button
             onClick={() => setViewMode("grid")}
-            className={`p-1.5 rounded-[var(--radius-sm)] transition-colors ${viewMode === "grid" ? "bg-[var(--color-surface-1)] shadow-[var(--shadow-sm)] text-[var(--color-text-primary)]" : "text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"}`}
+            className={`p-2 transition-colors ${viewMode === "grid" ? "bg-[#00DC82] text-[#0A0A0A]" : "text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"}`}
           >
             <Grid3X3 className="w-4 h-4" />
           </button>
           <button
             onClick={() => setViewMode("list")}
-            className={`p-1.5 rounded-[var(--radius-sm)] transition-colors ${viewMode === "list" ? "bg-[var(--color-surface-1)] shadow-[var(--shadow-sm)] text-[var(--color-text-primary)]" : "text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"}`}
+            className={`p-2 border-l-2 border-[#3A3A3A] transition-colors ${viewMode === "list" ? "bg-[#00DC82] text-[#0A0A0A]" : "text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"}`}
           >
             <List className="w-4 h-4" />
           </button>
@@ -558,7 +568,10 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
         {/* Folders */}
         {filteredFolders.length > 0 && (
           <div className="animate-in stagger-2 mb-6">
-            <p className="text-[11px] font-medium text-[var(--color-text-tertiary)] uppercase tracking-wider mb-2.5">Ordner</p>
+            <div className="flex items-center gap-3 mb-2.5">
+              <div className="w-[3px] h-5 bg-[#00DC82] flex-shrink-0" />
+              <p className="text-[11px] font-bold text-[var(--color-text-tertiary)] uppercase tracking-[0.12em]">Ordner</p>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {filteredFolders.map((folder) => (
                 <FolderCard
@@ -584,22 +597,23 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
         {/* Bulk action bar */}
         {selectedVideoIds.size > 0 && user?.role === "admin" && (
           <div className="mb-4 animate-in">
-            <div className="flex items-center gap-3 px-4 py-2.5 rounded-[var(--radius-md)] bg-[var(--color-accent-surface)] border border-[var(--color-accent)]/20">
-              <span className="text-[13px] font-medium text-[var(--color-accent)]">
+            <div className="flex items-center gap-3 px-4 py-2.5 border-2 border-[#00DC82] bg-[#0A0A0A]">
+              <div className="w-[3px] h-5 bg-[#00DC82] flex-shrink-0" />
+              <span className="text-[13px] font-bold uppercase tracking-[0.08em] text-[#00DC82]">
                 {selectedVideoIds.size} Video{selectedVideoIds.size > 1 ? "s" : ""} ausgewählt
               </span>
               <button
                 onClick={() => setBulkMoveTarget("__pick__")}
-                className="h-7 px-3 rounded-[var(--radius-sm)] bg-[var(--color-accent)] text-white text-[12px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors flex items-center gap-1.5"
+                className="h-7 px-3 bg-[#00DC82] text-[#0A0A0A] text-[12px] font-bold uppercase tracking-[0.08em] border-2 border-[#00DC82] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all flex items-center gap-1.5"
               >
                 <ArrowRight className="w-3 h-3" />
                 Verschieben
               </button>
               <button
                 onClick={() => setSelectedVideoIds(new Set())}
-                className="ml-auto text-[12px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
+                className="ml-auto text-[12px] font-mono text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
               >
-                Auswahl aufheben
+                aufheben
               </button>
             </div>
           </div>
@@ -608,15 +622,16 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
         {/* Videos */}
         {filteredVideos.length > 0 && (
           <div className="animate-in stagger-3">
-            <div className="flex items-center gap-2 mb-2.5">
-              <p className="text-[11px] font-medium text-[var(--color-text-tertiary)] uppercase tracking-wider">Videos</p>
+            <div className="flex items-center gap-3 mb-2.5">
+              <div className="w-[3px] h-5 bg-[#00DC82] flex-shrink-0" />
+              <p className="text-[11px] font-bold text-[var(--color-text-tertiary)] uppercase tracking-[0.12em]">Videos</p>
               {user?.role === "admin" && filteredVideos.length > 0 && (
                 <button
                   onClick={selectAllVideos}
-                  className="flex items-center gap-1 text-[11px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"
+                  className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--color-text-tertiary)] hover:text-[#00DC82] transition-colors"
                 >
                   {selectedVideoIds.size === filteredVideos.length ? (
-                    <CheckSquare className="w-3 h-3 text-[var(--color-accent)]" />
+                    <CheckSquare className="w-3 h-3 text-[#00DC82]" />
                   ) : (
                     <Square className="w-3 h-3" />
                   )}
@@ -631,10 +646,10 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
                     {user?.role === "admin" && (
                       <button
                         onClick={(e) => { e.stopPropagation(); toggleVideoSelect(video._id); }}
-                        className="absolute top-2 left-2 z-10 p-0.5 rounded bg-black/40 backdrop-blur-sm"
+                        className="absolute top-2 left-2 z-10 p-0.5 bg-black/40"
                       >
                         {selectedVideoIds.has(video._id) ? (
-                          <CheckSquare className="w-4 h-4 text-[var(--color-accent)]" />
+                          <CheckSquare className="w-4 h-4 text-[#00DC82]" />
                         ) : (
                           <Square className="w-4 h-4 text-white/70 hover:text-white" />
                         )}
@@ -651,16 +666,16 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
                 ))}
               </div>
             ) : (
-              <div className="space-y-1.5">
+              <div className="flex flex-col">
                 {filteredVideos.map((video) => (
-                  <div key={video._id} className="flex items-center gap-2">
+                  <div key={video._id} className="flex items-center gap-2 -mb-[2px] last:mb-0">
                     {user?.role === "admin" && (
                       <button
                         onClick={() => toggleVideoSelect(video._id)}
                         className="flex-shrink-0 p-1"
                       >
                         {selectedVideoIds.has(video._id) ? (
-                          <CheckSquare className="w-4 h-4 text-[var(--color-accent)]" />
+                          <CheckSquare className="w-4 h-4 text-[#00DC82]" />
                         ) : (
                           <Square className="w-4 h-4 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]" />
                         )}
@@ -684,14 +699,19 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
 
         {/* Empty state */}
         {isEmpty && !searchQuery && (
-          <div className="animate-in stagger-2 text-center py-20 bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)]">
-            <div className="w-16 h-16 rounded-2xl bg-[var(--color-surface-2)] flex items-center justify-center mx-auto mb-4">
+          <div className="animate-in stagger-2 relative text-center py-20 border-2 border-dashed border-[#3A3A3A]">
+            {/* Corner marks */}
+            <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#00DC82] -translate-x-[2px] -translate-y-[2px]" />
+            <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[#00DC82] translate-x-[2px] -translate-y-[2px]" />
+            <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#00DC82] -translate-x-[2px] translate-y-[2px]" />
+            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#00DC82] translate-x-[2px] translate-y-[2px]" />
+            <div className="w-16 h-16 border-2 border-[#3A3A3A] flex items-center justify-center mx-auto mb-4">
               <FolderOpen className="w-7 h-7 text-[var(--color-text-tertiary)]" />
             </div>
-            <p className="text-[16px] font-semibold text-[var(--color-text-primary)]">
-              {currentFolderId ? "Leerer Ordner" : "Mediathek ist leer"}
+            <p className="text-[15px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-primary)]">
+              {currentFolderId ? "LEERER ORDNER" : "MEDIATHEK LEER"}
             </p>
-            <p className="text-[13px] text-[var(--color-text-tertiary)] mt-1.5 max-w-[300px] mx-auto">
+            <p className="text-[12px] font-mono text-[var(--color-text-tertiary)] mt-1.5 max-w-[300px] mx-auto">
               {currentFolderId
                 ? "Ziehe Videos hierher oder erstelle Unterordner."
                 : "Erstelle Ordner um Videos zu organisieren."}
@@ -699,7 +719,7 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
             {user?.role === "admin" && (
               <button
                 onClick={() => setShowNewFolder(true)}
-                className="mt-5 inline-flex items-center gap-2 h-9 px-4 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[14px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors"
+                className="btn-brutal mt-5 inline-flex items-center gap-2 h-9 px-4"
               >
                 <FolderPlus className="w-4 h-4" />
                 Ordner erstellen
@@ -711,7 +731,7 @@ export function LibraryPage({ onNavigate }: LibraryPageProps) {
         {isEmpty && searchQuery && (
           <div className="animate-in stagger-2 text-center py-16">
             <Search className="w-10 h-10 mx-auto mb-3 text-[var(--color-text-tertiary)] opacity-30" />
-            <p className="text-[14px] text-[var(--color-text-secondary)]">Keine Ergebnisse für „{searchQuery}"</p>
+            <p className="text-[13px] font-mono text-[var(--color-text-secondary)]">KEINE ERGEBNISSE FÜR „{searchQuery}"</p>
           </div>
         )}
       </div>
@@ -758,13 +778,16 @@ function BulkMoveDialog({
   const [selected, setSelected] = useState<string>("");
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={onCancel}>
-      <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] shadow-[var(--shadow-lg)] p-5 w-[360px]" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-[15px] font-semibold mb-3">Videos verschieben</h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onCancel}>
+      <div className="bg-[#111111] border-2 border-[#3A3A3A] p-5 w-[360px]" style={{ boxShadow: "4px 4px 0px #00DC82" }} onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-[3px] h-5 bg-[#00DC82] flex-shrink-0" />
+          <h3 className="text-[14px] font-bold uppercase tracking-[0.08em]">Videos verschieben</h3>
+        </div>
         <select
           value={selected}
           onChange={(e) => setSelected(e.target.value)}
-          className="w-full h-9 px-3 rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-accent)] focus:outline-none"
+          className="w-full h-9 px-3 border-2 border-[#3A3A3A] bg-[#0A0A0A] text-[13px] focus:border-[#00DC82] focus:outline-none"
         >
           <option value="">Mediathek (Root)</option>
           {(allFolders || [])
@@ -773,11 +796,11 @@ function BulkMoveDialog({
               <option key={f._id} value={f._id}>{f.name}</option>
             ))}
         </select>
-        <div className="flex justify-end gap-2 mt-4">
-          <button onClick={onCancel} className="h-8 px-3 rounded-[var(--radius-md)] text-[13px] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] transition-colors">Abbrechen</button>
+        <div className="flex justify-end gap-0 mt-4">
+          <button onClick={onCancel} className="h-8 px-3 border-2 border-[#3A3A3A] text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--color-text-secondary)] hover:border-[#00DC82] transition-colors -mr-[2px]">Abbrechen</button>
           <button
             onClick={() => onMove(selected || undefined)}
-            className="h-8 px-3 rounded-[var(--radius-md)] text-[13px] bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] transition-colors font-medium flex items-center gap-1.5"
+            className="h-8 px-3 border-2 border-[#00DC82] bg-[#00DC82] text-[#0A0A0A] text-[13px] font-bold uppercase tracking-[0.06em] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all flex items-center gap-1.5"
           >
             <ArrowRight className="w-3 h-3" />
             Verschieben

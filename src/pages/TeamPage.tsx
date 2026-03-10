@@ -69,52 +69,55 @@ function UserModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] border border-[var(--color-border-subtle)] w-full max-w-[480px] mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border-subtle)]">
-          <h3 className="text-[17px] font-semibold">
-            {mode === "create" ? "Neuer Benutzer" : "Benutzer bearbeiten"}
-          </h3>
-          <button onClick={onClose} className="p-1 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+      <div className="animate-in bg-[#111111] border-2 border-[#3A3A3A] w-full max-w-[480px] mx-4 max-h-[90vh] overflow-y-auto" style={{ boxShadow: "4px 4px 0px #00DC82" }}>
+        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-[#3A3A3A]">
+          <div className="flex items-center gap-3">
+            <div className="w-[3px] h-5 bg-[#00DC82] flex-shrink-0" />
+            <h3 className="text-[15px] font-bold uppercase tracking-[0.08em]">
+              {mode === "create" ? "Neuer Benutzer" : "Benutzer bearbeiten"}
+            </h3>
+          </div>
+          <button onClick={onClose} className="p-1 border-2 border-transparent hover:border-red-500 transition-colors">
             <X className="w-4 h-4 text-[var(--color-text-tertiary)]" />
           </button>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="text-[13px] text-red-500 bg-red-500/10 rounded-[var(--radius-md)] px-3 py-2">{error}</div>
+            <div className="text-[13px] font-bold text-red-400 border-2 border-red-500 bg-red-500/10 px-3 py-2">{error}</div>
           )}
           <div>
-            <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Name *</label>
+            <label className="block text-[11px] font-bold uppercase tracking-[0.1em] text-[#00DC82] mb-1.5">Name *</label>
             <input value={name} onChange={(e) => setName(e.target.value)} required
-              className="w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none"
+              className="w-full h-10 px-3 border-2 border-[#3A3A3A] bg-[#0A0A0A] text-[14px] focus:border-[#00DC82] focus:outline-none"
               placeholder="Max Mustermann" />
           </div>
           <div>
-            <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">E-Mail *</label>
+            <label className="block text-[11px] font-bold uppercase tracking-[0.1em] text-[#00DC82] mb-1.5">E-Mail *</label>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
-              className="w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none"
+              className="w-full h-10 px-3 border-2 border-[#3A3A3A] bg-[#0A0A0A] text-[14px] focus:border-[#00DC82] focus:outline-none"
               placeholder="max@beispiel.de" />
           </div>
           {mode === "create" && (
             <div>
-              <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Passwort *</label>
+              <label className="block text-[11px] font-bold uppercase tracking-[0.1em] text-[#00DC82] mb-1.5">Passwort *</label>
               <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6}
-                className="w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none"
+                className="w-full h-10 px-3 border-2 border-[#3A3A3A] bg-[#0A0A0A] text-[14px] focus:border-[#00DC82] focus:outline-none"
                 placeholder="Mindestens 6 Zeichen" />
             </div>
           )}
           <div>
-            <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Rolle *</label>
-            <div className="grid grid-cols-2 gap-2">
+            <label className="block text-[11px] font-bold uppercase tracking-[0.1em] text-[#00DC82] mb-1.5">Rolle *</label>
+            <div className="grid grid-cols-2 gap-0">
               {(["admin", "editor", "viewer"] as const).map((r) => {
                 const rc = ROLE_COLORS[r];
                 return (
                   <button key={r} type="button" onClick={() => setRole(r)}
-                    className={`p-3 rounded-[var(--radius-md)] border text-left transition-all ${
-                      role === r ? "border-[var(--color-accent)] bg-[var(--color-accent-surface)]" : "border-[var(--color-border-subtle)] hover:border-[var(--color-border)]"
+                    className={`p-3 border-2 text-left transition-all -mb-[2px] -mr-[2px] ${
+                      role === r ? "border-[#00DC82] bg-[#0A0A0A]" : "border-[#3A3A3A] hover:border-[#00DC82]"
                     }`}>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full" style={{ background: rc.bg, color: rc.color }}>
+                      <span className="text-[10px] font-bold uppercase tracking-[0.08em] px-1.5 py-0.5 border" style={{ background: rc.bg, color: rc.color, borderColor: rc.color }}>
                         {ROLE_LABELS[r]}
                       </span>
                     </div>
@@ -124,13 +127,13 @@ function UserModal({
               })}
             </div>
           </div>
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-0 pt-2">
             <button type="button" onClick={onClose}
-              className="flex-1 h-10 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[14px] font-medium hover:bg-[var(--color-surface-2)] transition-colors">
+              className="flex-1 h-10 border-2 border-[#3A3A3A] text-[13px] font-bold uppercase tracking-[0.08em] hover:border-[#00DC82] transition-colors -mr-[2px]">
               Abbrechen
             </button>
             <button type="submit" disabled={saving || !name || !email || (mode === "create" && !password)}
-              className="flex-1 h-10 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[14px] font-medium hover:bg-[var(--color-accent-hover)] disabled:opacity-50 transition-colors">
+              className="flex-1 h-10 border-2 border-[#00DC82] bg-[#00DC82] text-[#0A0A0A] text-[13px] font-bold uppercase tracking-[0.08em] hover:-translate-x-0.5 hover:-translate-y-0.5 disabled:opacity-50 transition-all">
               {saving ? "Speichern…" : mode === "create" ? "Anlegen" : "Speichern"}
             </button>
           </div>
@@ -156,25 +159,30 @@ function ResetPasswordModal({ user, onClose }: { user: any; onClose: () => void 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] border border-[var(--color-border-subtle)] w-full max-w-[400px] mx-4 p-6">
-        <h3 className="text-[17px] font-semibold mb-1">Passwort zurücksetzen</h3>
-        <p className="text-[13px] text-[var(--color-text-tertiary)] mb-4">für {user.name} ({user.email})</p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+      <div className="animate-in bg-[#111111] border-2 border-[#3A3A3A] w-full max-w-[400px] mx-4 p-6" style={{ boxShadow: "4px 4px 0px #00DC82" }}>
+        <div className="flex items-center gap-3 mb-1">
+          <div className="w-[3px] h-5 bg-[#00DC82] flex-shrink-0" />
+          <h3 className="text-[15px] font-bold uppercase tracking-[0.08em]">Passwort zurücksetzen</h3>
+        </div>
+        <p className="text-[12px] font-mono text-[var(--color-text-tertiary)] mb-4 ml-[15px]">für {user.name} ({user.email})</p>
         {done ? (
           <div className="text-center py-4">
-            <UserCheck className="w-8 h-8 mx-auto mb-2 text-emerald-500" />
-            <p className="text-[14px] font-medium">Passwort wurde zurückgesetzt</p>
-            <button onClick={onClose} className="mt-4 h-9 px-4 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[13px] font-medium">OK</button>
+            <div className="w-10 h-10 border-2 border-emerald-500 flex items-center justify-center mx-auto mb-3">
+              <UserCheck className="w-5 h-5 text-emerald-400" />
+            </div>
+            <p className="text-[14px] font-bold uppercase tracking-[0.06em]">Passwort zurückgesetzt</p>
+            <button onClick={onClose} className="mt-4 btn-brutal h-9 px-4">OK</button>
           </div>
         ) : (
           <>
             <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Neues Passwort (min. 6 Zeichen)" minLength={6}
-              className="w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none" />
-            <div className="flex gap-2 mt-4">
-              <button onClick={onClose} className="flex-1 h-9 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[13px] font-medium hover:bg-[var(--color-surface-2)] transition-colors">Abbrechen</button>
+              className="w-full h-10 px-3 border-2 border-[#3A3A3A] bg-[#0A0A0A] text-[14px] focus:border-[#00DC82] focus:outline-none" />
+            <div className="flex gap-0 mt-4">
+              <button onClick={onClose} className="flex-1 h-9 border-2 border-[#3A3A3A] text-[13px] font-bold uppercase tracking-[0.08em] hover:border-[#00DC82] transition-colors -mr-[2px]">Abbrechen</button>
               <button onClick={handleReset} disabled={saving || password.length < 6}
-                className="flex-1 h-9 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[13px] font-medium hover:bg-[var(--color-accent-hover)] disabled:opacity-50 transition-colors">
-                {saving ? "Setze zurück…" : "Zurücksetzen"}
+                className="flex-1 h-9 border-2 border-[#00DC82] bg-[#00DC82] text-[#0A0A0A] text-[13px] font-bold uppercase tracking-[0.08em] hover:-translate-x-0.5 hover:-translate-y-0.5 disabled:opacity-50 transition-all">
+                {saving ? "Setzt zurück…" : "Zurücksetzen"}
               </button>
             </div>
           </>
@@ -254,16 +262,18 @@ export function TeamPage() {
 
   return (
     <div className="max-w-[960px] mx-auto">
-      <div className="px-6 lg:px-8 py-6 border-b border-[var(--color-border-subtle)]">
+      {/* Header */}
+      <div className="px-6 lg:px-8 py-6 border-b-2 border-[#3A3A3A]">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-[22px] font-semibold tracking-[-0.02em] title-accent">Team</h1>
-            <p className="text-[14px] text-[var(--color-text-tertiary)] mt-0.5">
-              {(users || []).length} Benutzer verwalten
-            </p>
+          <div className="flex items-center gap-3">
+            <div className="w-[3px] h-8 bg-[#00DC82] flex-shrink-0" />
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#00DC82]">TEAMVERWALTUNG</p>
+              <h1 className="text-[22px] font-bold uppercase tracking-[-0.01em]">Team</h1>
+            </div>
           </div>
           <button onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 h-9 px-4 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[14px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors">
+            className="btn-brutal flex items-center gap-2 h-9 px-4">
             <Plus className="w-4 h-4" />
             <span className="hidden sm:inline">Neuer Benutzer</span>
           </button>
@@ -271,18 +281,20 @@ export function TeamPage() {
       </div>
 
       <div className="px-6 lg:px-8 py-5">
-        {/* Role stats */}
-        <div className="grid grid-cols-3 gap-3 mb-5">
+        {/* Role stats — stacked/connected */}
+        <div className="flex gap-0 mb-5">
           {(["admin", "editor", "viewer"] as const).map((r) => {
             const rc = ROLE_COLORS[r];
             return (
               <button key={r}
                 onClick={() => setRoleFilter(roleFilter === r ? "all" : r)}
-                className={`p-3 rounded-[var(--radius-md)] border transition-all text-left ${
-                  roleFilter === r ? "border-[var(--color-accent)] bg-[var(--color-accent-surface)]" : "border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] hover:border-[var(--color-border)]"
+                className={`flex-1 p-3 border-2 text-left transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 -mr-[2px] last:mr-0 ${
+                  roleFilter === r
+                    ? "border-[#00DC82] bg-[#0A0A0A] shadow-[4px_4px_0px_#00DC82]"
+                    : "border-[#3A3A3A] bg-[#111111] hover:border-[#00DC82] hover:shadow-[4px_4px_0px_#00DC82]"
                 }`}>
-                <p className="text-[20px] font-semibold tabular-nums">{roleCounts[r] || 0}</p>
-                <p className="text-[11px] font-medium mt-0.5" style={{ color: rc.color }}>{ROLE_LABELS[r]}</p>
+                <p className="text-[22px] font-bold tabular-nums" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{roleCounts[r] || 0}</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.1em] mt-0.5" style={{ color: rc.color }}>{ROLE_LABELS[r]}</p>
               </button>
             );
           })}
@@ -291,58 +303,58 @@ export function TeamPage() {
         {/* Search */}
         <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-tertiary)]" />
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Benutzer suchen…"
-            className="w-full h-9 pl-9 pr-3 rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] text-[13px] focus:border-[var(--color-border)] focus:outline-none transition-colors" />
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="BENUTZER SUCHEN…"
+            className="w-full h-9 pl-9 pr-3 border-2 border-[#3A3A3A] bg-[#111111] text-[13px] font-mono placeholder:font-sans focus:border-[#00DC82] focus:outline-none transition-colors" />
         </div>
 
-        {/* User list */}
-        <div className="space-y-2">
+        {/* User list — stacked */}
+        <div className="flex flex-col">
           {filteredUsers.map((u) => {
             const rc = ROLE_COLORS[u.role] || ROLE_COLORS.viewer;
             const client = u.clientId ? clientMap[u.clientId] : null;
             const isCurrentUser = u._id === currentUser?.userId;
             return (
               <div key={u._id}
-                className="bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] px-4 py-3 flex items-center gap-4 hover:shadow-[var(--shadow-sm)] transition-shadow group">
-                {/* Avatar */}
-                <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-[15px] font-semibold" style={{ background: rc.bg, color: rc.color }}>
+                className="bg-[#111111] border-2 border-[#3A3A3A] px-4 py-3 flex items-center gap-4 hover:border-[#00DC82] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_#00DC82] transition-all group -mb-[2px] last:mb-0">
+                {/* Avatar — SQUARE */}
+                <div className="w-10 h-10 border-2 flex items-center justify-center flex-shrink-0 text-[15px] font-bold" style={{ background: rc.bg, color: rc.color, borderColor: rc.color }}>
                   {u.name.charAt(0).toUpperCase()}
                 </div>
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-[14px] font-medium truncate">{u.name}</p>
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0" style={{ background: rc.bg, color: rc.color }}>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.08em] px-1.5 py-0.5 border flex-shrink-0" style={{ background: rc.bg, color: rc.color, borderColor: rc.color }}>
                       {ROLE_LABELS[u.role]}
                     </span>
                     {isCurrentUser && (
-                      <span className="text-[10px] text-[var(--color-text-tertiary)]">(Du)</span>
+                      <span className="text-[10px] font-mono text-[var(--color-text-tertiary)]">(Du)</span>
                     )}
                   </div>
                   <div className="flex items-center gap-3 mt-0.5">
-                    <span className="text-[12px] text-[var(--color-text-tertiary)] flex items-center gap-1">
+                    <span className="text-[12px] font-mono text-[var(--color-text-tertiary)] flex items-center gap-1">
                       <Mail className="w-3 h-3" /> {u.email}
                     </span>
                     {client && (
-                      <span className="text-[11px] text-[var(--color-text-tertiary)]">
+                      <span className="text-[11px] font-mono text-[var(--color-text-tertiary)]">
                         → {client.name}
                       </span>
                     )}
                   </div>
                 </div>
                 {/* Actions */}
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-0 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button onClick={() => setEditingUser(u)} title="Bearbeiten"
-                    className="p-1.5 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors">
+                    className="p-1.5 border-2 border-transparent hover:border-[#00DC82] hover:text-[#00DC82] transition-colors -mr-[2px]">
                     <Pencil className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
                   </button>
                   <button onClick={() => setResetUser(u)} title="Passwort zurücksetzen"
-                    className="p-1.5 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors">
+                    className="p-1.5 border-2 border-transparent hover:border-[#00DC82] hover:text-[#00DC82] transition-colors -mr-[2px]">
                     <KeyRound className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
                   </button>
                   {!isCurrentUser && (
                     <button onClick={() => handleDelete(u._id)} title="Löschen"
-                      className="p-1.5 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors">
+                      className="p-1.5 border-2 border-transparent hover:border-red-500 transition-colors">
                       <Trash2 className="w-3.5 h-3.5 text-red-400" />
                     </button>
                   )}
@@ -353,10 +365,12 @@ export function TeamPage() {
         </div>
 
         {filteredUsers.length === 0 && (
-          <div className="text-center py-16">
-            <Users className="w-10 h-10 mx-auto mb-3 text-[var(--color-text-tertiary)] opacity-30" />
-            <p className="text-[14px] text-[var(--color-text-secondary)]">
-              {search ? `Keine Benutzer für „${search}"` : "Noch keine Benutzer"}
+          <div className="text-center py-16 border-2 border-dashed border-[#3A3A3A]">
+            <div className="w-10 h-10 border-2 border-[#3A3A3A] flex items-center justify-center mx-auto mb-3">
+              <Users className="w-5 h-5 text-[var(--color-text-tertiary)] opacity-30" />
+            </div>
+            <p className="text-[13px] font-mono uppercase tracking-[0.08em] text-[var(--color-text-secondary)]">
+              {search ? `KEINE BENUTZER FÜR „${search}"` : "NOCH KEINE BENUTZER"}
             </p>
           </div>
         )}

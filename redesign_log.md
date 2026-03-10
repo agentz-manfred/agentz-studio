@@ -572,3 +572,38 @@
 - ✅ TypeScript Build: Zero errors (npx tsc --noEmit clean)
 - ✅ Preview-HTML und .env.local gelöscht
 - ✅ Dev-Server gestoppt
+
+## Phase 7: Remaining Pages (10.03.2026, 03:00)
+
+### Was wurde gemacht
+Alle verbleibenden Seiten wurden auf den einheitlichen AgentZ Brutalist-Stil migriert:
+
+**10 Dateien redesigned:**
+1. **CalendarPage.tsx** — Kalender-Grid mit 2px Borders, square cells, brutale Event-Chips, green accent bars, stacked upcoming-Termine mit hover-translate+shadow, square popovers/modals
+2. **IdeasPage.tsx** — Square StatusDots, connected filter buttons, stacked idea items mit hover-brutal, square checkboxen, brutalist bulk-bar, AI-modal mit green accent header
+3. **IdeaDetail.tsx** — Square StatusBadge mit Borders, brutalist breadcrumb, ScriptEditor mit green accent bar, square AI-Buttons, stacked comments
+4. **LibraryPage.tsx** — Square folder/video cards mit brutal hover shadows, square toolbar, connected view-toggles, brutalist dialogs (Rename/NewFolder/Move)
+5. **TeamPage.tsx** — Square user avatars (nicht rounded-full!), stacked user items, connected role stats, square role badges mit borders, brutalist modals
+6. **SettingsPage.tsx** — Alle section cards: 2px border-strong + square icon containers + uppercase section headers. Theme-Buttons connected, brutalist PWA install section, square AI model dropdown
+7. **AuditLogPage.tsx** — Stacked log entries mit 2px border + hover-translate, connected filter selects, square icon dots, green corner marks empty state
+8. **InvitePage.tsx** — Square brand mark mit brutal shadow, brutalist form card, 2px border inputs, btn-brutal submit, square success/error states
+9. **SharePage.tsx** — Square brand mark mit green border, brutalist player container, square status badges, uppercase header/footer
+10. **LegalPages.tsx** — Square back button, green accent bar H1, Section headers mit green accent, square InfoBox, uppercase tracked footer links
+
+### Design-Prinzipien konsistent angewendet
+- `border-radius: 0` überall (keine Ausnahme)
+- `border: 2px solid var(--color-border-strong)` für alle Karten/Inputs
+- `shadow: var(--shadow-brutal)` / `var(--shadow-brutal-sm)` für Modals/Hover
+- Green accent bars (3px × 20px) bei Section Headers
+- Space Grotesk nur für H1/Hero Headlines
+- Uppercase + letter-spacing für Labels/Badges
+- Connected elements mit -2px margin
+- Hover: border-green + translate(-1px,-1px) + brutal-shadow
+- Empty states: dashed border + 4 grüne Corner-Marks
+- Font-mono für Timestamps/technische Daten
+
+### Keine Funktionalität geändert
+Rein visuelle Änderungen — alle Hooks, State, Mutations, Queries und Logik unverändert.
+
+### TypeScript
+✅ `npx tsc --noEmit` — kompiliert fehlerfrei
