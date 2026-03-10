@@ -59,35 +59,79 @@ export function IdeaDrawer({ ideaId, onClose, onNavigate }: IdeaDrawerProps) {
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-[70] bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 ${
+        className={`fixed inset-0 z-[70] transition-opacity duration-300 ${
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={onClose}
+        style={{
+          background: 'rgba(10, 10, 10, 0.8)',
+          backdropFilter: 'blur(8px) saturate(120%)',
+          WebkitBackdropFilter: 'blur(8px) saturate(120%)',
+        }}
       />
 
       {/* Drawer Panel */}
       <div
-        className={`fixed top-0 right-0 z-[80] h-full w-full sm:w-[480px] bg-[var(--color-surface-0)] border-l border-[var(--color-border-subtle)] shadow-2xl transition-transform duration-300 ease-out ${
+        className={`fixed top-0 right-0 z-[80] h-full w-full sm:w-[480px] transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
+        style={{
+          background: 'var(--color-surface-0)',
+          borderLeft: '2px solid var(--color-border-strong)',
+          boxShadow: '-6px 0 0 var(--color-green)',
+          transitionTimingFunction: 'var(--ease-brutal)',
+        }}
       >
         {idea && (
           <div className="h-full flex flex-col overflow-hidden">
             {/* Drawer Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--color-border-subtle)] flex-shrink-0">
+            <div
+              className="flex items-center justify-between px-5 py-4 flex-shrink-0"
+              style={{
+                borderBottom: '2px solid var(--color-border-strong)',
+                background: 'var(--color-surface-1)',
+              }}
+            >
+              {/* Green accent bar */}
               <div className="flex items-center gap-3 min-w-0">
+                <div style={{ width: '3px', height: '20px', background: 'var(--color-green)' }} />
                 <StatusBadge status={idea.status} />
                 {client && (
-                  <span className="text-[13px] text-[var(--color-text-tertiary)] truncate">
+                  <span style={{
+                    fontSize: '11px',
+                    fontFamily: 'var(--font-body)',
+                    fontWeight: 600,
+                    color: 'var(--color-text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
+                  }} className="truncate">
                     {client.name}
                   </span>
                 )}
               </div>
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors flex-shrink-0"
+                className="flex-shrink-0 flex items-center justify-center"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  border: '2px solid var(--color-border-strong)',
+                  background: 'transparent',
+                  color: 'var(--color-text-tertiary)',
+                  transition: 'all 100ms var(--ease-brutal)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--color-error)';
+                  e.currentTarget.style.color = 'var(--color-error)';
+                  e.currentTarget.style.background = 'rgba(255, 51, 51, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--color-border-strong)';
+                  e.currentTarget.style.color = 'var(--color-text-tertiary)';
+                  e.currentTarget.style.background = 'transparent';
+                }}
               >
-                <X className="w-5 h-5" />
+                <X style={{ width: '16px', height: '16px' }} strokeWidth={2} />
               </button>
             </div>
 
@@ -95,13 +139,25 @@ export function IdeaDrawer({ ideaId, onClose, onNavigate }: IdeaDrawerProps) {
             <div className="flex-1 overflow-y-auto">
               <div className="px-5 py-5 space-y-6">
                 {/* Title */}
-                <h2 className="text-[20px] font-semibold tracking-[-0.02em] leading-tight">
+                <h2 style={{
+                  fontSize: '20px',
+                  fontFamily: 'var(--font-display)',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '-0.01em',
+                  lineHeight: '1.2',
+                  color: 'var(--color-text-primary)',
+                }}>
                   {idea.title}
                 </h2>
 
                 {/* Description */}
                 {idea.description && (
-                  <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-4">
+                  <div style={{
+                    background: 'var(--color-surface-1)',
+                    border: '2px solid var(--color-border-strong)',
+                    padding: '16px',
+                  }}>
                     <RichTextDisplay content={idea.description} className="text-[var(--color-text-secondary)]" />
                   </div>
                 )}
@@ -110,16 +166,30 @@ export function IdeaDrawer({ ideaId, onClose, onNavigate }: IdeaDrawerProps) {
                 {user?.role === "admin" && (
                   <div className="flex flex-wrap items-center gap-3">
                     <StatusSelector current={idea.status} onChange={handleStatusChange} />
-                    <span className="text-[12px] text-[var(--color-text-tertiary)]">
-                      Erstellt am {new Date(idea.createdAt).toLocaleDateString("de-DE")}
+                    <span style={{
+                      fontSize: '11px',
+                      fontFamily: 'var(--font-mono)',
+                      color: 'var(--color-text-muted)',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}>
+                      {new Date(idea.createdAt).toLocaleDateString("de-DE")}
                     </span>
                     <div className="flex items-center gap-2 ml-auto">
-                      <Send className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
+                      <Send style={{ width: '14px', height: '14px', color: 'var(--color-text-tertiary)' }} strokeWidth={2} />
                       <input
                         type="date"
                         value={idea.scheduledPublishDate || ""}
                         onChange={(e) => { if (token) updateIdea({ token, ideaId: idea._id as Id<"ideas">, scheduledPublishDate: e.target.value || undefined }); }}
-                        className="h-7 px-2 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[12px] focus:border-[var(--color-accent)] focus:outline-none"
+                        style={{
+                          height: '28px',
+                          padding: '0 8px',
+                          border: '2px solid var(--color-border-strong)',
+                          background: 'var(--color-surface-0)',
+                          fontSize: '11px',
+                          fontFamily: 'var(--font-mono)',
+                          color: 'var(--color-text-secondary)',
+                        }}
+                        className="focus:border-[var(--color-green)] focus:outline-none"
                         title="Geplante Veröffentlichung"
                       />
                       <button
@@ -129,11 +199,33 @@ export function IdeaDrawer({ ideaId, onClose, onNavigate }: IdeaDrawerProps) {
                           await archiveIdea({ token, ideaId: idea._id as Id<"ideas">, archived: newState });
                           if (newState) onClose();
                         }}
-                        className="h-7 px-2.5 rounded-[var(--radius-sm)] border border-[var(--color-border)] text-[12px] hover:bg-[var(--color-surface-2)] transition-colors flex items-center gap-1 text-[var(--color-text-tertiary)]"
+                        className="flex items-center gap-1"
+                        style={{
+                          height: '28px',
+                          padding: '0 10px',
+                          border: '2px solid var(--color-border-strong)',
+                          background: 'transparent',
+                          fontSize: '11px',
+                          fontFamily: 'var(--font-body)',
+                          fontWeight: 600,
+                          color: 'var(--color-text-tertiary)',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.04em',
+                          transition: 'all 100ms var(--ease-brutal)',
+                          cursor: 'pointer',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--color-green)';
+                          e.currentTarget.style.color = 'var(--color-green)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--color-border-strong)';
+                          e.currentTarget.style.color = 'var(--color-text-tertiary)';
+                        }}
                         title={idea.archived ? "Wiederherstellen" : "Archivieren"}
                       >
-                        {idea.archived ? <ArchiveRestore className="w-3 h-3" /> : <Archive className="w-3 h-3" />}
-                        {idea.archived ? "Wiederherstellen" : "Archiv"}
+                        {idea.archived ? <ArchiveRestore style={{ width: '12px', height: '12px' }} strokeWidth={2} /> : <Archive style={{ width: '12px', height: '12px' }} strokeWidth={2} />}
+                        {idea.archived ? "RESTORE" : "ARCHIV"}
                       </button>
                     </div>
                   </div>
@@ -141,17 +233,53 @@ export function IdeaDrawer({ ideaId, onClose, onNavigate }: IdeaDrawerProps) {
 
                 {/* Shoot dates */}
                 {ideaShootDates.length > 0 && (
-                  <div className="space-y-2">
-                    {ideaShootDates.map((sd) => (
-                      <div key={sd._id} className="flex items-center gap-3 bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] px-4 py-3">
-                        <Clock className="w-4 h-4 text-[var(--color-text-tertiary)]" />
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    {ideaShootDates.map((sd, i) => (
+                      <div
+                        key={sd._id}
+                        className="flex items-center gap-3"
+                        style={{
+                          background: 'var(--color-surface-1)',
+                          border: '2px solid var(--color-border-strong)',
+                          padding: '12px 16px',
+                          marginTop: i > 0 ? '-2px' : '0',
+                        }}
+                      >
+                        <div style={{
+                          width: '32px',
+                          height: '32px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          border: '2px solid var(--color-border-strong)',
+                          background: 'var(--color-surface-0)',
+                        }}>
+                          <Clock style={{ width: '14px', height: '14px', color: 'var(--color-green)' }} strokeWidth={2} />
+                        </div>
                         <div>
-                          <p className="text-[14px] font-medium">
+                          <p style={{
+                            fontSize: '13px',
+                            fontFamily: 'var(--font-body)',
+                            fontWeight: 600,
+                            color: 'var(--color-text-primary)',
+                          }}>
                             {new Date(sd.date + "T00:00:00").toLocaleDateString("de-DE", { weekday: "short", day: "2-digit", month: "long", year: "numeric" })}
-                            {sd.time && ` · ${sd.time}`}
+                            {sd.time && (
+                              <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-green)', marginLeft: '8px' }}>
+                                {sd.time}
+                              </span>
+                            )}
                           </p>
                           {sd.location && (
-                            <p className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5">{sd.location}</p>
+                            <p style={{
+                              fontSize: '11px',
+                              color: 'var(--color-text-muted)',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.04em',
+                              marginTop: '2px',
+                            }}>
+                              {sd.location}
+                            </p>
                           )}
                         </div>
                       </div>

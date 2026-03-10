@@ -36,38 +36,136 @@ export function KeyboardShortcutsDialog() {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={() => setOpen(false)}>
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center"
+      onClick={() => setOpen(false)}
+      style={{
+        background: 'rgba(10, 10, 10, 0.8)',
+        backdropFilter: 'blur(8px) saturate(120%)',
+        WebkitBackdropFilter: 'blur(8px) saturate(120%)',
+      }}
+    >
       <div
-        className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] w-full max-w-[400px] mx-4"
+        className="animate-in w-full mx-4"
         onClick={(e) => e.stopPropagation()}
+        style={{
+          maxWidth: '400px',
+          background: 'var(--color-surface-1)',
+          border: '2px solid var(--color-border-strong)',
+          boxShadow: 'var(--shadow-brutal)',
+        }}
       >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--color-border-subtle)]">
-          <div className="flex items-center gap-2">
-            <Keyboard className="w-4 h-4 text-[var(--color-text-tertiary)]" />
-            <h2 className="text-[15px] font-semibold">Tastenkürzel</h2>
+        {/* Green accent bar */}
+        <div style={{ height: '3px', background: 'var(--color-green)' }} />
+
+        {/* Header */}
+        <div
+          className="flex items-center justify-between px-5 py-4"
+          style={{ borderBottom: '2px solid var(--color-border-strong)' }}
+        >
+          <div className="flex items-center gap-3">
+            <div style={{
+              width: '28px',
+              height: '28px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '2px solid var(--color-green)',
+              background: 'var(--color-green-subtle)',
+            }}>
+              <Keyboard style={{ width: '14px', height: '14px', color: 'var(--color-green)' }} strokeWidth={2} />
+            </div>
+            <h2 style={{
+              fontSize: '13px',
+              fontFamily: 'var(--font-body)',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              color: 'var(--color-text-primary)',
+            }}>
+              TASTENKÜRZEL
+            </h2>
           </div>
           <button
             onClick={() => setOpen(false)}
-            className="p-1.5 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-accent-surface)] transition-colors"
+            className="flex items-center justify-center"
+            style={{
+              width: '28px',
+              height: '28px',
+              border: '2px solid var(--color-border-strong)',
+              background: 'transparent',
+              color: 'var(--color-text-tertiary)',
+              cursor: 'pointer',
+              transition: 'all 100ms var(--ease-brutal)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--color-error)';
+              e.currentTarget.style.color = 'var(--color-error)';
+              e.currentTarget.style.background = 'rgba(255, 51, 51, 0.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--color-border-strong)';
+              e.currentTarget.style.color = 'var(--color-text-tertiary)';
+              e.currentTarget.style.background = 'transparent';
+            }}
           >
-            <X className="w-4 h-4" />
+            <X style={{ width: '14px', height: '14px' }} strokeWidth={2} />
           </button>
         </div>
-        <div className="p-5 space-y-5">
-          {SHORTCUTS.map((section) => (
-            <div key={section.section}>
-              <h3 className="text-[12px] font-medium text-[var(--color-text-tertiary)] uppercase tracking-wider mb-2">
-                {section.section}
-              </h3>
-              <div className="space-y-1.5">
-                {section.items.map((item) => (
-                  <div key={item.desc} className="flex items-center justify-between">
-                    <span className="text-[13px] text-[var(--color-text-secondary)]">{item.desc}</span>
+
+        {/* Content */}
+        <div style={{ padding: '20px' }}>
+          {SHORTCUTS.map((section, sIdx) => (
+            <div key={section.section} style={{ marginTop: sIdx > 0 ? '20px' : '0' }}>
+              {/* Section header */}
+              <div className="flex items-center gap-2" style={{ marginBottom: '10px' }}>
+                <div style={{ width: '3px', height: '12px', background: 'var(--color-green)' }} />
+                <h3 style={{
+                  fontSize: '10px',
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: 700,
+                  color: 'var(--color-text-muted)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                }}>
+                  {section.section}
+                </h3>
+              </div>
+              {/* Items */}
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {section.items.map((item, iIdx) => (
+                  <div
+                    key={item.desc}
+                    className="flex items-center justify-between"
+                    style={{
+                      padding: '6px 0',
+                      borderTop: iIdx > 0 ? '1px solid var(--color-border-subtle)' : 'none',
+                    }}
+                  >
+                    <span style={{
+                      fontSize: '12px',
+                      fontFamily: 'var(--font-body)',
+                      fontWeight: 500,
+                      color: 'var(--color-text-secondary)',
+                    }}>
+                      {item.desc}
+                    </span>
                     <div className="flex gap-1">
                       {item.keys.map((key) => (
                         <kbd
                           key={key}
-                          className="min-w-[24px] h-6 px-1.5 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-2)] text-[11px] font-mono font-medium text-[var(--color-text-secondary)] flex items-center justify-center"
+                          className="flex items-center justify-center"
+                          style={{
+                            minWidth: '24px',
+                            height: '24px',
+                            padding: '0 6px',
+                            border: '2px solid var(--color-border-strong)',
+                            background: 'var(--color-surface-2)',
+                            fontSize: '10px',
+                            fontFamily: 'var(--font-mono)',
+                            fontWeight: 600,
+                            color: 'var(--color-green)',
+                          }}
                         >
                           {key}
                         </kbd>

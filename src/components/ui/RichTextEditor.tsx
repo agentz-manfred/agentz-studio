@@ -43,12 +43,31 @@ function ToolbarButton({
       type="button"
       onClick={onClick}
       title={title}
-      className={cn(
-        "p-1.5 rounded-[var(--radius-sm)] transition-colors",
-        active
-          ? "bg-[var(--color-accent)] text-white"
-          : "text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-2)]"
-      )}
+      style={{
+        padding: '4px',
+        background: active ? 'var(--color-green)' : 'transparent',
+        color: active ? '#0A0A0A' : 'var(--color-text-tertiary)',
+        border: active ? '1px solid var(--color-green-dark)' : '1px solid transparent',
+        cursor: 'pointer',
+        transition: 'all 100ms var(--ease-brutal)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+      onMouseEnter={(e) => {
+        if (!active) {
+          e.currentTarget.style.color = 'var(--color-green)';
+          e.currentTarget.style.borderColor = 'var(--color-border-strong)';
+          e.currentTarget.style.background = 'var(--color-green-subtle)';
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!active) {
+          e.currentTarget.style.color = 'var(--color-text-tertiary)';
+          e.currentTarget.style.borderColor = 'transparent';
+          e.currentTarget.style.background = 'transparent';
+        }
+      }}
     >
       {children}
     </button>
@@ -95,90 +114,100 @@ export function RichTextEditor({
 
   return (
     <div
-      className={cn(
-        "rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-1)] overflow-hidden",
-        !editable && "border-transparent bg-transparent",
-        className
-      )}
+      className={cn(className)}
+      style={{
+        border: editable ? '2px solid var(--color-border-strong)' : 'none',
+        background: editable ? 'var(--color-surface-1)' : 'transparent',
+        overflow: 'hidden',
+      }}
     >
       {editable && !minimal && (
-        <div className="flex items-center gap-0.5 px-2 py-1.5 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]">
+        <div
+          className="flex items-center gap-0.5"
+          style={{
+            padding: '6px 8px',
+            borderBottom: '2px solid var(--color-border-strong)',
+            background: 'var(--color-surface-0)',
+          }}
+        >
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
             active={editor.isActive("heading", { level: 2 })}
             title="Überschrift 2"
           >
-            <Heading2 className="w-4 h-4" />
+            <Heading2 style={{ width: '14px', height: '14px' }} strokeWidth={2} />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
             active={editor.isActive("heading", { level: 3 })}
             title="Überschrift 3"
           >
-            <Heading3 className="w-4 h-4" />
+            <Heading3 style={{ width: '14px', height: '14px' }} strokeWidth={2} />
           </ToolbarButton>
-          <div className="w-px h-4 bg-[var(--color-border)] mx-1" />
+          {/* Divider */}
+          <div style={{ width: '2px', height: '16px', background: 'var(--color-border-strong)', margin: '0 4px' }} />
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleBold().run()}
             active={editor.isActive("bold")}
             title="Fett"
           >
-            <Bold className="w-4 h-4" />
+            <Bold style={{ width: '14px', height: '14px' }} strokeWidth={2} />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleItalic().run()}
             active={editor.isActive("italic")}
             title="Kursiv"
           >
-            <Italic className="w-4 h-4" />
+            <Italic style={{ width: '14px', height: '14px' }} strokeWidth={2} />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleCode().run()}
             active={editor.isActive("code")}
             title="Code"
           >
-            <Code className="w-4 h-4" />
+            <Code style={{ width: '14px', height: '14px' }} strokeWidth={2} />
           </ToolbarButton>
-          <div className="w-px h-4 bg-[var(--color-border)] mx-1" />
+          {/* Divider */}
+          <div style={{ width: '2px', height: '16px', background: 'var(--color-border-strong)', margin: '0 4px' }} />
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleBulletList().run()}
             active={editor.isActive("bulletList")}
             title="Liste"
           >
-            <List className="w-4 h-4" />
+            <List style={{ width: '14px', height: '14px' }} strokeWidth={2} />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
             active={editor.isActive("orderedList")}
             title="Nummerierte Liste"
           >
-            <ListOrdered className="w-4 h-4" />
+            <ListOrdered style={{ width: '14px', height: '14px' }} strokeWidth={2} />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
             active={editor.isActive("blockquote")}
             title="Zitat"
           >
-            <Quote className="w-4 h-4" />
+            <Quote style={{ width: '14px', height: '14px' }} strokeWidth={2} />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().setHorizontalRule().run()}
             title="Trennlinie"
           >
-            <Minus className="w-4 h-4" />
+            <Minus style={{ width: '14px', height: '14px' }} strokeWidth={2} />
           </ToolbarButton>
-          <div className="flex-1" />
+          <div style={{ flex: 1 }} />
           <ToolbarButton
             onClick={() => editor.chain().focus().undo().run()}
             title="Rückgängig"
           >
-            <Undo className="w-4 h-4" />
+            <Undo style={{ width: '14px', height: '14px' }} strokeWidth={2} />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().redo().run()}
             title="Wiederholen"
           >
-            <Redo className="w-4 h-4" />
+            <Redo style={{ width: '14px', height: '14px' }} strokeWidth={2} />
           </ToolbarButton>
         </div>
       )}

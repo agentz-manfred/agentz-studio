@@ -204,48 +204,105 @@ export function CommandPalette({
     <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[min(20vh,160px)]">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        className="absolute inset-0"
         onClick={close}
-        style={{ animation: "fadeInBg 150ms ease-out" }}
+        style={{
+          background: 'rgba(10, 10, 10, 0.8)',
+          backdropFilter: 'blur(8px) saturate(120%)',
+          WebkitBackdropFilter: 'blur(8px) saturate(120%)',
+          animation: 'cmdFadeIn 150ms var(--ease-out)',
+        }}
       />
 
       {/* Panel */}
       <div
-        className="relative w-full max-w-[560px] mx-4 bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] border border-[var(--color-border-subtle)] overflow-hidden"
-        style={{ animation: "slideUp 200ms var(--ease-out)" }}
+        className="relative w-full max-w-[560px] mx-4 overflow-hidden"
+        style={{
+          background: 'var(--color-surface-1)',
+          border: '2px solid var(--color-border-strong)',
+          boxShadow: 'var(--shadow-brutal)',
+          animation: 'cmdSlideDown 200ms var(--ease-brutal)',
+        }}
       >
+        {/* Green accent bar top */}
+        <div style={{ height: '3px', background: 'var(--color-green)' }} />
+
         {/* Search input */}
-        <div className="flex items-center gap-3 px-4 h-[52px] border-b border-[var(--color-border-subtle)]">
-          <Search className="w-[18px] h-[18px] text-[var(--color-text-tertiary)] flex-shrink-0" strokeWidth={1.75} />
+        <div
+          className="flex items-center gap-3 px-4"
+          style={{
+            height: '52px',
+            borderBottom: '2px solid var(--color-border-strong)',
+          }}
+        >
+          <Search className="flex-shrink-0" style={{ width: '18px', height: '18px', color: 'var(--color-green)' }} strokeWidth={2} />
           <input
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Suchen oder navigieren…"
-            className="flex-1 bg-transparent text-[15px] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
+            placeholder="SUCHEN ODER NAVIGIEREN…"
+            className="flex-1 bg-transparent outline-none"
+            style={{
+              fontSize: '13px',
+              fontFamily: 'var(--font-body)',
+              fontWeight: 500,
+              color: 'var(--color-text-primary)',
+              letterSpacing: '0.04em',
+            }}
           />
-          <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 h-5 rounded bg-[var(--color-surface-2)] text-[11px] text-[var(--color-text-tertiary)] font-medium border border-[var(--color-border-subtle)]">
+          <kbd
+            className="hidden sm:flex items-center justify-center"
+            style={{
+              padding: '2px 8px',
+              height: '22px',
+              background: 'var(--color-surface-2)',
+              border: '1px solid var(--color-border-strong)',
+              fontSize: '10px',
+              fontFamily: 'var(--font-mono)',
+              fontWeight: 600,
+              color: 'var(--color-text-tertiary)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+            }}
+          >
             ESC
           </kbd>
         </div>
 
         {/* Results */}
-        <div ref={listRef} className="max-h-[360px] overflow-auto py-2">
+        <div ref={listRef} className="overflow-auto" style={{ maxHeight: '360px', padding: '4px 0' }}>
           {filtered.length === 0 ? (
-            <div className="px-4 py-8 text-center">
-              <p className="text-[14px] text-[var(--color-text-tertiary)]">
-                Keine Ergebnisse für „{query}"
+            <div style={{ padding: '32px 16px', textAlign: 'center' }}>
+              <p style={{
+                fontSize: '12px',
+                fontFamily: 'var(--font-body)',
+                fontWeight: 600,
+                color: 'var(--color-text-tertiary)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+              }}>
+                KEINE ERGEBNISSE FÜR „{query}"
               </p>
             </div>
           ) : (
             Array.from(grouped.entries()).map(([cat, catItems]) => (
               <div key={cat}>
-                <div className="px-4 pt-2 pb-1">
-                  <span className="text-[11px] font-medium text-[var(--color-text-tertiary)] uppercase tracking-[0.05em]">
+                {/* Category label */}
+                <div className="flex items-center gap-2" style={{ padding: '8px 16px 4px' }}>
+                  <div style={{ width: '3px', height: '12px', background: 'var(--color-green)' }} />
+                  <span style={{
+                    fontSize: '10px',
+                    fontFamily: 'var(--font-body)',
+                    fontWeight: 700,
+                    color: 'var(--color-text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                  }}>
                     {categoryLabels[cat] || cat}
                   </span>
                 </div>
+                {/* Items */}
                 {catItems.map((item) => {
                   const idx = flatIdx++;
                   const isSelected = idx === selectedIndex;
@@ -254,27 +311,50 @@ export function CommandPalette({
                       key={item.id}
                       onClick={item.action}
                       onMouseEnter={() => setSelectedIndex(idx)}
-                      className={cn(
-                        "w-full flex items-center gap-3 px-4 h-10 text-left transition-colors",
-                        isSelected
-                          ? "bg-[var(--color-accent-surface)]"
-                          : "hover:bg-[var(--color-accent-surface)]"
-                      )}
+                      className="w-full flex items-center gap-3 text-left"
+                      style={{
+                        padding: '0 16px',
+                        height: '40px',
+                        background: isSelected ? 'var(--color-green)' : 'transparent',
+                        color: isSelected ? '#0A0A0A' : 'var(--color-text-primary)',
+                        borderLeft: isSelected ? '3px solid var(--color-green-dark)' : '3px solid transparent',
+                        transition: 'all 100ms var(--ease-brutal)',
+                        fontFamily: 'var(--font-body)',
+                      }}
                     >
                       <item.icon
-                        className="w-4 h-4 text-[var(--color-text-tertiary)] flex-shrink-0"
-                        strokeWidth={1.75}
+                        className="flex-shrink-0"
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          color: isSelected ? '#0A0A0A' : 'var(--color-text-tertiary)',
+                        }}
+                        strokeWidth={2}
                       />
-                      <span className="flex-1 text-[14px] truncate">
+                      <span className="flex-1 truncate" style={{
+                        fontSize: '13px',
+                        fontWeight: isSelected ? 700 : 500,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.02em',
+                      }}>
                         {item.label}
                       </span>
                       {item.sublabel && (
-                        <span className="text-[12px] text-[var(--color-text-tertiary)] truncate max-w-[120px]">
+                        <span className="truncate" style={{
+                          fontSize: '11px',
+                          fontFamily: 'var(--font-mono)',
+                          color: isSelected ? 'rgba(10,10,10,0.6)' : 'var(--color-text-muted)',
+                          maxWidth: '120px',
+                        }}>
                           {item.sublabel}
                         </span>
                       )}
                       {isSelected && (
-                        <ArrowRight className="w-3.5 h-3.5 text-[var(--color-text-tertiary)] flex-shrink-0" />
+                        <ArrowRight className="flex-shrink-0" style={{
+                          width: '14px',
+                          height: '14px',
+                          color: '#0A0A0A',
+                        }} strokeWidth={2.5} />
                       )}
                     </button>
                   );
@@ -285,21 +365,55 @@ export function CommandPalette({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center gap-4 px-4 h-9 border-t border-[var(--color-border-subtle)] bg-[var(--color-surface-2)]/50">
-          <span className="text-[11px] text-[var(--color-text-tertiary)] flex items-center gap-1">
-            <kbd className="px-1 py-0.5 rounded bg-[var(--color-surface-2)] text-[10px] border border-[var(--color-border-subtle)]">↑↓</kbd>
-            Navigieren
+        <div
+          className="flex items-center gap-4"
+          style={{
+            padding: '0 16px',
+            height: '36px',
+            borderTop: '2px solid var(--color-border-strong)',
+            background: 'var(--color-surface-0)',
+          }}
+        >
+          <span className="flex items-center gap-1.5" style={{
+            fontSize: '10px',
+            fontFamily: 'var(--font-body)',
+            fontWeight: 600,
+            color: 'var(--color-text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+          }}>
+            <kbd style={{
+              padding: '1px 5px',
+              background: 'var(--color-surface-2)',
+              border: '1px solid var(--color-border-strong)',
+              fontSize: '10px',
+              fontFamily: 'var(--font-mono)',
+            }}>↑↓</kbd>
+            NAVIGIEREN
           </span>
-          <span className="text-[11px] text-[var(--color-text-tertiary)] flex items-center gap-1">
-            <kbd className="px-1 py-0.5 rounded bg-[var(--color-surface-2)] text-[10px] border border-[var(--color-border-subtle)]">↵</kbd>
-            Öffnen
+          <span className="flex items-center gap-1.5" style={{
+            fontSize: '10px',
+            fontFamily: 'var(--font-body)',
+            fontWeight: 600,
+            color: 'var(--color-text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+          }}>
+            <kbd style={{
+              padding: '1px 5px',
+              background: 'var(--color-surface-2)',
+              border: '1px solid var(--color-border-strong)',
+              fontSize: '10px',
+              fontFamily: 'var(--font-mono)',
+            }}>↵</kbd>
+            ÖFFNEN
           </span>
         </div>
       </div>
 
       <style>{`
-        @keyframes fadeInBg { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(-8px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes cmdFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes cmdSlideDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
     </div>
   );
@@ -310,12 +424,47 @@ export function CommandPaletteTrigger({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-3 px-3 h-9 rounded-[var(--radius-sm)] text-[14px] text-[var(--color-text-tertiary)] hover:bg-[var(--color-accent-surface)] hover:text-[var(--color-text-secondary)] transition-all duration-150 ease-[var(--ease-out)] group"
+      className="w-full flex items-center gap-3 group"
+      style={{
+        padding: '0 12px',
+        height: '36px',
+        border: '1px solid transparent',
+        background: 'transparent',
+        fontFamily: 'var(--font-body)',
+        fontSize: '12px',
+        fontWeight: 500,
+        color: 'var(--color-text-tertiary)',
+        textTransform: 'uppercase',
+        letterSpacing: '0.04em',
+        transition: 'all 100ms var(--ease-brutal)',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = 'var(--color-border-strong)';
+        e.currentTarget.style.background = 'var(--color-green-subtle)';
+        e.currentTarget.style.color = 'var(--color-green)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = 'transparent';
+        e.currentTarget.style.background = 'transparent';
+        e.currentTarget.style.color = 'var(--color-text-tertiary)';
+      }}
     >
-      <Search className="w-[18px] h-[18px]" strokeWidth={1.75} />
-      <span className="flex-1 text-left">Suchen</span>
-      <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 h-5 rounded bg-[var(--color-surface-2)] text-[10px] font-medium border border-[var(--color-border-subtle)] group-hover:border-[var(--color-border)]">
-        <Command className="w-2.5 h-2.5" />K
+      <Search style={{ width: '16px', height: '16px' }} strokeWidth={2} />
+      <span className="flex-1 text-left">SUCHEN</span>
+      <kbd
+        className="hidden sm:flex items-center gap-0.5"
+        style={{
+          padding: '1px 6px',
+          height: '20px',
+          background: 'var(--color-surface-2)',
+          border: '1px solid var(--color-border-strong)',
+          fontSize: '10px',
+          fontFamily: 'var(--font-mono)',
+          fontWeight: 600,
+          color: 'var(--color-text-muted)',
+        }}
+      >
+        <Command style={{ width: '10px', height: '10px' }} />K
       </kbd>
     </button>
   );

@@ -607,3 +607,125 @@ Rein visuelle Änderungen — alle Hooks, State, Mutations, Queries und Logik un
 
 ### TypeScript
 ✅ `npx tsc --noEmit` — kompiliert fehlerfrei
+
+## Phase 8: Popups, Modals, Overlays (10.03.2026, 04:00)
+
+### Was wurde gemacht
+
+**6 Overlay-Komponenten auf einheitlichen Brutalist-Stil migriert:**
+
+**CommandPalette.tsx — Komplett-Redesign:**
+- Panel: 2px border-strong, 0px radius, brutal green shadow (statt rounded-lg + shadow-lg)
+- Green accent bar (3px) oben — visuelles Leitmotiv aller Overlays
+- Backdrop: rgba(10,10,10,0.8) + blur(8px) saturate(120%) — konsistent mit modal-backdrop CSS
+- Search Input: Uppercase placeholder, font-body, 0.04em tracking, green Search-icon
+- ESC kbd: Mono-font, 1px border-strong, square — kein rounded
+- Category Labels: Green accent bar (3px × 12px) links + 10px uppercase 0.1em tracking
+- Selected Item: Full green background + 3px green-dark left-border + bold uppercase + ArrowRight icon
+- Normal Items: Uppercase, 3px transparent left-border, hover → green bg
+- Sublabels: Font-mono für Personennamen/Status
+- Footer: Surface-0 background, 2px border-top, uppercase labels, square KBDs mit mono-font
+- Animation: cmdSlideDown (translateY statt scale) mit ease-brutal
+
+**CommandPaletteTrigger — Redesign:**
+- Uppercase "SUCHEN" label, 0.04em tracking
+- Square (kein border-radius), border on hover → green
+- KBD: Square, border-strong, mono-font
+
+**IdeaDrawer.tsx — Komplett-Redesign:**
+- Panel: 2px border-left strong, **-6px green shadow links** als visueller Marker (statt shadow-2xl)
+- Backdrop: Konsistent rgba(10,10,10,0.8) + blur
+- Header: Surface-1 background, 2px border-bottom, green accent bar (3px × 20px) links
+- Close Button: Square 32×32, 2px border-strong, hover → error-red border + bg
+- Client Name: 11px uppercase, 0.06em tracking, font-bold, muted
+- Title: Space Grotesk, 20px, uppercase (Display-Font für Drawer-Headline)
+- Description Box: 2px border-strong, square (statt rounded-md)
+- Shoot Dates: Stacked (-2px margin-top), square icon-box 32×32 mit green clock
+- Time: Font-mono, green color
+- Location: Uppercase, 0.04em tracking, muted
+- Date Input: 2px border-strong, font-mono, green focus
+- Archive Button: Uppercase "ARCHIV"/"RESTORE", hover → green border + green text
+- Created Date: Font-mono, tabular-nums
+
+**Toast.tsx — Komplett-Redesign:**
+- Entfernt: Tailwind emerald-500/red-500 Farben → Brand-Token-System
+- Border: 2px solid in Status-Farbe (green/error/info)
+- Shadow: 3px 3px 0px in Status-Farbe — brutal offset statt backdrop-blur
+- Icon Box: Square 28×28, 1px border in Status-Farbe, tinted background
+- Message: 12px uppercase, 0.03em tracking, font-bold
+- Dismiss Button: Square 24×24, 1px border-strong, hover → error-red
+- Animation: toastSlideIn von rechts (translateX statt translateY)
+- Exit: translateX(12px) statt translateY(2px) — nach rechts raussliden
+- Kein backdrop-blur mehr — clean, brutal, schnell
+
+**CookieBanner.tsx — Komplett-Redesign:**
+- Container: 2px border-strong, brutal green shadow (statt rounded-lg)
+- Icon Box: Square 32×32, 2px green border, green-subtle bg (statt nackte Icon)
+- Text: 12px, font-weight-500
+- "MEHR →" Link: 10px uppercase, 0.06em tracking, green, hover underline
+- Accept Button: btn-brutal helper class, 11px, 32px height
+- Max-width 480px (statt max-w-lg)
+
+**KeyboardShortcutsDialog.tsx — Komplett-Redesign:**
+- Panel: 2px border-strong, brutal green shadow (statt rounded-lg + shadow-lg)
+- Green accent bar (3px) oben — wie CommandPalette
+- Header: 2px border-bottom, square icon-box (28×28, 2px green border, green-subtle bg)
+- Title: 13px uppercase, 0.06em tracking, font-bold
+- Close: Square 28×28, 2px border-strong, hover → error-red
+- Section Headers: Green accent bar (3px × 12px) + 10px uppercase 0.1em tracking
+- Items: Separator mit border-subtle (statt space-y)
+- KBDs: Square, 2px border-strong, mono-font, **green text** — Key-Shortcut-Tasten leuchten grün
+- Description Text: 12px, font-weight-500, secondary
+
+**RichTextEditor.tsx — Brutalist Redesign:**
+- Container: 2px border-strong, square (statt rounded-md)
+- Toolbar: Surface-0 background (dunkler als Editor), 2px border-bottom
+- Toolbar Buttons: Square mit transparent border, active → green bg + green-dark border
+- Hover: Green text + border-strong + green-subtle bg (statt generic surface-2)
+- Dividers: 2px × 16px border-strong (statt 1px)
+- Icon strokeWidth: 2 (crisp)
+- Non-editable: Keine border/bg (transparent)
+
+**index.css — TipTap Styles aktualisiert:**
+- Editor focus: Background → surface-0 (dunklere Fokus-Ebene)
+- Placeholder: Uppercase, 0.04em tracking, 12px, muted (statt tertiary)
+- H2/H3: font-weight 700 (statt 600), uppercase, 0.02em tracking
+- List bullets: `square` statt `disc` — Brutalist konsequent
+- Inline code: 0px border-radius, 1px border-strong, green color
+- Pre blocks: 2px border-strong + 3px green left-border
+- Blockquote: Green-subtle background (statt transparent)
+- HR: border-strong (statt border)
+- Display-Variante: Gleiche Brutalist-Updates
+
+### Design-Entscheidungen
+- **Green Shadow Links (Drawer)**: Statt shadow-2xl ein 6px grüner Balken links — markiert den Drawer als Panel-Overlay, sofort erkennbar
+- **Consistent Backdrop**: Alle Overlays nutzen jetzt rgba(10,10,10,0.8) + blur(8px) saturate(120%) — identisch mit `.modal-backdrop` CSS-Klasse
+- **Toast Richtung**: Toasts sliden von rechts rein/raus statt von unten — natürlicher für bottom-right Position
+- **Green KBDs**: Keyboard-Shortcut-Tasten in grün — Brand-Color zeigt "das sind interaktive Keys"
+- **Uppercase durchgehend**: Alle Labels, Badges, Category-Headers, Buttons — militant einheitlich in allen Overlays
+- **Square Icons in allen Overlays**: Konsistent mit den Page-Redesigns — keine rounded icon-containers
+
+### Keine Funktionalität geändert
+Rein visuelle Änderungen — alle Hooks, State, Mutations, Queries, Keyboard-Shortcuts und Logik unverändert.
+
+### Visueller Review
+- ✅ Dev-Server gestartet (Port 5182)
+- ✅ Static HTML Preview erstellt (Command Palette, Toasts ×3, Cookie Banner, Keyboard Shortcuts, Idea Drawer, Rich Text Editor)
+- ✅ Full-Page Screenshot gemacht und analysiert
+- ✅ Background-Farben korrekt (surface-0/surface-1 richtig verteilt)
+- ✅ Text-Farben korrekt (primary, secondary, tertiary, muted — richtige Hierarchie)
+- ✅ Green #00DC82 durchgängig als Accent in allen Overlays
+- ✅ Space Grotesk NUR für Drawer-Title (Display)
+- ✅ Poppins für alle Labels, Buttons, Messages
+- ✅ JetBrains Mono für KBDs, Sublabels, Timestamps
+- ✅ 0px border-radius überall — keine rounded corners in Overlays
+- ✅ 2px Borders durchgängig (border-strong)
+- ✅ Brutal shadows korrekt (offset-Stil für Toasts + Panels)
+- ✅ Green accent bars bei Command Palette + Keyboard Shortcuts + Drawer Header
+- ✅ Square Icon-Boxes, KBDs, Close-Buttons, Dismiss-Buttons
+- ✅ Uppercase + Tracking militant einheitlich
+- ✅ Toast-Farben: Green/Red/Blue — korrekte Status-Trennung
+- ✅ RichTextEditor Toolbar: Green active state, brutal dividers
+- ✅ TypeScript Build: Zero errors (npx tsc --noEmit clean)
+- ✅ Preview-HTML und .env.local gelöscht
+- ✅ Dev-Server gestoppt
