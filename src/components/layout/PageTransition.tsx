@@ -7,32 +7,44 @@ interface PageTransitionProps {
 
 export function PageTransition({ pageKey, children }: PageTransitionProps) {
   const [displayChildren, setDisplayChildren] = useState(children);
-  const [transitioning, setTransitioning] = useState(false);
+  const [phase, setPhase] = useState<"idle" | "exit" | "enter">("idle");
   const prevKey = useRef(pageKey);
 
   useEffect(() => {
     if (prevKey.current !== pageKey) {
-      setTransitioning(true);
-      const timer = setTimeout(() => {
+      // Exit phase
+      setPhase("exit");
+      const exitTimer = setTimeout(() => {
         setDisplayChildren(children);
-        setTransitioning(false);
+        setPhase("enter");
         prevKey.current = pageKey;
-      }, 120);
-      return () => clearTimeout(timer);
+        // Enter → idle
+        const enterTimer = setTimeout(() => setPhase("idle"), 200);
+        return () => clearTimeout(enterTimer);
+      }, 100);
+      return () => clearTimeout(exitTimer);
     } else {
       setDisplayChildren(children);
     }
   }, [pageKey, children]);
 
-  return (
-    <div
-      className="transition-all duration-150 ease-[var(--ease-out)]"
-      style={{
-        opacity: transitioning ? 0 : 1,
-        transform: transitioning ? "translateY(4px)" : "translateY(0)",
-      }}
-    >
-      {displayChildren}
-    </div>
-  );
+  const style: React.CSSProperties =
+    phase === "exit"
+      ? {
+          opacity: 0,
+          transform: "translateX(-6px)",
+          transition: "opacity 100ms var(--ease-brutal), transform 100ms var(--ease-brutal)",
+        }
+      : phase === "enter"
+        ? {
+            opacity: 1,
+            transform: "translateX(0)",
+            transition: "opacity 200ms var(--ease-out), transform 200ms var(--ease-out)",
+          }
+        : {
+            opacity: 1,
+            transform: "translateX(0)",
+          };
+
+  return <div style={style}>{displayChildren}</div>;
 }

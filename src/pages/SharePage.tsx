@@ -45,7 +45,7 @@ export function SharePage({ token }: { token: string }) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
         <div className="animate-pulse flex flex-col items-center gap-3">
-          <div className="w-10 h-10 rounded-[10px] bg-white/10" />
+          <div className="w-10 h-10 bg-white/10 border border-white/20" />
           <p className="text-[13px] text-white/40">Laden…</p>
         </div>
       </div>
@@ -103,11 +103,11 @@ export function SharePage({ token }: { token: string }) {
             {client && <span>{client.company || client.name}</span>}
             {idea && (
               <>
-                <span className="w-1 h-1 rounded-full bg-white/20" />
+                <span className="w-1 h-1 bg-white/20" />
                 <span>{idea.title}</span>
               </>
             )}
-            <span className="w-1 h-1 rounded-full bg-white/20" />
+            <span className="w-1 h-1 bg-white/20" />
             <span className={`px-2 py-0.5 text-[10px] font-bold uppercase border ${
               video.status === "freigegeben" ? "bg-emerald-500/10 text-emerald-400 border-emerald-400/30" :
               video.status === "review" ? "bg-amber-500/10 text-amber-400 border-amber-400/30" :
@@ -157,7 +157,7 @@ export function SharePage({ token }: { token: string }) {
                   style={{ borderRadius: 0 }}
                 >
                   {comment.timestamp != null && (
-                    <span className="flex-shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/10 text-[11px] font-mono text-white/60">
+                    <span className="flex-shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 bg-white/10 text-[11px] font-mono text-white/60 border border-white/20">
                       <Clock className="w-3 h-3" />
                       {formatTimestamp(comment.timestamp)}
                     </span>

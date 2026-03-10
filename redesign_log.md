@@ -729,3 +729,92 @@ Rein visuelle Änderungen — alle Hooks, State, Mutations, Queries, Keyboard-Sh
 - ✅ TypeScript Build: Zero errors (npx tsc --noEmit clean)
 - ✅ Preview-HTML und .env.local gelöscht
 - ✅ Dev-Server gestoppt
+
+## Phase 9: Polish + Micro-Interactions (10.03.2026, 05:00)
+
+### Was wurde gemacht
+
+**Skeleton.tsx — Komplett-Redesign auf Brutalist-Stil:**
+- Entfernt: Alle `rounded-*` (md, lg, full, [10px]) → 0px radius überall
+- Entfernt: `border-subtle` → 2px `border-strong` durchgehend
+- Entfernt: `animate-pulse` → Custom `skeleton-shimmer` Animation (directional sweep, nicht opacity-pulse)
+- Alle Skeleton-Varianten auf Brand-Stil migriert:
+  - **StatSkeleton**: Left accent bar (3px), square icon-box
+  - **ListItemSkeleton**: Square dots statt rounded-full, stacked (-2px margin-top)
+  - **DashboardSkeleton**: Green accent bar placeholder, stacked stat-grid, connected widget-panels
+  - **PipelineSkeleton**: Connected Kanban-Columns (-2px margin), column headers mit border-bottom
+  - **CalendarSkeleton**: Grid mit 2px borders, connected nav-buttons
+  - **LibrarySkeleton**: Green accent bars bei Section-Labels, stacked folder/video cards
+  - **ClientsSkeleton**: Stacked grid, border-top separator in cards
+  - **TeamSkeleton**: Stacked items, square avatare, square role badges
+  - **IdeasListSkeleton**: Connected filter-bar, stacked items
+
+**PageTransition.tsx — Verfeinert:**
+- Von simplem opacity-fade auf 2-Phasen-System (exit → enter → idle)
+- Exit: translateX(-6px) + opacity 0, 100ms, ease-brutal
+- Enter: translateX(0) + opacity 1, 200ms, ease-out
+- Keine CSS-Klassen mehr, direkte style-Objekte für saubere Phasen-Kontrolle
+- Kein `transition-all` mehr (war zu breit), nur opacity + transform
+
+**ErrorBoundary.tsx — Brutalist-Redesign:**
+- Icon-Container: Square (0px radius), 2px border-error, error-tinted bg
+- Title: Uppercase, 0.04em tracking, font-bold
+- Error-Message: font-mono (technischer Fehlertext)
+- Button: `btn-brutal` helper class statt eigenem rounded-md + accent-bg
+- Entfernt: `rounded-full`, `rounded-[var(--radius-md)]`
+
+**index.css — Neue Sektionen hinzugefügt:**
+
+**1. Skeleton Loading Animation:**
+- `@keyframes skeletonShimmer`: Horizontaler Sweep (400px range)
+- `.skeleton-shimmer`: Gradient-basiert (surface-2 → surface-3 → surface-2), 1.6s, ease-in-out
+- Kein `animate-pulse` mehr — shimmer ist visuell interessanter + brand-consistent
+
+**2. Unified Hover States:**
+- `.hover-brutal`: translate(-2px, -2px) + brutal shadow + green border — für Cards/Items
+- `.hover-brutal-sm`: translate(-1px, -1px) + brutal-sm shadow — für kleinere Elemente
+- `.hover-green`: Color → green Transition — für Links/Labels
+- Alle mit `var(--duration-fast)` + `var(--ease-brutal)` Timing
+
+**3. Unified Focus States (Accessibility WCAG 2.1 AA):**
+- Base `:focus-visible`: 2px green outline + 4px green ring (0.15 opacity) + glow
+- Inputs: `outline: none`, green border + brutal-sm shadow (kein doppelter Outline)
+- Buttons/Links: Green outline + ring (kein transform, das ist für hover)
+- `:focus:not(:focus-visible)`: Keine outline bei Mouse-Klicks (nur Keyboard-Focus sichtbar)
+- Alte duplicate `:focus-visible` Regel entfernt (war bei Zeile 160)
+
+**4. Responsive Polish:**
+- Mobile (≤640px): Reduzierte brutal shadows (3px statt 4px) — weniger visuelles Gewicht auf kleinen Screens
+- Tablet (641–1024px): Moderate shadow-lg Anpassung
+- `prefers-reduced-motion`: Alle Animationen auf 0.01ms, skeleton-shimmer deaktiviert
+- Touch-Devices (`hover: none` + `pointer: coarse`): Min-Height/Width 44px auf Buttons (Touch-Target-Size), keine hover-transforms (kleben auf Touch)
+
+**5. Weitere Fixes:**
+- **SharePage.tsx**: `rounded-[10px]` → square, `rounded-full` dots → square, `rounded` timestamp badge → square mit border
+- **kanban.tsx** (Base-Komponente): `rounded-lg bg-zinc-100 dark:bg-zinc-900` → 2px border-strong + surface-1 (Brand-consistent)
+- **Shimmer @keyframes**: Fehlende `}` bei `@keyframes shimmer` gefixt
+
+### Design-Entscheidungen
+- **Shimmer statt Pulse**: animate-pulse ist generisch. Ein horizontaler Gradient-Sweep passt zum technischen Brutalist-Vibe.
+- **2-Phasen PageTransition**: Exit geht nach links (translateX), Enter kommt von neutral. Horizontale Bewegung passt zum App-Navigations-Gefühl.
+- **Focus vs Hover Trennung**: Focus-visible = grüner Ring (Accessibility). Hover = translate + shadow (Mouse). Kein Mischen.
+- **Touch-Target 44px**: WCAG 2.5.5 Target Size — alle interaktiven Elemente mindestens 44×44px auf Touch-Devices.
+
+### Keine Funktionalität geändert
+Rein visuelle Änderungen — alle Hooks, State, Mutations, Queries und Logik unverändert.
+
+### Visueller Review
+- ✅ Dev-Server gestartet (Port 5180, .env.local mit Dummy-Convex-URL)
+- ✅ Desktop Screenshot: Login-Seite korrekt
+- ✅ Hover State: ANMELDEN Button — translate + lighter green ✅
+- ✅ Focus State: E-Mail Input — grüne Border + glow ✅
+- ✅ Tab-Navigation: Passwort → ANMELDEN — grüner Focus-Ring ✅
+- ✅ Cookie Banner OK Hover: translate + brutal shadow ✅
+- ✅ Mobile Viewport (375×812): Login responsive, zentriert ✅
+- ✅ Tablet Viewport (768×1024): Login responsive ✅
+- ✅ Background-Farben korrekt (#0A0A0A)
+- ✅ Green #00DC82 durchgängig als Accent
+- ✅ 0px border-radius überall
+- ✅ TypeScript Build: Zero errors (npx tsc --noEmit clean)
+- ✅ .env.local gelöscht
+- ✅ Dev-Server gestoppt

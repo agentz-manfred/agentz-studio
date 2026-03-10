@@ -156,12 +156,7 @@ button:not(:disabled):hover,
   transition: all var(--duration-fast) var(--ease-brutal);
 }
 
-/* ─── Brutal Focus States ─── */
-:focus-visible {
-  outline: 2px solid var(--color-green);
-  outline-offset: 2px;
-  box-shadow: var(--shadow-glow-sm);
-}
+/* ─── Focus States → see "Unified Focus States" section below ─── */
 
 /* ─── Selection ─── */
 ::selection {
@@ -215,6 +210,11 @@ button:not(:disabled):hover,
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
+}
+
+@keyframes skeletonShimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
 }
 
 @keyframes float {
@@ -609,6 +609,150 @@ button:not(:disabled):hover,
 @supports (-webkit-overflow-scrolling: touch) {
   .overflow-auto {
     -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Skeleton Loading — Brutalist Shimmer
+   ═══════════════════════════════════════════════════════════════════ */
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-2) 0%,
+    var(--color-surface-3) 40%,
+    var(--color-surface-2) 80%
+  );
+  background-size: 400px 100%;
+  animation: skeletonShimmer 1.6s var(--ease-in-out) infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Unified Hover States — Green Glow + Brutal Shadow Shifts
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Base hover transition for all interactive elements */
+.hover-brutal {
+  transition: transform var(--duration-fast) var(--ease-brutal),
+              box-shadow var(--duration-fast) var(--ease-brutal),
+              border-color var(--duration-fast) var(--ease-brutal),
+              background-color var(--duration-fast) var(--ease-brutal),
+              color var(--duration-fast) var(--ease-brutal);
+}
+
+.hover-brutal:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-brutal);
+  border-color: var(--color-border-green);
+}
+
+.hover-brutal-sm {
+  transition: transform var(--duration-fast) var(--ease-brutal),
+              box-shadow var(--duration-fast) var(--ease-brutal),
+              border-color var(--duration-fast) var(--ease-brutal),
+              background-color var(--duration-fast) var(--ease-brutal),
+              color var(--duration-fast) var(--ease-brutal);
+}
+
+.hover-brutal-sm:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-brutal-sm);
+  border-color: var(--color-border-green);
+}
+
+/* Green text-glow on hover (for links, labels) */
+.hover-green {
+  transition: color var(--duration-fast) var(--ease-brutal);
+}
+
+.hover-green:hover {
+  color: var(--color-green);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Unified Focus States — Accessibility (WCAG 2.1 AA)
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Enhanced focus-visible: green outline + glow for all interactive elements */
+:focus-visible {
+  outline: 2px solid var(--color-green);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(0, 220, 130, 0.15), var(--shadow-glow-sm);
+}
+
+/* Inputs get a left-bar + border change on focus */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[contenteditable]:focus-visible {
+  outline: none;
+  border-color: var(--color-green);
+  box-shadow: var(--shadow-brutal-sm);
+}
+
+/* Buttons: green ring only (no translate on focus, that's for hover) */
+button:focus-visible,
+[role="button"]:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--color-green);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(0, 220, 130, 0.15);
+}
+
+/* Skip focus ring for mouse clicks (preserve keyboard focus) */
+:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Responsive Polish — Mobile + Tablet
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Mobile: reduce brutal shadows (too much offset on small screens) */
+@media (max-width: 640px) {
+  :root {
+    --shadow-brutal: 3px 3px 0px #00DC82;
+    --shadow-brutal-lg: 4px 4px 0px #00DC82;
+    --shadow-brutal-dark: 3px 3px 0px #0A0A0A;
+  }
+}
+
+/* Tablet: moderate adjustments */
+@media (min-width: 641px) and (max-width: 1024px) {
+  :root {
+    --shadow-brutal-lg: 5px 5px 0px #00DC82;
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .skeleton-shimmer {
+    animation: none;
+    background: var(--color-surface-2);
+  }
+}
+
+/* Touch devices: larger touch targets */
+@media (hover: none) and (pointer: coarse) {
+  button, [role="button"], a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Disable hover transforms on touch (they stick) */
+  .hover-brutal:hover,
+  .hover-brutal-sm:hover,
+  .stat-card:hover,
+  .client-card:hover,
+  .card-brutal:hover {
+    transform: none;
   }
 }
 
