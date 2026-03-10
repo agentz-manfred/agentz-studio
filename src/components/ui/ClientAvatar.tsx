@@ -11,13 +11,13 @@ interface ClientAvatarProps {
 }
 
 const SIZES = {
-  xs: "w-5 h-5 text-[9px]",
-  sm: "w-7 h-7 text-[10px]",
-  md: "w-9 h-9 text-[12px]",
-  lg: "w-12 h-12 text-[14px]",
+  xs: { box: "w-5 h-5", text: "text-[8px]", border: "1px" },
+  sm: { box: "w-7 h-7", text: "text-[10px]", border: "1px" },
+  md: { box: "w-9 h-9", text: "text-[12px]", border: "2px" },
+  lg: { box: "w-12 h-12", text: "text-[14px]", border: "2px" },
 };
 
-const DEFAULT_COLOR = "#4F46E5";
+const DEFAULT_COLOR = "#00DC82";
 
 export function ClientAvatar({ name, avatarColor, avatarImageId, size = "sm", className = "" }: ClientAvatarProps) {
   const imageUrl = useQuery(
@@ -33,22 +33,28 @@ export function ClientAvatar({ name, avatarColor, avatarImageId, size = "sm", cl
     .toUpperCase();
 
   const color = avatarColor || DEFAULT_COLOR;
-  const sizeClass = SIZES[size];
+  const s = SIZES[size];
 
   if (imageUrl) {
     return (
       <img
         src={imageUrl}
         alt={name}
-        className={`${sizeClass} rounded-full object-cover flex-shrink-0 ${className}`}
+        className={`${s.box} object-cover flex-shrink-0 ${className}`}
+        style={{ border: `${s.border} solid var(--color-border-strong)` }}
       />
     );
   }
 
   return (
     <div
-      className={`${sizeClass} rounded-full flex items-center justify-center flex-shrink-0 font-bold text-white ${className}`}
-      style={{ background: color }}
+      className={`${s.box} flex items-center justify-center flex-shrink-0 font-bold text-white ${s.text} ${className}`}
+      style={{
+        background: color,
+        border: `${s.border} solid ${color}`,
+        boxShadow: size === "lg" ? "3px 3px 0px var(--color-surface-0)" : size === "md" ? "2px 2px 0px var(--color-surface-0)" : "none",
+        letterSpacing: "0.05em",
+      }}
     >
       {initials}
     </div>

@@ -36,16 +36,16 @@ import { RichTextEditor, RichTextDisplay } from "../components/ui/RichTextEditor
 import { openMonthlyReport } from "../lib/export";
 import { STATUS_LABELS } from "../lib/utils";
 
-const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
-  idee: { bg: "rgba(107,114,128,0.1)", text: "#6b7280" },
-  skript: { bg: "rgba(139,92,246,0.1)", text: "#8b5cf6" },
-  freigabe: { bg: "rgba(245,158,11,0.1)", text: "#f59e0b" },
-  korrektur: { bg: "rgba(239,68,68,0.1)", text: "#ef4444" },
-  freigegeben: { bg: "rgba(34,197,94,0.1)", text: "#22c55e" },
-  gedreht: { bg: "rgba(59,130,246,0.1)", text: "#3b82f6" },
-  geschnitten: { bg: "rgba(99,102,241,0.1)", text: "#6366f1" },
-  review: { bg: "rgba(239,68,68,0.1)", text: "#ef4444" },
-  "veröffentlicht": { bg: "rgba(16,185,129,0.1)", text: "#10b981" },
+const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  idee: { bg: "rgba(107,114,128,0.1)", text: "#6b7280", border: "rgba(107,114,128,0.3)" },
+  skript: { bg: "rgba(139,92,246,0.1)", text: "#8b5cf6", border: "rgba(139,92,246,0.3)" },
+  freigabe: { bg: "rgba(245,158,11,0.1)", text: "#f59e0b", border: "rgba(245,158,11,0.3)" },
+  korrektur: { bg: "rgba(239,68,68,0.1)", text: "#ef4444", border: "rgba(239,68,68,0.3)" },
+  freigegeben: { bg: "rgba(34,197,94,0.1)", text: "#22c55e", border: "rgba(34,197,94,0.3)" },
+  gedreht: { bg: "rgba(59,130,246,0.1)", text: "#3b82f6", border: "rgba(59,130,246,0.3)" },
+  geschnitten: { bg: "rgba(99,102,241,0.1)", text: "#6366f1", border: "rgba(99,102,241,0.3)" },
+  review: { bg: "rgba(239,68,68,0.1)", text: "#ef4444", border: "rgba(239,68,68,0.3)" },
+  "veröffentlicht": { bg: "rgba(0,220,130,0.1)", text: "#00DC82", border: "rgba(0,220,130,0.3)" },
 };
 
 const PLATFORM_OPTIONS = [
@@ -71,6 +71,24 @@ function formatDate(ts: number) {
   });
 }
 
+/* ─── Section Header ─── */
+function SectionHeader({ title, icon: Icon, action, onAction }: { title: string; icon: any; action?: string; onAction?: () => void }) {
+  return (
+    <div className="flex items-center justify-between mb-3">
+      <h2 className="text-[13px] font-bold uppercase tracking-[0.08em] flex items-center gap-2">
+        <div className="w-[3px] h-[20px] bg-[var(--color-green)]" />
+        <Icon className="w-4 h-4 text-[var(--color-text-muted)]" strokeWidth={2} />
+        {title}
+      </h2>
+      {action && onAction && (
+        <button onClick={onAction} className="text-[11px] uppercase tracking-[0.06em] font-semibold text-[var(--color-text-muted)] hover:text-[var(--color-green)] transition-colors flex items-center gap-1">
+          {action} <ArrowRight className="w-3 h-3" />
+        </button>
+      )}
+    </div>
+  );
+}
+
 /* ─── Profile Edit Section ─── */
 function ProfileEditor({
   client,
@@ -93,7 +111,7 @@ function ProfileEditor({
     mainPlatform: client.mainPlatform || "",
     videosPerWeek: client.videosPerWeek ?? "",
     context: client.context || "",
-    avatarColor: client.avatarColor || "#4F46E5",
+    avatarColor: client.avatarColor || "#00DC82",
   });
 
   const togglePlatform = (id: string) => {
@@ -140,23 +158,19 @@ function ProfileEditor({
     setSaving(false);
   };
 
-  const inputClass =
-    "w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none transition-colors";
-  const labelClass =
-    "block text-[12px] font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1.5";
+  const inputClass = "w-full h-10 px-3 border-2 border-[var(--color-border-strong)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-green)] focus:shadow-[var(--shadow-brutal-sm)] focus:outline-none transition-all";
+  const labelClass = "block text-[11px] font-bold text-[var(--color-text-muted)] uppercase tracking-[0.08em] mb-1.5";
 
   return (
-    <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] border border-[var(--color-border-subtle)] overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-3.5 border-b border-[var(--color-border-subtle)]">
-        <h3 className="text-[15px] font-semibold flex items-center gap-2">
-          <Pencil className="w-4 h-4 text-[var(--color-accent)]" />
+    <div className="bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-3.5 border-b-2 border-[var(--color-border-strong)]">
+        <h3 className="text-[13px] font-bold uppercase tracking-[0.08em] flex items-center gap-2">
+          <div className="w-[3px] h-[20px] bg-[var(--color-green)]" />
+          <Pencil className="w-4 h-4 text-[var(--color-green)]" strokeWidth={2} />
           Profil bearbeiten
         </h3>
-        <button
-          onClick={onClose}
-          className="p-1 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors"
-        >
-          <X className="w-4 h-4 text-[var(--color-text-tertiary)]" />
+        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center border border-[var(--color-border-strong)] hover:border-[var(--color-error)] hover:text-[var(--color-error)] transition-colors">
+          <X className="w-4 h-4" strokeWidth={2} />
         </button>
       </div>
 
@@ -165,36 +179,19 @@ function ProfileEditor({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className={labelClass}>Name</label>
-            <input
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className={inputClass}
-            />
+            <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputClass} />
           </div>
           <div>
             <label className={labelClass}>Unternehmen</label>
-            <input
-              value={form.company}
-              onChange={(e) => setForm({ ...form, company: e.target.value })}
-              className={inputClass}
-            />
+            <input value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} className={inputClass} />
           </div>
           <div>
             <label className={labelClass}>E-Mail</label>
-            <input
-              type="email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className={inputClass}
-            />
+            <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={inputClass} />
           </div>
           <div>
             <label className={labelClass}>Telefon</label>
-            <input
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              className={inputClass}
-            />
+            <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={inputClass} />
           </div>
         </div>
 
@@ -203,13 +200,18 @@ function ProfileEditor({
           <label className={labelClass}>Avatar-Farbe</label>
           <div className="flex items-center gap-3">
             <div className="flex gap-1.5 flex-wrap">
-              {["#4F46E5", "#7C3AED", "#2563EB", "#0891B2", "#059669", "#D97706", "#DC2626", "#DB2777", "#4338CA", "#0D9488", "#CA8A04", "#9333EA"].map(c => (
+              {["#00DC82", "#7C3AED", "#2563EB", "#0891B2", "#059669", "#D97706", "#DC2626", "#DB2777", "#4338CA", "#0D9488", "#CA8A04", "#9333EA"].map(c => (
                 <button
                   key={c}
                   type="button"
                   onClick={() => setForm({ ...form, avatarColor: c })}
-                  className={`w-7 h-7 rounded-full border-2 transition-all ${form.avatarColor === c ? "border-[var(--color-text-primary)] scale-110" : "border-transparent hover:scale-105"}`}
-                  style={{ background: c }}
+                  className="w-7 h-7 border-2 transition-all"
+                  style={{
+                    background: c,
+                    borderColor: form.avatarColor === c ? "var(--color-text-primary)" : "transparent",
+                    transform: form.avatarColor === c ? "translate(-1px, -1px)" : "",
+                    boxShadow: form.avatarColor === c ? "2px 2px 0px var(--color-surface-4)" : "",
+                  }}
                 />
               ))}
             </div>
@@ -217,7 +219,7 @@ function ProfileEditor({
               type="color"
               value={form.avatarColor}
               onChange={(e) => setForm({ ...form, avatarColor: e.target.value })}
-              className="w-7 h-7 rounded cursor-pointer border-0 p-0"
+              className="w-7 h-7 cursor-pointer border-2 border-[var(--color-border-strong)] p-0"
               title="Eigene Farbe wählen"
             />
           </div>
@@ -231,30 +233,12 @@ function ProfileEditor({
           </label>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <span className="text-[11px] text-[var(--color-text-tertiary)]">
-                Beginn
-              </span>
-              <input
-                type="date"
-                value={form.contractStart}
-                onChange={(e) =>
-                  setForm({ ...form, contractStart: e.target.value })
-                }
-                className={inputClass}
-              />
+              <span className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-[0.06em]">Beginn</span>
+              <input type="date" value={form.contractStart} onChange={(e) => setForm({ ...form, contractStart: e.target.value })} className={inputClass} />
             </div>
             <div>
-              <span className="text-[11px] text-[var(--color-text-tertiary)]">
-                Ende
-              </span>
-              <input
-                type="date"
-                value={form.contractEnd}
-                onChange={(e) =>
-                  setForm({ ...form, contractEnd: e.target.value })
-                }
-                className={inputClass}
-              />
+              <span className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-[0.06em]">Ende</span>
+              <input type="date" value={form.contractEnd} onChange={(e) => setForm({ ...form, contractEnd: e.target.value })} className={inputClass} />
             </div>
           </div>
         </div>
@@ -274,38 +258,24 @@ function ProfileEditor({
                   key={p.id}
                   type="button"
                   onClick={() => togglePlatform(p.id)}
-                  onDoubleClick={() =>
-                    setForm((f) => ({ ...f, mainPlatform: p.id }))
-                  }
-                  className="relative px-3 py-1.5 rounded-full text-[13px] font-medium border transition-all"
+                  onDoubleClick={() => setForm((f) => ({ ...f, mainPlatform: p.id }))}
+                  className="px-3 py-1.5 text-[12px] font-semibold border-2 transition-all uppercase tracking-[0.04em]"
                   style={{
-                    borderColor: active
-                      ? "var(--color-accent)"
-                      : "var(--color-border)",
-                    background: active
-                      ? "rgba(59,130,246,0.08)"
-                      : "transparent",
-                    color: active
-                      ? "var(--color-accent)"
-                      : "var(--color-text-tertiary)",
+                    borderColor: active ? "var(--color-green)" : "var(--color-border-strong)",
+                    background: active ? "var(--color-green-subtle)" : "transparent",
+                    color: active ? "var(--color-green)" : "var(--color-text-tertiary)",
+                    transform: active ? "translate(-1px, -1px)" : "",
+                    boxShadow: active ? "2px 2px 0px var(--color-surface-4)" : "",
                   }}
-                  title={
-                    active
-                      ? "Doppelklick = Hauptplattform"
-                      : "Klick zum Hinzufügen"
-                  }
+                  title={active ? "Doppelklick = Hauptplattform" : "Klick zum Hinzufügen"}
                 >
                   {p.icon} {p.label}
-                  {isMain && (
-                    <span className="ml-1 text-[10px] font-bold opacity-70">
-                      ★
-                    </span>
-                  )}
+                  {isMain && <span className="ml-1 text-[10px] font-bold">★</span>}
                 </button>
               );
             })}
           </div>
-          <p className="text-[11px] text-[var(--color-text-tertiary)] mt-1.5">
+          <p className="text-[10px] text-[var(--color-text-muted)] mt-1.5 uppercase tracking-[0.04em]">
             Klick = Auswählen · Doppelklick = Hauptplattform (★)
           </p>
         </div>
@@ -320,14 +290,12 @@ function ProfileEditor({
             type="number"
             min="1"
             value={form.videosPerWeek}
-            onChange={(e) =>
-              setForm({ ...form, videosPerWeek: e.target.value })
-            }
+            onChange={(e) => setForm({ ...form, videosPerWeek: e.target.value })}
             placeholder="z.B. 7"
             className={inputClass + " max-w-[160px]"}
           />
           {form.videosPerWeek && Number(form.videosPerWeek) > 0 && (
-            <p className="text-[11px] text-[var(--color-text-tertiary)] mt-1">
+            <p className="text-[10px] text-[var(--color-text-muted)] mt-1 font-mono tabular-nums">
               ≈ {Math.round(Number(form.videosPerWeek) * 4.33)} Videos/Monat
             </p>
           )}
@@ -337,27 +305,24 @@ function ProfileEditor({
         <div>
           <label className={labelClass}>
             <FileText className="w-3.5 h-3.5 inline mr-1" />
-            Kundenkontext (wird bei KI-Generierung mitgegeben)
+            Kundenkontext (KI-Generierung)
           </label>
           <RichTextEditor
             content={form.context}
             onChange={(html) => setForm({ ...form, context: html })}
-            placeholder="Tonalität, Do's & Don'ts, Zielgruppe, Besonderheiten, Referenz-Videos, Branche… Markdown einfügen funktioniert!"
+            placeholder="Tonalität, Do's & Don'ts, Zielgruppe, Besonderheiten…"
           />
         </div>
 
         {/* Save */}
         <div className="flex justify-end gap-3 pt-2">
-          <button
-            onClick={onClose}
-            className="h-9 px-4 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[13px] font-medium hover:bg-[var(--color-surface-2)] transition-colors"
-          >
+          <button onClick={onClose} className="btn-brutal-outline h-9 !py-0 text-[12px]">
             Abbrechen
           </button>
           <button
             onClick={handleSave}
             disabled={saving || !form.name || !form.email}
-            className="h-9 px-5 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[13px] font-medium hover:bg-[var(--color-accent-hover)] disabled:opacity-50 transition-colors flex items-center gap-1.5"
+            className="btn-brutal h-9 !py-0 text-[12px] disabled:opacity-50 flex items-center gap-1.5"
           >
             <Save className="w-3.5 h-3.5" />
             Speichern
@@ -420,13 +385,14 @@ function CategoryManager({ clientId }: { clientId: string }) {
   return (
     <section>
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-[15px] font-semibold flex items-center gap-2">
-          <Tag className="w-4 h-4 text-[var(--color-text-tertiary)]" />
+        <h2 className="text-[13px] font-bold uppercase tracking-[0.08em] flex items-center gap-2">
+          <div className="w-[3px] h-[20px] bg-[var(--color-green)]" />
+          <Tag className="w-4 h-4 text-[var(--color-text-muted)]" strokeWidth={2} />
           Kategorien
         </h2>
         <button
           onClick={() => setAdding(true)}
-          className="text-[12px] text-[var(--color-accent)] hover:underline flex items-center gap-1"
+          className="text-[11px] uppercase tracking-[0.06em] font-semibold text-[var(--color-text-muted)] hover:text-[var(--color-green)] transition-colors flex items-center gap-1"
         >
           <Plus className="w-3 h-3" />
           Neue Kategorie
@@ -437,40 +403,28 @@ function CategoryManager({ clientId }: { clientId: string }) {
         {sorted.map((cat) => {
           if (editId === cat._id) {
             return (
-              <div
-                key={cat._id}
-                className="flex items-center gap-1.5 bg-[var(--color-surface-1)] border border-[var(--color-border)] rounded-full pl-1 pr-2 py-0.5"
-              >
+              <div key={cat._id} className="flex items-center gap-1.5 bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] pl-1 pr-2 py-0.5">
                 <div className="flex gap-0.5 ml-1">
                   {CATEGORY_COLORS.slice(0, 7).map((c) => (
                     <button
                       key={c}
                       onClick={() => setEditColor(c)}
-                      className="w-4 h-4 rounded-full border-2 transition-all"
-                      style={{
-                        background: c,
-                        borderColor:
-                          editColor === c
-                            ? "var(--color-text-primary)"
-                            : "transparent",
-                      }}
+                      className="w-4 h-4 border-2 transition-all"
+                      style={{ background: c, borderColor: editColor === c ? "var(--color-text-primary)" : "transparent" }}
                     />
                   ))}
                 </div>
                 <input
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
-                  className="w-20 h-6 px-1.5 text-[12px] bg-transparent border-b border-[var(--color-border)] focus:outline-none focus:border-[var(--color-accent)]"
+                  className="w-20 h-6 px-1.5 text-[12px] bg-transparent border-b-2 border-[var(--color-border-strong)] focus:outline-none focus:border-[var(--color-green)]"
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === "Enter") handleUpdate(cat._id);
                     if (e.key === "Escape") setEditId(null);
                   }}
                 />
-                <button
-                  onClick={() => handleUpdate(cat._id)}
-                  className="p-0.5 text-[var(--color-accent)]"
-                >
+                <button onClick={() => handleUpdate(cat._id)} className="p-0.5 text-[var(--color-green)]">
                   <Save className="w-3 h-3" />
                 </button>
               </div>
@@ -480,11 +434,11 @@ function CategoryManager({ clientId }: { clientId: string }) {
           return (
             <div
               key={cat._id}
-              className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-medium cursor-default transition-all"
+              className="group flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold cursor-default transition-all uppercase tracking-[0.04em]"
               style={{
                 background: cat.color + "18",
                 color: cat.color,
-                border: `1px solid ${cat.color}30`,
+                border: `2px solid ${cat.color}30`,
               }}
               onClick={() => {
                 setEditId(cat._id);
@@ -492,16 +446,10 @@ function CategoryManager({ clientId }: { clientId: string }) {
                 setEditColor(cat.color);
               }}
             >
-              <span
-                className="w-2 h-2 rounded-full flex-shrink-0"
-                style={{ background: cat.color }}
-              />
+              <span className="w-2.5 h-2.5 flex-shrink-0" style={{ background: cat.color }} />
               {cat.name}
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleRemove(cat._id);
-                }}
+                onClick={(e) => { e.stopPropagation(); handleRemove(cat._id); }}
                 className="opacity-0 group-hover:opacity-100 p-0.5 hover:text-[var(--color-error)] transition-all"
               >
                 <Trash2 className="w-3 h-3" />
@@ -512,20 +460,14 @@ function CategoryManager({ clientId }: { clientId: string }) {
 
         {/* Add inline */}
         {adding && (
-          <div className="flex items-center gap-1.5 bg-[var(--color-surface-1)] border border-[var(--color-border)] rounded-full pl-1 pr-2 py-0.5">
+          <div className="flex items-center gap-1.5 bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] pl-1 pr-2 py-0.5">
             <div className="flex gap-0.5 ml-1">
               {CATEGORY_COLORS.slice(0, 7).map((c) => (
                 <button
                   key={c}
                   onClick={() => setNewColor(c)}
-                  className="w-4 h-4 rounded-full border-2 transition-all"
-                  style={{
-                    background: c,
-                    borderColor:
-                      newColor === c
-                        ? "var(--color-text-primary)"
-                        : "transparent",
-                  }}
+                  className="w-4 h-4 border-2 transition-all"
+                  style={{ background: c, borderColor: newColor === c ? "var(--color-text-primary)" : "transparent" }}
                 />
               ))}
             </div>
@@ -533,31 +475,24 @@ function CategoryManager({ clientId }: { clientId: string }) {
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               placeholder="Name…"
-              className="w-20 h-6 px-1.5 text-[12px] bg-transparent border-b border-[var(--color-border)] focus:outline-none focus:border-[var(--color-accent)]"
+              className="w-20 h-6 px-1.5 text-[12px] bg-transparent border-b-2 border-[var(--color-border-strong)] focus:outline-none focus:border-[var(--color-green)]"
               autoFocus
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleAdd();
                 if (e.key === "Escape") setAdding(false);
               }}
             />
-            <button
-              onClick={handleAdd}
-              disabled={!newName.trim()}
-              className="p-0.5 text-[var(--color-accent)] disabled:opacity-30"
-            >
+            <button onClick={handleAdd} disabled={!newName.trim()} className="p-0.5 text-[var(--color-green)] disabled:opacity-30">
               <Plus className="w-3 h-3" />
             </button>
-            <button
-              onClick={() => setAdding(false)}
-              className="p-0.5 text-[var(--color-text-tertiary)]"
-            >
+            <button onClick={() => setAdding(false)} className="p-0.5 text-[var(--color-text-tertiary)]">
               <X className="w-3 h-3" />
             </button>
           </div>
         )}
 
         {sorted.length === 0 && !adding && (
-          <p className="text-[13px] text-[var(--color-text-tertiary)] italic">
+          <p className="text-[12px] text-[var(--color-text-muted)] italic">
             Keine Kategorien — erstelle z.B. "Real Talk", "Comedy", "Sketch"
           </p>
         )}
@@ -578,15 +513,15 @@ function ProfileInfo({ client }: { client: any }) {
   }
 
   return (
-    <section className="bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-4">
+    <section className="bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] p-4">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-[13px]">
         {/* Contract */}
         {(client.contractStart || client.contractEnd) && (
           <div>
-            <span className="text-[11px] text-[var(--color-text-tertiary)] uppercase tracking-wider font-medium">
+            <span className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-[0.08em] font-bold">
               Vertrag
             </span>
-            <p className="mt-0.5 font-medium">
+            <p className="mt-1 font-semibold font-mono tabular-nums">
               {client.contractStart
                 ? new Date(client.contractStart).toLocaleDateString("de-DE")
                 : "—"}{" "}
@@ -601,7 +536,7 @@ function ProfileInfo({ client }: { client: any }) {
         {/* Platforms */}
         {client.platforms?.length > 0 && (
           <div>
-            <span className="text-[11px] text-[var(--color-text-tertiary)] uppercase tracking-wider font-medium">
+            <span className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-[0.08em] font-bold">
               Plattformen
             </span>
             <div className="flex flex-wrap gap-1 mt-1">
@@ -611,13 +546,11 @@ function ProfileInfo({ client }: { client: any }) {
                 return (
                   <span
                     key={p}
-                    className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium"
+                    className="inline-flex items-center px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.04em]"
                     style={{
-                      background: isMain
-                        ? "rgba(59,130,246,0.12)"
-                        : "rgba(107,114,128,0.08)",
-                      color: isMain ? "#3b82f6" : "var(--color-text-secondary)",
-                      fontWeight: isMain ? 600 : 500,
+                      background: isMain ? "var(--color-green-subtle)" : "rgba(107,114,128,0.08)",
+                      color: isMain ? "var(--color-green)" : "var(--color-text-secondary)",
+                      border: `1px solid ${isMain ? "var(--color-border-green)" : "var(--color-border)"}`,
                     }}
                   >
                     {opt?.icon} {opt?.label || p}
@@ -632,13 +565,13 @@ function ProfileInfo({ client }: { client: any }) {
         {/* Videos/week */}
         {client.videosPerWeek && (
           <div>
-            <span className="text-[11px] text-[var(--color-text-tertiary)] uppercase tracking-wider font-medium">
+            <span className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-[0.08em] font-bold">
               Videos / Woche
             </span>
-            <p className="mt-0.5 font-semibold text-[16px]">
+            <p className="mt-1 font-bold text-[20px]" style={{ fontFamily: "var(--font-display)" }}>
               {client.videosPerWeek}
-              <span className="text-[11px] font-normal text-[var(--color-text-tertiary)] ml-1.5">
-                ≈ {Math.round(client.videosPerWeek * 4.33)}/Monat
+              <span className="text-[11px] font-normal text-[var(--color-text-muted)] ml-1.5 font-mono">
+                ≈ {Math.round(client.videosPerWeek * 4.33)}/mo
               </span>
             </p>
           </div>
@@ -647,9 +580,9 @@ function ProfileInfo({ client }: { client: any }) {
 
       {/* Context */}
       {client.context && (
-        <div className="mt-4 pt-4 border-t border-[var(--color-border-subtle)]">
-          <span className="text-[11px] text-[var(--color-text-tertiary)] uppercase tracking-wider font-medium flex items-center gap-1">
-            <FileText className="w-3 h-3" />
+        <div className="mt-4 pt-4 border-t-2 border-[var(--color-border-strong)]">
+          <span className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-[0.08em] font-bold flex items-center gap-1">
+            <FileText className="w-3 h-3" strokeWidth={2} />
             Kundenkontext
           </span>
           <div className="mt-2 max-h-[200px] overflow-y-auto">
@@ -702,8 +635,9 @@ function ActivityTimeline({
   return (
     <section>
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-[15px] font-semibold flex items-center gap-2">
-          <Activity className="w-4 h-4 text-[var(--color-text-tertiary)]" />
+        <h2 className="text-[13px] font-bold uppercase tracking-[0.08em] flex items-center gap-2">
+          <div className="w-[3px] h-[20px] bg-[var(--color-green)]" />
+          <Activity className="w-4 h-4 text-[var(--color-text-muted)]" strokeWidth={2} />
           Aktivität
         </h2>
         <div className="flex items-center gap-1">
@@ -711,11 +645,12 @@ function ActivityTimeline({
             <button
               key={fb.key}
               onClick={() => setFilter(fb.key)}
-              className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-all ${
-                filter === fb.key
-                  ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/20"
-                  : "text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-2)] border border-transparent"
-              }`}
+              className="px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.04em] transition-all border"
+              style={{
+                borderColor: filter === fb.key ? "var(--color-green)" : "var(--color-border)",
+                background: filter === fb.key ? "var(--color-green-subtle)" : "transparent",
+                color: filter === fb.key ? "var(--color-green)" : "var(--color-text-muted)",
+              }}
             >
               {fb.label}
             </button>
@@ -725,19 +660,19 @@ function ActivityTimeline({
 
       {!activity ? (
         <div className="flex items-center justify-center h-20">
-          <div className="w-4 h-4 border-2 border-[var(--color-accent)] border-t-transparent rounded-full animate-spin" />
+          <div className="w-4 h-4 border-2 border-[var(--color-green)] border-t-transparent animate-spin" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-8 text-center">
-          <Activity className="w-8 h-8 mx-auto mb-2 text-[var(--color-text-tertiary)] opacity-30" />
-          <p className="text-[13px] text-[var(--color-text-tertiary)]">
+        <div className="bg-[var(--color-surface-1)] border-2 border-dashed border-[var(--color-border-strong)] p-8 text-center">
+          <Activity className="w-8 h-8 mx-auto mb-2 text-[var(--color-text-muted)]" strokeWidth={1.5} />
+          <p className="text-[12px] text-[var(--color-text-muted)] uppercase tracking-[0.04em]">
             Noch keine Aktivitäten
           </p>
         </div>
       ) : (
         <div className="relative">
           {/* Timeline line */}
-          <div className="absolute left-[15px] top-3 bottom-3 w-px bg-[var(--color-border-subtle)]" />
+          <div className="absolute left-[15px] top-3 bottom-3 w-[2px] bg-[var(--color-border-strong)]" />
 
           <div className="space-y-0">
             {filtered.map((item, i) => {
@@ -765,7 +700,7 @@ function ActivityTimeline({
                   : { page: "video", id: item.targetId };
               } else {
                 icon = Upload;
-                color = "#22c55e";
+                color = "#00DC82";
                 title = `Video hochgeladen`;
                 detail = item.title;
               }
@@ -777,31 +712,28 @@ function ActivityTimeline({
                   key={`${item.type}-${item.id}`}
                   onClick={() => clickTarget && onNavigate(clickTarget.page, clickTarget.id)}
                   disabled={!clickTarget}
-                  className="w-full flex items-start gap-3 pl-0 pr-4 py-2.5 text-left hover:bg-[var(--color-accent-surface)] rounded-[var(--radius-md)] transition-colors group relative"
+                  className="w-full flex items-start gap-3 pl-0 pr-4 py-2.5 text-left hover:bg-[var(--color-green-subtle)] transition-colors group relative"
+                  style={{ marginTop: i > 0 ? "-2px" : "0" }}
                 >
                   {/* Icon dot */}
                   <div
-                    className="w-[30px] h-[30px] rounded-full flex items-center justify-center flex-shrink-0 relative z-10"
-                    style={{ background: color + "15" }}
+                    className="w-[30px] h-[30px] flex items-center justify-center flex-shrink-0 relative z-10 border"
+                    style={{ background: color + "15", borderColor: color + "30" }}
                   >
-                    <Icon className="w-3.5 h-3.5" style={{ color }} />
+                    <Icon className="w-3.5 h-3.5" style={{ color }} strokeWidth={2} />
                   </div>
 
                   <div className="flex-1 min-w-0 pt-0.5">
                     <div className="flex items-center gap-2">
-                      <span className="text-[13px] font-medium truncate">{title}</span>
-                      <span className="text-[11px] text-[var(--color-text-tertiary)] tabular-nums flex-shrink-0">
+                      <span className="text-[13px] font-semibold truncate group-hover:text-[var(--color-green)] transition-colors">{title}</span>
+                      <span className="text-[11px] text-[var(--color-text-muted)] font-mono tabular-nums flex-shrink-0">
                         {formatTime(item.createdAt)}
                       </span>
                     </div>
                     {detail && (
-                      <p className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5 truncate">
-                        {detail}
-                      </p>
+                      <p className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5 truncate">{detail}</p>
                     )}
-                    <p className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5">
-                      {item.userName}
-                    </p>
+                    <p className="text-[10px] text-[var(--color-text-muted)] mt-0.5 uppercase tracking-[0.06em]">{item.userName}</p>
                   </div>
                 </button>
               );
@@ -855,21 +787,16 @@ export function ClientDetail({
   if (client === undefined) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-5 h-5 border-2 border-[var(--color-accent)] border-t-transparent rounded-full animate-spin" />
+        <div className="w-5 h-5 border-2 border-[var(--color-green)] border-t-transparent animate-spin" />
       </div>
     );
   }
 
   if (!client) {
     return (
-      <div className="p-8 text-center">
-        <p className="text-[var(--color-text-tertiary)]">
-          Kunde nicht gefunden
-        </p>
-        <button
-          onClick={onBack}
-          className="mt-4 text-[var(--color-accent)] text-[14px]"
-        >
+      <div className="p-8 text-center border-2 border-dashed border-[var(--color-border-strong)]">
+        <p className="text-[var(--color-text-muted)] uppercase tracking-[0.04em]">Kunde nicht gefunden</p>
+        <button onClick={onBack} className="mt-4 text-[var(--color-green)] text-[13px] uppercase tracking-[0.04em] font-semibold hover:underline">
           Zurück
         </button>
       </div>
@@ -886,49 +813,59 @@ export function ClientDetail({
 
   const upcomingShoots = (shoots || [])
     .filter((s) => new Date(s.date).getTime() > Date.now())
-    .sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  const initials = client.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase();
 
   return (
     <div className="max-w-[960px] mx-auto">
       {/* Header */}
-      <div className="px-6 lg:px-8 py-6 border-b border-[var(--color-border-subtle)]">
+      <div className="px-6 lg:px-8 py-6 border-b-2 border-[var(--color-border-strong)]">
         <button
           onClick={onBack}
-          className="flex items-center gap-1.5 text-[13px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors mb-4"
+          className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.08em] font-semibold text-[var(--color-text-muted)] hover:text-[var(--color-green)] transition-colors mb-4"
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
+          <ArrowLeft className="w-3.5 h-3.5" strokeWidth={2} />
           Kunden
         </button>
 
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-[20px] font-semibold" style={{ background: client.avatarColor || '#4F46E5' }}>
-              {client.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase()}
+            <div
+              className="w-14 h-14 flex items-center justify-center text-white text-[18px] font-bold"
+              style={{
+                background: client.avatarColor || '#00DC82',
+                border: `2px solid ${client.avatarColor || '#00DC82'}`,
+                boxShadow: "3px 3px 0px var(--color-surface-0)",
+                letterSpacing: "0.05em",
+              }}
+            >
+              {initials}
             </div>
             <div>
-              <h1 className="text-[22px] font-semibold tracking-[-0.02em]">
+              <h1 className="text-[24px] font-bold tracking-[-0.02em] uppercase" style={{ fontFamily: "var(--font-display)" }}>
                 {client.name}
               </h1>
               <div className="flex items-center gap-3 mt-1 flex-wrap">
                 {client.company && (
-                  <span className="flex items-center gap-1.5 text-[13px] text-[var(--color-text-secondary)]">
-                    <Building2 className="w-3.5 h-3.5" />
+                  <span className="flex items-center gap-1.5 text-[12px] text-[var(--color-text-secondary)]">
+                    <Building2 className="w-3.5 h-3.5" strokeWidth={2} />
                     {client.company}
                   </span>
                 )}
-                <span className="flex items-center gap-1.5 text-[13px] text-[var(--color-text-secondary)]">
-                  <Mail className="w-3.5 h-3.5" />
+                <span className="flex items-center gap-1.5 text-[12px] text-[var(--color-text-secondary)] font-mono">
+                  <Mail className="w-3.5 h-3.5" strokeWidth={2} />
                   {client.email}
                 </span>
                 {client.phone && (
-                  <span className="flex items-center gap-1.5 text-[13px] text-[var(--color-text-secondary)]">
-                    <Phone className="w-3.5 h-3.5" />
+                  <span className="flex items-center gap-1.5 text-[12px] text-[var(--color-text-secondary)] font-mono">
+                    <Phone className="w-3.5 h-3.5" strokeWidth={2} />
                     {client.phone}
                   </span>
                 )}
               </div>
+              {/* Green accent bar */}
+              <div className="w-12 h-[3px] bg-[var(--color-green)] mt-3" />
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -957,44 +894,32 @@ export function ClientDetail({
                     .map((i) => ({ title: i.title, status: i.status })),
                 });
               }}
-              className="h-8 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[12px] font-medium hover:bg-[var(--color-surface-2)] transition-colors flex items-center gap-1.5"
-              title="Monatsbericht generieren"
+              className="h-8 px-3 border-2 border-[var(--color-border-strong)] text-[11px] font-semibold uppercase tracking-[0.04em] hover:border-[var(--color-green)] hover:text-[var(--color-green)] transition-colors flex items-center gap-1.5"
+              title="Monatsbericht"
             >
-              <FileText className="w-3 h-3" />
+              <FileText className="w-3 h-3" strokeWidth={2} />
               Bericht
             </button>
             <button
               onClick={() => setShowAiSuggest(true)}
-              className="h-8 px-3 rounded-[var(--radius-md)] bg-gradient-to-r from-violet-500/10 to-indigo-500/10 text-violet-700 dark:text-violet-300 border border-violet-200/50 dark:border-violet-500/20 text-[12px] font-medium hover:from-violet-500/20 hover:to-indigo-500/20 transition-all flex items-center gap-1.5"
+              className="h-8 px-3 border-2 border-[var(--color-green)] bg-[var(--color-green-subtle)] text-[var(--color-green)] text-[11px] font-semibold uppercase tracking-[0.04em] hover:bg-[var(--color-green-muted)] transition-all flex items-center gap-1.5"
             >
-              <Sparkles className="w-3 h-3" />
+              <Sparkles className="w-3 h-3" strokeWidth={2} />
               KI-Ideen
             </button>
             <button
               onClick={() => setEditing(!editing)}
-              className="h-8 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[12px] font-medium hover:bg-[var(--color-surface-2)] transition-colors flex items-center gap-1.5"
+              className="h-8 px-3 border-2 border-[var(--color-border-strong)] text-[11px] font-semibold uppercase tracking-[0.04em] hover:border-[var(--color-green)] hover:text-[var(--color-green)] transition-colors flex items-center gap-1.5"
             >
-              <Pencil className="w-3 h-3" />
-              Bearbeiten
+              <Pencil className="w-3 h-3" strokeWidth={2} />
+              Edit
             </button>
             {hasLogin ? (
-              <span
-                className="inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-medium"
-                style={{
-                  background: "rgba(22,163,74,0.1)",
-                  color: "#16a34a",
-                }}
-              >
+              <span className="inline-flex items-center px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.06em] bg-[var(--color-green-subtle)] text-[var(--color-green)] border border-[var(--color-border-green)]">
                 Login aktiv
               </span>
             ) : (
-              <span
-                className="inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-medium"
-                style={{
-                  background: "rgba(107,114,128,0.1)",
-                  color: "#6b7280",
-                }}
-              >
+              <span className="inline-flex items-center px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.06em] bg-[rgba(107,114,128,0.08)] text-[var(--color-text-muted)] border border-[var(--color-border)]">
                 Kein Login
               </span>
             )}
@@ -1011,40 +936,62 @@ export function ClientDetail({
         )}
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4">
-          <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Lightbulb className="w-4 h-4 text-amber-500" />
-              <span className="text-[12px] text-[var(--color-text-tertiary)] uppercase tracking-wider font-medium">
-                Ideen
-              </span>
+        <div className="grid grid-cols-3 gap-0">
+          {[
+            { icon: Lightbulb, label: "Ideen", value: totalIdeas, isGreen: false },
+            { icon: TrendingUp, label: "In Arbeit", value: inProgress, isGreen: false },
+            { icon: Video, label: "Veröffentlicht", value: published, isGreen: true },
+          ].map((stat, idx) => (
+            <div
+              key={stat.label}
+              className="bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] p-4 relative transition-all duration-150 hover:translate-x-[-2px] hover:translate-y-[-2px]"
+              style={{
+                marginLeft: idx > 0 ? "-2px" : "0",
+                zIndex: 0,
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget;
+                el.style.boxShadow = stat.isGreen ? "4px 4px 0px #00DC82" : "4px 4px 0px #0A0A0A";
+                el.style.borderColor = stat.isGreen ? "#00DC82" : "rgba(0, 220, 130, 0.3)";
+                el.style.zIndex = "10";
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget;
+                el.style.boxShadow = "";
+                el.style.borderColor = "";
+                el.style.zIndex = "0";
+              }}
+            >
+              {/* Left accent bar */}
+              <div
+                className="absolute left-0 top-3 bottom-3 w-[3px]"
+                style={{ background: stat.isGreen ? "var(--color-green)" : "var(--color-surface-4)" }}
+              />
+              <div className="flex items-center gap-2 mb-1">
+                <div
+                  className="w-8 h-8 flex items-center justify-center border"
+                  style={{
+                    background: stat.isGreen ? "var(--color-green-subtle)" : "var(--color-surface-2)",
+                    borderColor: stat.isGreen ? "var(--color-border-green)" : "var(--color-border-strong)",
+                  }}
+                >
+                  <stat.icon className="w-4 h-4" style={{ color: stat.isGreen ? "var(--color-green)" : "var(--color-text-tertiary)" }} strokeWidth={2} />
+                </div>
+                <span className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-[0.08em] font-bold">
+                  {stat.label}
+                </span>
+              </div>
+              <p
+                className="text-[32px] font-bold tracking-[-0.03em] tabular-nums ml-10"
+                style={{
+                  fontFamily: "var(--font-display)",
+                  color: stat.isGreen ? "var(--color-green)" : "var(--color-text-primary)",
+                }}
+              >
+                {stat.value}
+              </p>
             </div>
-            <p className="text-[28px] font-semibold tracking-[-0.03em]">
-              {totalIdeas}
-            </p>
-          </div>
-          <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <TrendingUp className="w-4 h-4 text-blue-500" />
-              <span className="text-[12px] text-[var(--color-text-tertiary)] uppercase tracking-wider font-medium">
-                In Arbeit
-              </span>
-            </div>
-            <p className="text-[28px] font-semibold tracking-[-0.03em]">
-              {inProgress}
-            </p>
-          </div>
-          <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Video className="w-4 h-4 text-green-500" />
-              <span className="text-[12px] text-[var(--color-text-tertiary)] uppercase tracking-wider font-medium">
-                Veröffentlicht
-              </span>
-            </div>
-            <p className="text-[28px] font-semibold tracking-[-0.03em]">
-              {published}
-            </p>
-          </div>
+          ))}
         </div>
 
         {/* Categories */}
@@ -1052,63 +999,52 @@ export function ClientDetail({
 
         {/* Ideas */}
         <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-[15px] font-semibold">Ideen</h2>
-            <button
-              onClick={() => onNavigate("ideas")}
-              className="text-[12px] text-[var(--color-accent)] hover:underline"
-            >
-              Alle anzeigen
-            </button>
-          </div>
+          <SectionHeader title="Ideen" icon={Lightbulb} action="Alle anzeigen" onAction={() => onNavigate("ideas")} />
 
           {(ideas || []).length === 0 ? (
-            <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-8 text-center">
-              <Lightbulb className="w-8 h-8 mx-auto mb-2 text-[var(--color-text-tertiary)] opacity-30" />
-              <p className="text-[13px] text-[var(--color-text-tertiary)]">
+            <div className="bg-[var(--color-surface-1)] border-2 border-dashed border-[var(--color-border-strong)] p-8 text-center relative">
+              <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-[var(--color-green)]" />
+              <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-[var(--color-green)]" />
+              <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-[var(--color-green)]" />
+              <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-[var(--color-green)]" />
+              <div className="w-10 h-10 mx-auto mb-2 border-2 border-[var(--color-border-strong)] flex items-center justify-center">
+                <Lightbulb className="w-5 h-5 text-[var(--color-text-muted)]" strokeWidth={1.5} />
+              </div>
+              <p className="text-[12px] text-[var(--color-text-muted)] uppercase tracking-[0.04em]">
                 Noch keine Ideen für diesen Kunden
               </p>
             </div>
           ) : (
-            <div className="space-y-1.5">
-              {(ideas || []).slice(0, 8).map((idea) => {
-                const sc = STATUS_COLORS[idea.status] || STATUS_COLORS.idea;
-                const cat = idea.categoryId
-                  ? categoryMap[idea.categoryId]
-                  : null;
+            <div className="space-y-0">
+              {(ideas || []).slice(0, 8).map((idea, idx) => {
+                const sc = STATUS_COLORS[idea.status] || STATUS_COLORS.idee;
+                const cat = idea.categoryId ? categoryMap[idea.categoryId] : null;
                 return (
                   <button
                     key={idea._id}
                     onClick={() => onNavigate("idea", idea._id)}
-                    className="w-full flex items-center justify-between gap-3 bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] px-4 py-3 hover:shadow-[var(--shadow-sm)] transition-all text-left group"
+                    className="w-full flex items-center justify-between gap-3 bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] px-4 py-3 text-left group transition-all duration-150 hover:border-[var(--color-border-green)] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[2px_2px_0px_var(--color-surface-4)]"
+                    style={{ marginTop: idx > 0 ? "-2px" : "0" }}
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       <span
-                        className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium flex-shrink-0"
-                        style={{ background: sc.bg, color: sc.text }}
+                        className="inline-flex items-center px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.04em] flex-shrink-0"
+                        style={{ background: sc.bg, color: sc.text, border: `1px solid ${sc.border}` }}
                       >
                         {STATUS_LABELS[idea.status] || idea.status}
                       </span>
                       {cat && (
                         <span
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium flex-shrink-0"
-                          style={{
-                            background: cat.color + "18",
-                            color: cat.color,
-                          }}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold flex-shrink-0"
+                          style={{ background: cat.color + "18", color: cat.color, border: `1px solid ${cat.color}30` }}
                         >
-                          <span
-                            className="w-1.5 h-1.5 rounded-full"
-                            style={{ background: cat.color }}
-                          />
+                          <span className="w-1.5 h-1.5" style={{ background: cat.color }} />
                           {cat.name}
                         </span>
                       )}
-                      <span className="text-[14px] truncate">
-                        {idea.title}
-                      </span>
+                      <span className="text-[13px] truncate group-hover:text-[var(--color-green)] transition-colors">{idea.title}</span>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-[var(--color-text-tertiary)] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                    <ChevronRight className="w-4 h-4 text-[var(--color-text-muted)] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                   </button>
                 );
               })}
@@ -1118,57 +1054,65 @@ export function ClientDetail({
 
         {/* Upcoming Shoots */}
         <section>
-          <h2 className="text-[15px] font-semibold mb-3">
-            Nächste Drehtermine
-          </h2>
+          <SectionHeader title="Nächste Drehtermine" icon={Calendar} />
 
           {upcomingShoots.length === 0 ? (
-            <div className="bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] p-8 text-center">
-              <Calendar className="w-8 h-8 mx-auto mb-2 text-[var(--color-text-tertiary)] opacity-30" />
-              <p className="text-[13px] text-[var(--color-text-tertiary)]">
+            <div className="bg-[var(--color-surface-1)] border-2 border-dashed border-[var(--color-border-strong)] p-8 text-center">
+              <div className="w-10 h-10 mx-auto mb-2 border-2 border-[var(--color-border-strong)] flex items-center justify-center">
+                <Calendar className="w-5 h-5 text-[var(--color-text-muted)]" strokeWidth={1.5} />
+              </div>
+              <p className="text-[12px] text-[var(--color-text-muted)] uppercase tracking-[0.04em]">
                 Keine anstehenden Drehtermine
               </p>
             </div>
           ) : (
-            <div className="space-y-1.5">
-              {upcomingShoots.slice(0, 5).map((shoot) => (
-                <div
-                  key={shoot._id}
-                  className="flex items-center gap-3 bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)] px-4 py-3"
-                >
+            <div className="space-y-0">
+              {upcomingShoots.slice(0, 5).map((shoot, idx) => {
+                const isToday = new Date(shoot.date).toDateString() === new Date().toDateString();
+                return (
                   <div
-                    className="w-10 h-10 rounded-[var(--radius-md)] flex flex-col items-center justify-center flex-shrink-0"
+                    key={shoot._id}
+                    className="flex items-center gap-3 bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] px-4 py-3 transition-all duration-150 hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[2px_2px_0px_var(--color-surface-4)]"
                     style={{
-                      background: "rgba(59,130,246,0.08)",
+                      marginTop: idx > 0 ? "-2px" : "0",
+                      borderColor: isToday ? "var(--color-green)" : "",
                     }}
                   >
-                    <span className="text-[11px] font-semibold text-blue-500 leading-none">
-                      {new Date(shoot.date).toLocaleDateString("de-DE", {
-                        day: "2-digit",
-                      })}
-                    </span>
-                    <span className="text-[9px] text-blue-400 uppercase">
-                      {new Date(shoot.date).toLocaleDateString("de-DE", {
-                        month: "short",
-                      })}
-                    </span>
+                    <div
+                      className="w-12 h-12 flex flex-col items-center justify-center flex-shrink-0 border-2"
+                      style={{
+                        background: isToday ? "var(--color-green)" : "var(--color-surface-2)",
+                        borderColor: isToday ? "var(--color-green)" : "var(--color-border-strong)",
+                        color: isToday ? "#0A0A0A" : "var(--color-text-secondary)",
+                      }}
+                    >
+                      <span className="text-[14px] font-bold leading-none" style={{ fontFamily: "var(--font-display)" }}>
+                        {new Date(shoot.date).toLocaleDateString("de-DE", { day: "2-digit" })}
+                      </span>
+                      <span className="text-[9px] uppercase font-semibold tracking-[0.06em] opacity-80">
+                        {new Date(shoot.date).toLocaleDateString("de-DE", { month: "short" })}
+                      </span>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="text-[14px] font-semibold truncate">{shoot.title || "Drehtermin"}</p>
+                        {isToday && (
+                          <span className="text-[10px] font-bold uppercase tracking-[0.06em] px-2 py-0.5 bg-[var(--color-green-subtle)] text-[var(--color-green)] border border-[var(--color-border-green)]">
+                            Heute
+                          </span>
+                        )}
+                      </div>
+                      {shoot.location && (
+                        <p className="text-[12px] text-[var(--color-text-tertiary)] truncate">{shoot.location}</p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[11px] text-[var(--color-text-muted)] font-mono tabular-nums">
+                      <Clock className="w-3 h-3" strokeWidth={2} />
+                      {formatDate(new Date(shoot.date).getTime())}
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[14px] font-medium truncate">
-                      {shoot.title || "Drehtermin"}
-                    </p>
-                    {shoot.location && (
-                      <p className="text-[12px] text-[var(--color-text-tertiary)] truncate">
-                        {shoot.location}
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1.5 text-[12px] text-[var(--color-text-tertiary)]">
-                    <Clock className="w-3 h-3" />
-                    {formatDate(new Date(shoot.date).getTime())}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </section>

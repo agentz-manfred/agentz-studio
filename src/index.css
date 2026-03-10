@@ -340,10 +340,10 @@ button:not(:disabled):hover,
 
 /* ─── Client card (brutalist hover) ─── */
 .client-card {
-  transition: transform 0.2s var(--ease-brutal),
-              box-shadow 0.2s var(--ease-brutal),
-              border-color 0.2s var(--ease-brutal);
-  border: 1px solid var(--color-border);
+  transition: transform 0.15s var(--ease-brutal),
+              box-shadow 0.15s var(--ease-brutal),
+              border-color 0.15s var(--ease-brutal);
+  border: 2px solid var(--color-border-strong);
 }
 .client-card:hover {
   transform: translate(-2px, -2px);
