@@ -54,6 +54,29 @@
   --color-error: #FF3333;
   --color-info: #3B82F6;
 
+  /* ─── Status Colors ─── */
+  --color-status-create: #10B981;
+  --color-status-update: #3B82F6;
+  --color-status-delete: #FF3333;
+  --color-status-archive: #F59E0B;
+  --color-status-unarchive: #8B5CF6;
+  --color-status-change: #6366F1;
+
+  /* Ideas Pipeline Status */
+  --color-pipeline-idee: #A3A3A3;
+  --color-pipeline-skript: #3B82F6;
+  --color-pipeline-freigabe: #F59E0B;
+  --color-pipeline-korrektur: #F97316;
+  --color-pipeline-freigegeben: #10B981;
+  --color-pipeline-gedreht: #8B5CF6;
+  --color-pipeline-geschnitten: #6366F1;
+  --color-pipeline-review: #F43F5E;
+  --color-pipeline-published: #059669;
+
+  /* ─── AI/Feature accent ─── */
+  --color-violet: #8B5CF6;
+  --color-violet-light: #A78BFA;
+
   /* ─── Brutal Shadows ─── */
   --shadow-brutal-sm: 2px 2px 0px #00DC82;
   --shadow-brutal: 4px 4px 0px #00DC82;

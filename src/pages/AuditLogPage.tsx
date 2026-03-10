@@ -13,14 +13,16 @@ const ACTION_LABELS: Record<string, string> = {
   status_change: "Status geändert",
 };
 
-const ACTION_COLORS: Record<string, string> = {
-  create: "text-emerald-600 bg-emerald-500/10",
-  update: "text-blue-600 bg-blue-500/10",
-  delete: "text-red-600 bg-red-500/10",
-  archive: "text-amber-600 bg-amber-500/10",
-  unarchive: "text-violet-600 bg-violet-500/10",
-  status_change: "text-indigo-600 bg-indigo-500/10",
+const ACTION_COLORS: Record<string, { color: string; bg: string }> = {
+  create: { color: "var(--color-status-create)", bg: "rgba(16,185,129,0.1)" },
+  update: { color: "var(--color-status-update)", bg: "rgba(59,130,246,0.1)" },
+  delete: { color: "var(--color-status-delete)", bg: "rgba(255,51,51,0.1)" },
+  archive: { color: "var(--color-status-archive)", bg: "rgba(245,158,11,0.1)" },
+  unarchive: { color: "var(--color-status-unarchive)", bg: "rgba(139,92,246,0.1)" },
+  status_change: { color: "var(--color-status-change)", bg: "rgba(99,102,241,0.1)" },
 };
+
+const DEFAULT_ACTION_COLOR = { color: "var(--color-text-muted)", bg: "rgba(163,163,163,0.1)" };
 
 const ENTITY_ICONS: Record<string, typeof FileText> = {
   idea: Lightbulb,
@@ -109,7 +111,7 @@ export function AuditLogPage() {
         <div className="space-y-1">
           {(logs || []).map((entry, i) => {
             const Icon = ENTITY_ICONS[entry.entityType] || FileText;
-            const actionColor = ACTION_COLORS[entry.action] || "text-neutral-600 bg-neutral-500/10";
+            const actionColor = ACTION_COLORS[entry.action] || DEFAULT_ACTION_COLOR;
 
             return (
               <div
@@ -119,7 +121,7 @@ export function AuditLogPage() {
               >
                 {/* Timeline dot */}
                 <div className="flex-shrink-0 mt-1">
-                  <div className={`w-8 h-8 flex items-center justify-center border-2 ${actionColor}`} style={{ borderRadius: 0, borderColor: 'var(--color-border-strong)' }}>
+                  <div className="w-8 h-8 flex items-center justify-center border-2" style={{ borderRadius: 0, borderColor: 'var(--color-border-strong)', color: actionColor.color, background: actionColor.bg }}>
                     <Icon className="w-3.5 h-3.5" />
                   </div>
                 </div>
@@ -128,7 +130,7 @@ export function AuditLogPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-[13px] font-bold uppercase" style={{ letterSpacing: '0.02em' }}>{entry.userName}</span>
-                    <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 border ${actionColor}`} style={{ borderRadius: 0, letterSpacing: '0.06em', borderColor: 'currentColor' }}>
+                    <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 border" style={{ borderRadius: 0, letterSpacing: '0.06em', borderColor: 'currentColor', color: actionColor.color, background: actionColor.bg }}>
                       {ACTION_LABELS[entry.action] || entry.action}
                     </span>
                     <span className="text-[11px] text-[var(--color-text-tertiary)] uppercase font-bold" style={{ letterSpacing: '0.04em' }}>
