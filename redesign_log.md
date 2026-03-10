@@ -436,3 +436,139 @@
 - ✅ TypeScript Build: Zero errors (npx tsc --noEmit clean)
 - ✅ Preview-HTML und .env.local gelöscht
 - ✅ Dev-Server gestoppt
+
+## Phase 6: Video/Pipeline Pages (10.03.2026, 02:00)
+
+### Was wurde gemacht
+
+**VideosPage.tsx — Komplett-Redesign:**
+- Page Header: Green accent bar (3×20px) + "VIDEOVERWALTUNG" meta-label (uppercase, 0.12em tracking)
+- H1: Space Grotesk, 24px, uppercase — NUR hier Display-Font
+- Count: Font-mono, tabular-nums, bold
+- Search: 2px border-strong, font-mono placeholder, green focus mit brutal-sm shadow, square (0px radius)
+- "Video hochladen" Button: btn-brutal Helper-Class (green, uppercase, shadow on hover)
+- Filter Buttons: Stacked (connected mit -2px margin-right), 2px border, square, active → green bg + green border
+- Video Grid: Stacked cards mit -2px margins (vertikal + horizontal), keine gaps
+- Video Cards: 2px border-strong, 0px radius, hover → translate(-2px, -2px) + brutal green shadow + border-green
+- Thumbnails: Square green play-overlay (statt rounded-full white)
+- Video Title: 13px bold uppercase, goes green on hover
+- Status Badges: Square, 10px, border in status-color, uppercase tracking
+- Meta Row: 11px uppercase tracking
+- Date: Border-top separator, font-mono tabular-nums, clock icon
+- Empty State: Dashed border + 4 green corner marks + square icon-box + Space Grotesk title
+- No-Results: Uppercase bold + Search icon
+
+**VideoPlayer.tsx — Brutalist Redesign:**
+- Container: 2px border-strong, 0px radius (kein rounded-lg)
+- Play Overlay: Square green button (64×64) mit border + box-shadow, statt rounded-full white
+- Progress Bar: 6px height (statt 1px), square (kein border-radius)
+- Progress Fill: Green, square
+- Playhead: Square 14×14, green, 2px border green-dark, shadow 1px offset
+- Timeline Markers: Square 10×10 (statt rounded-full 2.5), border 1px #0A0A0A
+- Hover Tooltip: Square, green text on black bg, green border, mono font
+- Control Buttons: Hover → green (statt generic white)
+- Time Display: Font-mono, tabular-nums
+- Embed Variant: Square border (kein rounded)
+
+**VideoReview.tsx — Komplett-Redesign:**
+- Header: 2px border-bottom, surface-0 background
+- Back Button: Square, border on hover → green + green-subtle bg
+- Title: 14px bold uppercase, font-body
+- Linked Idea Badge: Square, green border + green-subtle bg, 10px uppercase
+- Status Badge: Square, border in status-color, uppercase tracking, ChevronDown for admin
+- Status Dropdown: 2px border-strong, brutal shadow, square, items hover → green-subtle + green text, square status dots
+- Share Button: Square, hover → green border
+- Share Panel: 2px border-strong, brutal shadow, green accent bar header, stacked link items (-2px margin), mono font for URLs, btn-brutal for new link
+- Player Area: surface-0 background
+- Processing State: Square icon box, uppercase labels
+
+**Comment Panel:**
+- 2px border-left, surface-1 background
+- Header: 2px border-bottom, green accent bar + MessageSquare icon + uppercase "KOMMENTARE" + mono count
+- Stacked Comment Cards: 2px border-strong, -2px margin-top, hover → border-green
+- Author: 11px bold uppercase tracking
+- Timestamp Badge: Square green bg, #0A0A0A text, mono font, green-dark border
+- Reply Thread: border-left-2 green (statt generic border)
+- Reply Input: Connected (gap-0, -2px margin), square
+- Send Button: Square green, border green-dark
+- Resolved Toggle: Uppercase bold tracking, hover → green
+- Comment Dates: Font-mono tabular-nums
+- Pending Comments: Green border + green-subtle bg
+- Timestamp Toggle: 10px uppercase bold
+
+**VideoUpload.tsx — Brutalist Redesign:**
+- Drop Zone: 2px dashed border-strong, square, 4 green corner marks
+- Icon Box: 40×40, square, 2px border
+- Labels: 13px bold uppercase tracking
+- Hint: 11px uppercase tracking
+- Drag-Over State: Green border + green-subtle bg + brutal shadow
+- Summary Bar: 2px border-strong, square, uppercase, mono counts
+- Upload Items: Stacked (-2px margin-top), 2px border-strong, square
+- File Name: 12px bold uppercase
+- File Size: 10px mono tabular-nums
+- Progress %: 10px mono bold green
+- Progress Bar: 6px height, square, border, green fill
+- Status Icons: strokeWidth 2 (crisp)
+- Cancel/Remove: Square hover → error border
+
+**PipelinePage.tsx — Komplett-Redesign:**
+- Header: 2px border-bottom, green accent bar + "CONTENT PIPELINE" meta
+- H1: Space Grotesk, 24px, uppercase
+- Subtitle: 12px uppercase tracking bold
+- "Neue Idee" Button: btn-brutal
+- New Idea Modal: 2px border-strong + brutal shadow, square
+- Modal Header: Green accent bar + uppercase title + close → error hover
+- Labels: 11px uppercase 0.08em tracking bold, text-muted
+- Inputs: 2px border-strong, surface-0 bg, green focus + brutal-sm shadow
+- Selects: Same brutal input style
+- Category Buttons: Stacked (connected -2px margin), square, 2px border, colored
+- Buttons: btn-brutal / btn-brutal-outline, connected (gap-0, -2px margin)
+
+**KanbanBoard.tsx — Komplett-Redesign:**
+- Board Grid: gap-0, columns connected (-2px margin-left)
+- Column Headers: 2px border-strong, square, status dot (10×10 square mit border)
+- Column Name: 11px bold uppercase 0.08em tracking
+- Count Badge: Square, border in status-color, mono font, tabular-nums
+- Cards: 2px border-strong, -2px margin-top (stacked), square
+- Card Accent Bar: 3px height, status-colored, full-width (kein border-radius)
+- Card Title: 12px bold uppercase, hover → green
+- Card Description: 11px, text-tertiary
+- Client Section: 2px border-top separator
+- Client Avatar: Square 20×20, border #0A0A0A, colored bg (statt rounded-full)
+- Client Name: 10px uppercase tracking bold
+- Hover: translate(-2px, -2px) + 3px green-dark shadow + green border
+- Active/Drag: 4px green shadow, slight scale
+- Empty Column: Square dashed border, 10px uppercase tracking
+- Drag Overlay: Square, 2px green border, 4px green shadow, rotate(2deg)
+
+### Design-Entscheidungen
+- **Square Play Buttons**: Green-filled squares statt weiße Kreise — konsequenter Brutalist-Approach + Brand-Color prominent
+- **Connected Elements**: Filter-Buttons, Upload-Items, Comment-Cards, Kanban-Columns — alles -2px margin für zusammenhängendes Terminal-Feeling
+- **Square Progress Bars**: 6px statt 1px, kein border-radius — massiver, sichtbarer, brutaler
+- **Square Timeline Markers**: 10×10 Quadrate mit Border — passen zum Square-Everything-Prinzip
+- **Comment Stacking**: Cards liegen direkt übereinander — Data-Terminal-Vibe, spart Platz
+- **Kanban Connected Columns**: Columns ohne Gap — visuell ein zusammenhängender Block statt separate Spalten
+- **Mono für alles Technische**: Timestamps, File-Sizes, Counts, URLs — konsequent JetBrains Mono
+
+### Visueller Review
+- ✅ Dev-Server gestartet (Port 5181, .env.local mit Dummy-Convex-URL)
+- ✅ Static HTML Preview erstellt (alle 6 Komponenten: Videos Grid, Video Review, Video Player, Video Upload, Pipeline Header, Kanban Board + Modal)
+- ✅ Full-Page Screenshot gemacht und analysiert
+- ✅ Background-Farben korrekt (surface-0 main, surface-1 cards/panels)
+- ✅ Text-Farben korrekt (primary, secondary, tertiary, muted — richtige Hierarchie)
+- ✅ Green #00DC82 durchgängig als Accent
+- ✅ Space Grotesk NUR für Page-Titles (Videos, Pipeline)
+- ✅ Poppins für ALLE Labels, Buttons, Body-Text, Card-Titles
+- ✅ JetBrains Mono für Timestamps, File-Sizes, Counts, Progress, URLs
+- ✅ 0px border-radius überall — keine rounded corners
+- ✅ 2px Borders durchgängig (border-strong)
+- ✅ Brutal shadows korrekt (translate + offset)
+- ✅ Green accent bars bei Section Headers
+- ✅ Square Badges, Play-Buttons, Markers, Progress-Bars, Avatars
+- ✅ Stacked Items (Cards, Comments, Upload-Queue, Kanban-Cards) korrekt zusammenhängend
+- ✅ Filter-Buttons connected mit active state
+- ✅ Modal mit brutal shadow + green accent bar
+- ✅ Uppercase + Tracking militant einheitlich
+- ✅ TypeScript Build: Zero errors (npx tsc --noEmit clean)
+- ✅ Preview-HTML und .env.local gelöscht
+- ✅ Dev-Server gestoppt

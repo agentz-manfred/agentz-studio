@@ -17,9 +17,10 @@ function TimestampBadge({ time, onClick }: { time: number; onClick?: () => void 
   return (
     <button
       onClick={onClick}
-      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[var(--color-accent)] text-white text-[11px] font-mono font-medium hover:bg-[var(--color-accent-hover)] transition-colors"
+      className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-[var(--color-green)] text-[#0A0A0A] text-[11px] font-bold hover:bg-[var(--color-green-dark)] transition-colors border border-[var(--color-green-dark)]"
+      style={{ fontFamily: 'var(--font-mono)', borderRadius: 0 }}
     >
-      <Clock className="w-3 h-3" />
+      <Clock className="w-3 h-3" strokeWidth={2.5} />
       {formatTimestamp(time)}
     </button>
   );
@@ -60,7 +61,6 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
   const sortedComments = useMemo(() => {
     const list = (comments || []).filter(c => !c.parentId);
     return [...list].sort((a, b) => {
-      // Timestamp comments sorted by time, others by creation
       if (a.timestamp != null && b.timestamp != null) return a.timestamp - b.timestamp;
       if (a.timestamp != null) return -1;
       if (b.timestamp != null) return 1;
@@ -138,27 +138,26 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
 
   const handleSeek = (time: number) => {
     setSeekTo(time);
-    // Reset seekTo after a tick so it can be re-triggered
     setTimeout(() => setSeekTo(null), 100);
   };
 
   if (video === undefined) {
     return (
       <div className="p-8">
-        <button onClick={onBack} className="flex items-center gap-1.5 text-[13px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors mb-4">
-          <ArrowLeft className="w-4 h-4" /> Zurück
+        <button onClick={onBack} className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-muted)] hover:text-[var(--color-green)] transition-colors mb-4" style={{ fontFamily: 'var(--font-body)' }}>
+          <ArrowLeft className="w-4 h-4" strokeWidth={2} /> Zurück
         </button>
-        <p className="text-[14px] text-[var(--color-text-tertiary)]">Video wird geladen…</p>
+        <p className="text-[14px] text-[var(--color-text-tertiary)]" style={{ fontFamily: 'var(--font-body)' }}>Video wird geladen…</p>
       </div>
     );
   }
   if (!video) {
     return (
       <div className="p-8">
-        <button onClick={onBack} className="flex items-center gap-1.5 text-[13px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors mb-4">
-          <ArrowLeft className="w-4 h-4" /> Zurück
+        <button onClick={onBack} className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-muted)] hover:text-[var(--color-green)] transition-colors mb-4" style={{ fontFamily: 'var(--font-body)' }}>
+          <ArrowLeft className="w-4 h-4" strokeWidth={2} /> Zurück
         </button>
-        <p className="text-[14px] text-[var(--color-text-tertiary)]">Video nicht gefunden</p>
+        <p className="text-[14px] text-[var(--color-text-tertiary)]" style={{ fontFamily: 'var(--font-body)' }}>Video nicht gefunden</p>
       </div>
     );
   }
@@ -172,41 +171,47 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
       {/* Video area */}
       <div className="flex-1 min-w-0 flex flex-col">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-[var(--color-border-subtle)] flex items-center gap-3">
+        <div className="px-6 py-4 border-b-2 border-[var(--color-border-strong)] flex items-center gap-3 bg-[var(--color-surface-0)]">
           <button
             onClick={onBack}
-            className="p-1.5 -ml-1.5 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-2)] transition-colors"
+            className="p-1.5 -ml-1.5 text-[var(--color-text-tertiary)] hover:text-[var(--color-green)] hover:bg-[var(--color-green-subtle)] transition-colors border border-transparent hover:border-[var(--color-green)]"
+            style={{ borderRadius: 0 }}
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4" strokeWidth={2} />
           </button>
           <div className="flex items-center gap-2 min-w-0">
-            <Film className="w-4 h-4 text-[var(--color-text-tertiary)] flex-shrink-0" />
-            <h1 className="text-[16px] font-semibold tracking-[-0.01em] truncate">{video.title}</h1>
+            <Film className="w-4 h-4 text-[var(--color-text-tertiary)] flex-shrink-0" strokeWidth={2} />
+            <h1 className="text-[14px] font-bold uppercase tracking-[0.02em] truncate" style={{ fontFamily: 'var(--font-body)' }}>{video.title}</h1>
             {linkedIdea && onNavigate && (
               <button
                 onClick={() => onNavigate("idea", linkedIdea._id)}
-                className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-[var(--color-accent-surface)] text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 transition-colors flex-shrink-0"
+                className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.04em] bg-[var(--color-green-subtle)] text-[var(--color-green)] hover:bg-[var(--color-green-muted)] transition-colors border border-[var(--color-green)] flex-shrink-0"
+                style={{ borderRadius: 0, fontFamily: 'var(--font-body)' }}
               >
-                <Lightbulb className="w-3 h-3" />
+                <Lightbulb className="w-3 h-3" strokeWidth={2} />
                 {linkedIdea.title}
               </button>
             )}
           </div>
-          {/* Video Status - clickable for admin */}
+          {/* Video Status */}
           <div className="ml-auto relative">
             <button
               onClick={() => user?.role === "admin" && setShowStatusMenu(!showStatusMenu)}
-              className={`text-[12px] font-medium px-2.5 py-1 rounded-full inline-flex items-center gap-1 transition-colors ${user?.role === "admin" ? "cursor-pointer hover:opacity-80" : "cursor-default"}`}
+              className="text-[10px] font-bold px-2.5 py-1 uppercase tracking-[0.04em] inline-flex items-center gap-1 transition-colors border"
               style={{
+                borderRadius: 0,
+                fontFamily: 'var(--font-body)',
                 background: (STATUS_BADGE_STYLES[video.status] || STATUS_BADGE_STYLES.hochgeladen).bg,
                 color: (STATUS_BADGE_STYLES[video.status] || STATUS_BADGE_STYLES.hochgeladen).color,
+                borderColor: (STATUS_BADGE_STYLES[video.status] || STATUS_BADGE_STYLES.hochgeladen).color,
+                cursor: user?.role === "admin" ? "pointer" : "default",
               }}
             >
               {VIDEO_STATUS_LABELS[video.status] || video.status}
-              {user?.role === "admin" && <ChevronDown className="w-3 h-3" />}
+              {user?.role === "admin" && <ChevronDown className="w-3 h-3" strokeWidth={2} />}
             </button>
             {showStatusMenu && user?.role === "admin" && (
-              <div className="absolute right-0 top-full mt-1 w-40 bg-[var(--color-surface-1)] border border-[var(--color-border)] rounded-[var(--radius-md)] shadow-[var(--shadow-lg)] z-50 py-1">
+              <div className="absolute right-0 top-full mt-1 w-40 bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] shadow-[var(--shadow-brutal)] z-50 py-1" style={{ borderRadius: 0 }}>
                 {["hochgeladen", "review", "korrektur", "freigegeben", "final"].map((s) => (
                   <button
                     key={s}
@@ -214,11 +219,12 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
                       if (token) updateVideoStatus({ token, videoId: videoId as Id<"videos">, status: s });
                       setShowStatusMenu(false);
                     }}
-                    className={`w-full text-left px-3 py-1.5 text-[13px] flex items-center gap-2 transition-colors hover:bg-[var(--color-accent-surface)] ${s === video.status ? "font-medium" : ""}`}
+                    className="w-full text-left px-3 py-1.5 text-[12px] uppercase tracking-[0.04em] font-bold flex items-center gap-2 transition-colors hover:bg-[var(--color-green-subtle)] hover:text-[var(--color-green)]"
+                    style={{ fontFamily: 'var(--font-body)' }}
                   >
-                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: STATUS_BADGE_STYLES[s]?.color || "#737373" }} />
+                    <span className="w-[8px] h-[8px] flex-shrink-0" style={{ background: STATUS_BADGE_STYLES[s]?.color || "#737373", borderRadius: 0 }} />
                     {VIDEO_STATUS_LABELS[s] || s}
-                    {s === video.status && <Check className="w-3.5 h-3.5 ml-auto" />}
+                    {s === video.status && <Check className="w-3.5 h-3.5 ml-auto text-[var(--color-green)]" strokeWidth={2.5} />}
                   </button>
                 ))}
               </div>
@@ -228,34 +234,40 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
             <div className="relative ml-2">
               <button
                 onClick={() => setShowSharePanel(!showSharePanel)}
-                className="p-1.5 rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-2)] transition-colors"
+                className="p-1.5 text-[var(--color-text-tertiary)] hover:text-[var(--color-green)] hover:bg-[var(--color-green-subtle)] transition-colors border border-transparent hover:border-[var(--color-green)]"
                 title="Teilen"
+                style={{ borderRadius: 0 }}
               >
-                <Share2 className="w-4 h-4" />
+                <Share2 className="w-4 h-4" strokeWidth={2} />
               </button>
               {showSharePanel && (
-                <div className="absolute right-0 top-full mt-2 w-[320px] bg-[var(--color-surface-1)] border border-[var(--color-border)] rounded-[var(--radius-md)] shadow-[var(--shadow-lg)] z-50 p-4">
-                  <h3 className="text-[14px] font-medium mb-3">Share-Links</h3>
+                <div className="absolute right-0 top-full mt-2 w-[320px] bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] shadow-[var(--shadow-brutal)] z-50 p-4" style={{ borderRadius: 0 }}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-[3px] h-[14px] bg-[var(--color-green)]" />
+                    <h3 className="text-[12px] font-bold uppercase tracking-[0.08em]" style={{ fontFamily: 'var(--font-body)' }}>Share-Links</h3>
+                  </div>
                   {(shareLinks || []).filter(l => l.active).length === 0 ? (
-                    <p className="text-[13px] text-[var(--color-text-tertiary)] mb-3">Noch kein Share-Link erstellt.</p>
+                    <p className="text-[12px] text-[var(--color-text-tertiary)] mb-3" style={{ fontFamily: 'var(--font-body)' }}>Noch kein Share-Link erstellt.</p>
                   ) : (
-                    <div className="space-y-2 mb-3">
-                      {(shareLinks || []).filter(l => l.active).map(link => (
-                        <div key={link._id} className="flex items-center gap-2 p-2 rounded-[var(--radius-sm)] bg-[var(--color-surface-2)]">
-                          <Link2 className="w-3.5 h-3.5 text-[var(--color-text-tertiary)] flex-shrink-0" />
-                          <span className="text-[12px] text-[var(--color-text-secondary)] flex-1 truncate font-mono">
+                    <div className="mb-3">
+                      {(shareLinks || []).filter(l => l.active).map((link, i) => (
+                        <div key={link._id} className="flex items-center gap-2 p-2 bg-[var(--color-surface-0)] border-2 border-[var(--color-border-strong)]" style={{ borderRadius: 0, marginTop: i > 0 ? '-2px' : 0 }}>
+                          <Link2 className="w-3.5 h-3.5 text-[var(--color-text-tertiary)] flex-shrink-0" strokeWidth={2} />
+                          <span className="text-[11px] text-[var(--color-text-secondary)] flex-1 truncate" style={{ fontFamily: 'var(--font-mono)' }}>
                             …/share/{link.token.slice(0, 8)}…
                           </span>
-                          <span className="text-[11px] text-[var(--color-text-tertiary)]">{link.viewCount}×</span>
+                          <span className="text-[10px] text-[var(--color-text-tertiary)] tabular-nums font-bold" style={{ fontFamily: 'var(--font-mono)' }}>{link.viewCount}×</span>
                           <button
                             onClick={() => handleCopyShareLink(link.token)}
-                            className="p-1 rounded hover:bg-[var(--color-surface-3)] transition-colors"
+                            className="p-1 hover:bg-[var(--color-green-subtle)] transition-colors border border-transparent hover:border-[var(--color-green)]"
+                            style={{ borderRadius: 0 }}
                           >
-                            {copiedLink ? <CheckCheck className="w-3.5 h-3.5 text-[var(--color-success)]" /> : <Copy className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />}
+                            {copiedLink ? <CheckCheck className="w-3.5 h-3.5 text-[var(--color-success)]" strokeWidth={2} /> : <Copy className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" strokeWidth={2} />}
                           </button>
                           <button
                             onClick={() => deactivateShareLink({ token: token!, linkId: link._id })}
-                            className="text-[11px] text-[var(--color-error)] hover:underline"
+                            className="text-[10px] font-bold uppercase text-[var(--color-error)] hover:underline"
+                            style={{ fontFamily: 'var(--font-body)' }}
                           >
                             Löschen
                           </button>
@@ -265,9 +277,9 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
                   )}
                   <button
                     onClick={handleCreateShareLink}
-                    className="w-full h-8 rounded-[var(--radius-sm)] bg-[var(--color-accent)] text-white text-[13px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors flex items-center justify-center gap-1.5"
+                    className="btn-brutal w-full h-8 text-[11px] font-bold uppercase tracking-[0.06em] flex items-center justify-center gap-1.5"
                   >
-                    <Link2 className="w-3.5 h-3.5" />
+                    <Link2 className="w-3.5 h-3.5" strokeWidth={2} />
                     Neuen Link erstellen
                   </button>
                 </div>
@@ -291,38 +303,43 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
             </div>
           ) : (
             <div className="text-center py-20">
-              <Film className="w-12 h-12 mx-auto mb-3 text-[var(--color-text-tertiary)] opacity-30" />
-              <p className="text-[14px] text-[var(--color-text-tertiary)]">Video wird verarbeitet…</p>
-              <p className="text-[12px] text-[var(--color-text-tertiary)] mt-1">Bunny CDN encodiert das Video. Bitte kurz warten.</p>
+              <div className="w-12 h-12 border-2 border-[var(--color-border-strong)] bg-[var(--color-surface-1)] flex items-center justify-center mx-auto mb-3" style={{ borderRadius: 0 }}>
+                <Film className="w-6 h-6 text-[var(--color-text-tertiary)]" strokeWidth={2} />
+              </div>
+              <p className="text-[13px] font-bold uppercase tracking-[0.04em] text-[var(--color-text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>Video wird verarbeitet…</p>
+              <p className="text-[12px] text-[var(--color-text-tertiary)] mt-1" style={{ fontFamily: 'var(--font-body)' }}>Bunny CDN encodiert das Video. Bitte kurz warten.</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Comments panel */}
-      <div className="w-full lg:w-[380px] border-t lg:border-t-0 lg:border-l border-[var(--color-border-subtle)] flex flex-col bg-[var(--color-surface-1)]">
+      <div className="w-full lg:w-[380px] border-t-2 lg:border-t-0 lg:border-l-2 border-[var(--color-border-strong)] flex flex-col bg-[var(--color-surface-1)]">
         {/* Panel header */}
-        <div className="px-4 py-3 border-b border-[var(--color-border-subtle)] flex items-center gap-2">
-          <MessageSquare className="w-4 h-4 text-[var(--color-text-secondary)]" />
-          <h2 className="text-[14px] font-medium">Kommentare</h2>
-          <span className="text-[12px] text-[var(--color-text-tertiary)]">
+        <div className="px-4 py-3 border-b-2 border-[var(--color-border-strong)] flex items-center gap-2">
+          <div className="w-[3px] h-[14px] bg-[var(--color-green)]" />
+          <MessageSquare className="w-4 h-4 text-[var(--color-text-secondary)]" strokeWidth={2} />
+          <h2 className="text-[12px] font-bold uppercase tracking-[0.08em]" style={{ fontFamily: 'var(--font-body)' }}>Kommentare</h2>
+          <span className="text-[11px] text-[var(--color-text-tertiary)] tabular-nums font-bold" style={{ fontFamily: 'var(--font-mono)' }}>
             ({unresolvedComments.length} offen)
           </span>
         </div>
 
         {/* Comments list */}
-        <div className="flex-1 overflow-auto px-4 py-3 space-y-3">
+        <div className="flex-1 overflow-auto px-4 py-3">
           {unresolvedComments.length === 0 && resolvedComments.length === 0 && (
             <div className="text-center py-12">
-              <MessageSquare className="w-8 h-8 mx-auto mb-2 text-[var(--color-text-tertiary)] opacity-30" />
-              <p className="text-[13px] text-[var(--color-text-tertiary)]">Noch keine Kommentare</p>
-              <p className="text-[12px] text-[var(--color-text-tertiary)] mt-1">
+              <div className="w-10 h-10 border-2 border-[var(--color-border-strong)] bg-[var(--color-surface-0)] flex items-center justify-center mx-auto mb-2" style={{ borderRadius: 0 }}>
+                <MessageSquare className="w-5 h-5 text-[var(--color-text-tertiary)]" strokeWidth={2} />
+              </div>
+              <p className="text-[12px] font-bold uppercase tracking-[0.04em] text-[var(--color-text-tertiary)]" style={{ fontFamily: 'var(--font-body)' }}>Noch keine Kommentare</p>
+              <p className="text-[11px] text-[var(--color-text-tertiary)] mt-1" style={{ fontFamily: 'var(--font-body)' }}>
                 Klicke auf eine Stelle im Video und schreibe einen Kommentar
               </p>
             </div>
           )}
 
-          {unresolvedComments.map((comment) => (
+          {unresolvedComments.map((comment, i) => (
             <CommentCard
               key={comment._id}
               comment={comment}
@@ -340,34 +357,36 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
               onReplyChange={setReplyText}
               onReplySubmit={handleReply}
               onReplyCancel={() => { setReplyingTo(null); setReplyText(""); }}
+              isFirst={i === 0}
             />
           ))}
 
           {/* Optimistic pending comments */}
-          {pendingComments.map((pc) => (
-            <div key={pc.id} className="rounded-[var(--radius-md)] border border-[var(--color-accent)]/20 bg-[var(--color-accent-surface)] p-3 opacity-70 animate-in">
+          {pendingComments.map((pc, i) => (
+            <div key={pc.id} className="border-2 border-[var(--color-green)] bg-[var(--color-green-subtle)] p-3 opacity-70 animate-in" style={{ borderRadius: 0, marginTop: (unresolvedComments.length > 0 || i > 0) ? '-2px' : 0 }}>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-[12px] font-medium">{user?.name}</span>
+                <span className="text-[11px] font-bold uppercase tracking-[0.04em]" style={{ fontFamily: 'var(--font-body)' }}>{user?.name}</span>
                 {pc.timestamp != null && <TimestampBadge time={pc.timestamp} />}
               </div>
-              <p className="text-[13px] leading-relaxed text-[var(--color-text-secondary)]">{pc.content}</p>
-              <p className="text-[11px] text-[var(--color-text-tertiary)] mt-2">Wird gesendet…</p>
+              <p className="text-[13px] leading-relaxed text-[var(--color-text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>{pc.content}</p>
+              <p className="text-[10px] text-[var(--color-text-tertiary)] mt-2 uppercase tracking-[0.06em] font-bold" style={{ fontFamily: 'var(--font-body)' }}>Wird gesendet…</p>
             </div>
           ))}
 
           {/* Resolved section */}
           {resolvedComments.length > 0 && (
-            <div>
+            <div className="mt-3">
               <button
                 onClick={() => setShowResolved(!showResolved)}
-                className="flex items-center gap-1.5 text-[12px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors py-2"
+                className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--color-text-tertiary)] hover:text-[var(--color-green)] transition-colors py-2"
+                style={{ fontFamily: 'var(--font-body)' }}
               >
-                {showResolved ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                {showResolved ? <ChevronUp className="w-3.5 h-3.5" strokeWidth={2} /> : <ChevronDown className="w-3.5 h-3.5" strokeWidth={2} />}
                 {resolvedComments.length} erledigt
               </button>
               {showResolved && (
-                <div className="space-y-3 opacity-50">
-                  {resolvedComments.map((comment) => (
+                <div className="opacity-50">
+                  {resolvedComments.map((comment, i) => (
                     <CommentCard
                       key={comment._id}
                       comment={comment}
@@ -375,6 +394,7 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
                       replies={[]}
                       onSeek={handleSeek}
                       resolved
+                      isFirst={i === 0}
                     />
                   ))}
                 </div>
@@ -384,13 +404,14 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
         </div>
 
         {/* Comment input */}
-        <div className="border-t border-[var(--color-border-subtle)] p-4">
+        <div className="border-t-2 border-[var(--color-border-strong)] p-4">
           {addTimestamp && (
             <div className="flex items-center gap-2 mb-2">
               <TimestampBadge time={currentTime} />
               <button
                 onClick={() => setAddTimestamp(false)}
-                className="text-[11px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"
+                className="text-[10px] font-bold uppercase tracking-[0.06em] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"
+                style={{ fontFamily: 'var(--font-body)' }}
               >
                 Ohne Zeitstempel
               </button>
@@ -399,25 +420,28 @@ export function VideoReview({ videoId, onBack, onNavigate }: { videoId: string; 
           {!addTimestamp && (
             <button
               onClick={() => setAddTimestamp(true)}
-              className="flex items-center gap-1 mb-2 text-[11px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"
+              className="flex items-center gap-1 mb-2 text-[10px] font-bold uppercase tracking-[0.06em] text-[var(--color-text-tertiary)] hover:text-[var(--color-green)]"
+              style={{ fontFamily: 'var(--font-body)' }}
             >
-              <Clock className="w-3 h-3" />
+              <Clock className="w-3 h-3" strokeWidth={2} />
               Mit Zeitstempel ({formatTimestamp(currentTime)})
             </button>
           )}
-          <form onSubmit={handleSubmit} className="flex gap-2">
+          <form onSubmit={handleSubmit} className="flex gap-0">
             <input
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              className="flex-1 h-9 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[14px] focus:border-[var(--color-accent)] focus:outline-none transition-colors"
+              className="flex-1 h-9 px-3 border-2 border-[var(--color-border-strong)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-green)] focus:shadow-[var(--shadow-brutal-sm)] focus:outline-none transition-all -mr-[2px]"
               placeholder="Feedback geben…"
+              style={{ fontFamily: 'var(--font-body)', borderRadius: 0 }}
             />
             <button
               type="submit"
               disabled={!newComment.trim()}
-              className="h-9 w-9 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white flex items-center justify-center hover:bg-[var(--color-accent-hover)] disabled:opacity-30 transition-all"
+              className="h-9 w-9 bg-[var(--color-green)] text-[#0A0A0A] flex items-center justify-center hover:bg-[var(--color-green-dark)] disabled:opacity-30 transition-all border-2 border-[var(--color-green-dark)]"
+              style={{ borderRadius: 0 }}
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-4 h-4" strokeWidth={2} />
             </button>
           </form>
         </div>
@@ -440,6 +464,7 @@ function CommentCard({
   onReplyChange,
   onReplySubmit,
   onReplyCancel,
+  isFirst,
 }: {
   comment: any;
   userName: string;
@@ -454,42 +479,49 @@ function CommentCard({
   onReplyChange?: (text: string) => void;
   onReplySubmit?: (parentId: string) => void;
   onReplyCancel?: () => void;
+  isFirst?: boolean;
 }) {
   const isReplying = replyingTo === comment._id;
 
   return (
-    <div className={`rounded-[var(--radius-md)] border p-3 transition-colors ${
-      resolved
-        ? "border-[var(--color-border-subtle)] bg-[var(--color-surface-0)]"
-        : "border-[var(--color-border-subtle)] bg-[var(--color-surface-1)]"
-    }`}>
+    <div
+      className="border-2 p-3 transition-all hover:border-[var(--color-green)]"
+      style={{
+        borderRadius: 0,
+        marginTop: isFirst ? 0 : '-2px',
+        borderColor: resolved ? 'var(--color-border-subtle)' : 'var(--color-border-strong)',
+        background: resolved ? 'var(--color-surface-0)' : 'var(--color-surface-1)',
+      }}
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[12px] font-medium">{userName}</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.04em]" style={{ fontFamily: 'var(--font-body)' }}>{userName}</span>
             {comment.timestamp != null && (
               <TimestampBadge time={comment.timestamp} onClick={() => onSeek(comment.timestamp)} />
             )}
           </div>
-          <p className="text-[13px] leading-relaxed text-[var(--color-text-secondary)]">{comment.content}</p>
+          <p className="text-[13px] leading-relaxed text-[var(--color-text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>{comment.content}</p>
         </div>
         <div className="flex items-center gap-0.5 flex-shrink-0">
           {!resolved && onReplyStart && (
             <button
               onClick={() => onReplyStart(comment._id)}
-              className="p-1 rounded hover:bg-[var(--color-surface-2)] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
+              className="p-1 text-[var(--color-text-tertiary)] hover:text-[var(--color-green)] hover:bg-[var(--color-green-subtle)] transition-colors border border-transparent hover:border-[var(--color-green)]"
               title="Antworten"
+              style={{ borderRadius: 0 }}
             >
-              <Reply className="w-3.5 h-3.5" />
+              <Reply className="w-3.5 h-3.5" strokeWidth={2} />
             </button>
           )}
           {!resolved && canResolve && onResolve && (
             <button
               onClick={onResolve}
-              className="p-1 rounded hover:bg-[var(--color-surface-2)] text-[var(--color-text-tertiary)] hover:text-[var(--color-success)] transition-colors"
+              className="p-1 text-[var(--color-text-tertiary)] hover:text-[var(--color-success)] hover:bg-[rgba(22,163,74,0.08)] transition-colors border border-transparent hover:border-[var(--color-success)]"
               title="Als erledigt markieren"
+              style={{ borderRadius: 0 }}
             >
-              <Check className="w-3.5 h-3.5" />
+              <Check className="w-3.5 h-3.5" strokeWidth={2} />
             </button>
           )}
         </div>
@@ -497,11 +529,11 @@ function CommentCard({
 
       {/* Replies */}
       {replies.length > 0 && (
-        <div className="mt-2 pt-2 border-t border-[var(--color-border-subtle)] space-y-2">
+        <div className="mt-2 pt-2 border-t-2 border-[var(--color-border-subtle)] space-y-2">
           {replies.map((r) => (
-            <div key={r._id} className="pl-3 border-l-2 border-[var(--color-border)]">
-              <span className="text-[11px] font-medium">{r.userName}</span>
-              <p className="text-[12px] text-[var(--color-text-secondary)]">{r.content}</p>
+            <div key={r._id} className="pl-3 border-l-2 border-[var(--color-green)]">
+              <span className="text-[10px] font-bold uppercase tracking-[0.04em]" style={{ fontFamily: 'var(--font-body)' }}>{r.userName}</span>
+              <p className="text-[12px] text-[var(--color-text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>{r.content}</p>
             </div>
           ))}
         </div>
@@ -509,14 +541,15 @@ function CommentCard({
 
       {/* Reply input */}
       {isReplying && (
-        <div className="mt-2 pt-2 border-t border-[var(--color-border-subtle)]">
-          <div className="flex gap-1.5">
+        <div className="mt-2 pt-2 border-t-2 border-[var(--color-border-subtle)]">
+          <div className="flex gap-0">
             <input
               value={replyText || ""}
               onChange={(e) => onReplyChange?.(e.target.value)}
-              className="flex-1 h-7 px-2.5 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-0)] text-[12px] focus:border-[var(--color-accent)] focus:outline-none"
+              className="flex-1 h-7 px-2.5 border-2 border-[var(--color-border-strong)] bg-[var(--color-surface-0)] text-[12px] focus:border-[var(--color-green)] focus:outline-none -mr-[2px]"
               placeholder="Antworten…"
               autoFocus
+              style={{ fontFamily: 'var(--font-body)', borderRadius: 0 }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); onReplySubmit?.(comment._id); }
                 if (e.key === "Escape") onReplyCancel?.();
@@ -525,17 +558,18 @@ function CommentCard({
             <button
               onClick={() => onReplySubmit?.(comment._id)}
               disabled={!(replyText || "").trim()}
-              className="h-7 w-7 rounded-[var(--radius-sm)] bg-[var(--color-accent)] text-white flex items-center justify-center hover:bg-[var(--color-accent-hover)] disabled:opacity-30 transition-all"
+              className="h-7 w-7 bg-[var(--color-green)] text-[#0A0A0A] flex items-center justify-center hover:bg-[var(--color-green-dark)] disabled:opacity-30 transition-all border-2 border-[var(--color-green-dark)]"
+              style={{ borderRadius: 0 }}
             >
-              <Send className="w-3 h-3" />
+              <Send className="w-3 h-3" strokeWidth={2} />
             </button>
           </div>
         </div>
       )}
 
-      <p className="text-[11px] text-[var(--color-text-tertiary)] mt-2">
+      <p className="text-[10px] text-[var(--color-text-tertiary)] mt-2 tabular-nums" style={{ fontFamily: 'var(--font-mono)' }}>
         {new Date(comment.createdAt).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
-        {resolved && " · ✓ Erledigt"}
+        {resolved && " · ✓ ERLEDIGT"}
       </p>
     </div>
   );

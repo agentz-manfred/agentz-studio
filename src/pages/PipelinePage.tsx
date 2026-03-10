@@ -3,7 +3,7 @@ import { api } from "../../convex/_generated/api";
 import { useAuth } from "../lib/auth";
 import { useClientFilter } from "../lib/clientFilter";
 import { KanbanBoard } from "../components/kanban/KanbanBoard";
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useState } from "react";
 import { PipelineSkeleton } from "../components/ui/Skeleton";
 import { IdeaDrawer } from "../components/ideas/IdeaDrawer";
@@ -68,18 +68,25 @@ export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: 
 
   return (
     <div>
-      <div className="px-6 lg:px-8 py-6 border-b border-[var(--color-border-subtle)]">
+      {/* Header */}
+      <div className="px-6 lg:px-8 py-6 border-b-2 border-[var(--color-border-strong)]">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-[22px] font-semibold tracking-[-0.02em] title-accent">Pipeline</h1>
-            <p className="text-[14px] text-[var(--color-text-tertiary)] mt-0.5">Drag & Drop zum Verschieben</p>
+            <div className="flex items-center gap-3 mb-1">
+              <div className="w-[3px] h-[20px] bg-[var(--color-green)]" />
+              <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-muted)]" style={{ fontFamily: 'var(--font-body)' }}>
+                CONTENT PIPELINE
+              </span>
+            </div>
+            <h1 className="text-[24px] font-bold uppercase tracking-[-0.02em]" style={{ fontFamily: 'var(--font-display)' }}>Pipeline</h1>
+            <p className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5 uppercase tracking-[0.04em] font-bold" style={{ fontFamily: 'var(--font-body)' }}>Drag & Drop zum Verschieben</p>
           </div>
           {user?.role === "admin" && (
             <button
               onClick={() => setShowNewIdea(true)}
-              className="flex items-center gap-2 h-9 px-4 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[14px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors"
+              className="btn-brutal flex items-center gap-2 h-9 px-4 text-[12px] font-bold uppercase tracking-[0.06em]"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4" strokeWidth={2.5} />
               Neue Idee
             </button>
           )}
@@ -103,18 +110,33 @@ export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: 
         onNavigate={onNavigate}
       />
 
-      {/* New Idea Modal */}
+      {/* New Idea Modal — Brutal */}
       {showNewIdea && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="animate-in bg-[var(--color-surface-1)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] w-full max-w-[440px] mx-4 p-6">
-            <h3 className="text-[18px] font-semibold mb-5">Neue Idee</h3>
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="animate-in bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)] shadow-[var(--shadow-brutal)] w-full max-w-[440px] mx-4 p-6" style={{ borderRadius: 0 }}>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2">
+                <div className="w-[3px] h-[16px] bg-[var(--color-green)]" />
+                <h3 className="text-[14px] font-bold uppercase tracking-[0.06em]" style={{ fontFamily: 'var(--font-body)' }}>Neue Idee</h3>
+              </div>
+              <button
+                onClick={() => setShowNewIdea(false)}
+                className="p-1 border border-[var(--color-border-strong)] text-[var(--color-text-tertiary)] hover:border-[var(--color-error)] hover:text-[var(--color-error)] hover:bg-[rgba(239,68,68,0.08)] transition-colors"
+                style={{ borderRadius: 0 }}
+              >
+                <X className="w-4 h-4" strokeWidth={2} />
+              </button>
+            </div>
+
             <form onSubmit={handleCreateIdea} className="space-y-4">
               <div>
-                <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Kunde</label>
+                <label className="block text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-muted)] mb-1.5" style={{ fontFamily: 'var(--font-body)' }}>Kunde</label>
                 <select
                   value={selectedClient}
                   onChange={(e) => setSelectedClient(e.target.value)}
-                  className="w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-1)] text-[14px]"
+                  className="w-full h-10 px-3 border-2 border-[var(--color-border-strong)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-green)] focus:shadow-[var(--shadow-brutal-sm)] focus:outline-none transition-all"
+                  style={{ borderRadius: 0, fontFamily: 'var(--font-body)' }}
                   required
                 >
                   <option value="">Kunde wählen…</option>
@@ -125,17 +147,30 @@ export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: 
               </div>
               {selectedClient && pipelineCategories && pipelineCategories.length > 0 && (
                 <div>
-                  <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Kategorie</label>
-                  <div className="flex flex-wrap gap-1.5">
+                  <label className="block text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-muted)] mb-1.5" style={{ fontFamily: 'var(--font-body)' }}>Kategorie</label>
+                  <div className="flex flex-wrap gap-0">
                     <button type="button" onClick={() => setSelectedCategory("")}
-                      className={`h-7 px-3 rounded-full text-[12px] font-medium border transition-colors ${!selectedCategory ? "bg-[var(--color-surface-3)] border-[var(--color-border)] text-[var(--color-text-primary)]" : "border-[var(--color-border-subtle)] text-[var(--color-text-tertiary)] hover:border-[var(--color-border)]"}`}>
+                      className="h-7 px-3 text-[11px] font-bold uppercase tracking-[0.04em] border-2 transition-all -mr-[2px]"
+                      style={{
+                        borderRadius: 0,
+                        fontFamily: 'var(--font-body)',
+                        borderColor: !selectedCategory ? 'var(--color-green)' : 'var(--color-border-strong)',
+                        background: !selectedCategory ? 'var(--color-green-subtle)' : 'transparent',
+                        color: !selectedCategory ? 'var(--color-green)' : 'var(--color-text-tertiary)',
+                      }}>
                       Keine
                     </button>
                     {pipelineCategories.map((cat) => (
                       <button key={cat._id} type="button" onClick={() => setSelectedCategory(cat._id)}
-                        className={`h-7 px-3 rounded-full text-[12px] font-medium border transition-colors flex items-center gap-1.5 ${selectedCategory === cat._id ? "border-current" : "border-[var(--color-border-subtle)] hover:border-[var(--color-border)]"}`}
-                        style={{ color: cat.color }}>
-                        <span className="w-2 h-2 rounded-full" style={{ background: cat.color }} />
+                        className="h-7 px-3 text-[11px] font-bold uppercase tracking-[0.04em] border-2 transition-all flex items-center gap-1.5 -mr-[2px]"
+                        style={{
+                          borderRadius: 0,
+                          fontFamily: 'var(--font-body)',
+                          borderColor: selectedCategory === cat._id ? cat.color : 'var(--color-border-strong)',
+                          background: selectedCategory === cat._id ? `${cat.color}15` : 'transparent',
+                          color: cat.color,
+                        }}>
+                        <span className="w-[8px] h-[8px]" style={{ background: cat.color, borderRadius: 0 }} />
                         {cat.name}
                       </button>
                     ))}
@@ -143,29 +178,38 @@ export function PipelinePage({ onNavigate }: { onNavigate?: (page: string, id?: 
                 </div>
               )}
               <div>
-                <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Titel</label>
+                <label className="block text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-muted)] mb-1.5" style={{ fontFamily: 'var(--font-body)' }}>Titel</label>
                 <input
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full h-10 px-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-1)] text-[14px]"
+                  className="w-full h-10 px-3 border-2 border-[var(--color-border-strong)] bg-[var(--color-surface-0)] text-[13px] focus:border-[var(--color-green)] focus:shadow-[var(--shadow-brutal-sm)] focus:outline-none transition-all"
                   placeholder="Video-Idee…"
+                  style={{ borderRadius: 0, fontFamily: 'var(--font-body)' }}
                   required
                 />
               </div>
               <div>
-                <label className="block text-[13px] font-medium text-[var(--color-text-secondary)] mb-1.5">Beschreibung</label>
+                <label className="block text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-muted)] mb-1.5" style={{ fontFamily: 'var(--font-body)' }}>Beschreibung</label>
                 <textarea
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
-                  className="w-full h-24 px-3 py-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-1)] text-[14px] resize-none"
+                  className="w-full h-24 px-3 py-2 border-2 border-[var(--color-border-strong)] bg-[var(--color-surface-0)] text-[13px] resize-none focus:border-[var(--color-green)] focus:shadow-[var(--shadow-brutal-sm)] focus:outline-none transition-all"
                   placeholder="Optional…"
+                  style={{ borderRadius: 0, fontFamily: 'var(--font-body)' }}
                 />
               </div>
-              <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setShowNewIdea(false)} className="flex-1 h-10 rounded-[var(--radius-md)] border border-[var(--color-border)] text-[14px] font-medium hover:bg-[var(--color-surface-2)] transition-colors">
+              <div className="flex gap-0 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowNewIdea(false)}
+                  className="btn-brutal-outline flex-1 h-10 text-[12px] font-bold uppercase tracking-[0.06em] -mr-[2px]"
+                >
                   Abbrechen
                 </button>
-                <button type="submit" className="flex-1 h-10 rounded-[var(--radius-md)] bg-[var(--color-accent)] text-white text-[14px] font-medium hover:bg-[var(--color-accent-hover)] transition-colors">
+                <button
+                  type="submit"
+                  className="btn-brutal flex-1 h-10 text-[12px] font-bold uppercase tracking-[0.06em]"
+                >
                   Erstellen
                 </button>
               </div>

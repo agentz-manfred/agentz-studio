@@ -118,7 +118,6 @@ export function VideoUpload({ ideaId, folderId, onUploaded }: VideoUploadProps) 
     processingRef.current = true;
 
     while (true) {
-      // Check how many are currently uploading
       const currentQueue = queue;
       const uploading = currentQueue.filter((q) => q.status === "uploading").length;
       if (uploading >= MAX_PARALLEL) break;
@@ -126,16 +125,13 @@ export function VideoUpload({ ideaId, folderId, onUploaded }: VideoUploadProps) 
       const next = currentQueue.find((q) => q.status === "queued");
       if (!next) break;
 
-      // Start upload (don't await — let it run in parallel)
       uploadFile(next);
-      // Small delay to prevent batching issues
       await new Promise((r) => setTimeout(r, 100));
     }
 
     processingRef.current = false;
   }, [queue, uploadFile]);
 
-  // Process queue whenever it changes
   useEffect(() => {
     const uploading = queue.filter((q) => q.status === "uploading").length;
     const queued = queue.filter((q) => q.status === "queued").length;
@@ -208,28 +204,40 @@ export function VideoUpload({ ideaId, folderId, onUploaded }: VideoUploadProps) 
         onChange={(e) => e.target.files && addFiles(e.target.files)}
       />
 
-      {/* Drop zone */}
+      {/* Drop zone — brutal */}
       <div
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
         onClick={() => inputRef.current?.click()}
-        className={`rounded-[var(--radius-md)] border-2 border-dashed cursor-pointer transition-all duration-200 p-6 text-center ${
-          dragOver
-            ? "border-[var(--color-accent)] bg-[var(--color-accent-surface)]"
-            : "border-[var(--color-border)] hover:border-[var(--color-text-tertiary)] bg-[var(--color-surface-1)]"
-        }`}
+        className="cursor-pointer transition-all duration-200 p-6 text-center border-2 border-dashed relative"
+        style={{
+          borderRadius: 0,
+          borderColor: dragOver ? 'var(--color-green)' : 'var(--color-border-strong)',
+          background: dragOver ? 'var(--color-green-subtle)' : 'var(--color-surface-1)',
+          boxShadow: dragOver ? 'var(--shadow-brutal)' : 'none',
+        }}
       >
+        {/* Corner marks */}
+        <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[var(--color-green)]" />
+        <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[var(--color-green)]" />
+        <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-[var(--color-green)]" />
+        <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-[var(--color-green)]" />
+
         <div className="flex flex-col items-center gap-2">
           {dragOver ? (
-            <Film className="w-7 h-7 text-[var(--color-accent)]" />
+            <div className="w-10 h-10 border-2 border-[var(--color-green)] bg-[var(--color-green-subtle)] flex items-center justify-center" style={{ borderRadius: 0 }}>
+              <Film className="w-6 h-6 text-[var(--color-green)]" strokeWidth={2} />
+            </div>
           ) : (
-            <Upload className="w-7 h-7 text-[var(--color-text-tertiary)]" />
+            <div className="w-10 h-10 border-2 border-[var(--color-border-strong)] bg-[var(--color-surface-0)] flex items-center justify-center" style={{ borderRadius: 0 }}>
+              <Upload className="w-6 h-6 text-[var(--color-text-tertiary)]" strokeWidth={2} />
+            </div>
           )}
-          <p className="text-[14px] font-medium">
+          <p className="text-[13px] font-bold uppercase tracking-[0.04em]" style={{ fontFamily: 'var(--font-body)' }}>
             {dragOver ? "Hier ablegen" : "Videos hochladen"}
           </p>
-          <p className="text-[12px] text-[var(--color-text-tertiary)]">
+          <p className="text-[11px] text-[var(--color-text-tertiary)] uppercase tracking-[0.02em]" style={{ fontFamily: 'var(--font-body)' }}>
             Mehrere Videos oder Ordner · Drag & Drop · Max. 2 GB pro Video
           </p>
         </div>
@@ -237,59 +245,73 @@ export function VideoUpload({ ideaId, folderId, onUploaded }: VideoUploadProps) 
 
       {/* Queue */}
       {queue.length > 0 && (
-        <div className="mt-3 space-y-1.5">
+        <div className="mt-3">
           {/* Summary bar */}
           {queue.length > 1 && (
-            <div className="flex items-center justify-between px-3 py-2 bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)]">
-              <span className="text-[12px] text-[var(--color-text-secondary)]">
-                {completedCount}/{queue.length} abgeschlossen
-                {hasActiveUploads && ` · ${totalProgress}%`}
+            <div className="flex items-center justify-between px-3 py-2 bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)]" style={{ borderRadius: 0 }}>
+              <span className="text-[11px] font-bold uppercase tracking-[0.04em] text-[var(--color-text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
+                <span style={{ fontFamily: 'var(--font-mono)' }} className="tabular-nums">{completedCount}/{queue.length}</span> abgeschlossen
+                {hasActiveUploads && <span style={{ fontFamily: 'var(--font-mono)' }} className="tabular-nums ml-1">· {totalProgress}%</span>}
               </span>
               {hasCompleted && (
-                <button onClick={clearCompleted} className="text-[11px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
+                <button onClick={clearCompleted} className="text-[10px] font-bold uppercase tracking-[0.06em] text-[var(--color-text-tertiary)] hover:text-[var(--color-green)] transition-colors" style={{ fontFamily: 'var(--font-body)' }}>
                   Erledigte entfernen
                 </button>
               )}
             </div>
           )}
 
-          {queue.map((item) => (
-            <div key={item.id} className="flex items-center gap-3 px-3 py-2.5 bg-[var(--color-surface-1)] rounded-[var(--radius-md)] border border-[var(--color-border-subtle)]">
+          {queue.map((item, i) => (
+            <div
+              key={item.id}
+              className="flex items-center gap-3 px-3 py-2.5 bg-[var(--color-surface-1)] border-2 border-[var(--color-border-strong)]"
+              style={{ borderRadius: 0, marginTop: (queue.length > 1 || i > 0) ? '-2px' : (i === 0 && queue.length <= 1) ? '0' : '-2px' }}
+            >
               {/* Status icon */}
-              {item.status === "uploading" && <Loader2 className="w-4 h-4 animate-spin text-[var(--color-accent)] flex-shrink-0" />}
-              {item.status === "queued" && <Pause className="w-4 h-4 text-[var(--color-text-tertiary)] flex-shrink-0" />}
-              {item.status === "done" && <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />}
-              {item.status === "error" && <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />}
-              {item.status === "cancelled" && <X className="w-4 h-4 text-[var(--color-text-tertiary)] flex-shrink-0" />}
+              {item.status === "uploading" && <Loader2 className="w-4 h-4 animate-spin text-[var(--color-green)] flex-shrink-0" strokeWidth={2} />}
+              {item.status === "queued" && <Pause className="w-4 h-4 text-[var(--color-text-tertiary)] flex-shrink-0" strokeWidth={2} />}
+              {item.status === "done" && <CheckCircle2 className="w-4 h-4 text-[var(--color-success)] flex-shrink-0" strokeWidth={2} />}
+              {item.status === "error" && <AlertCircle className="w-4 h-4 text-[var(--color-error)] flex-shrink-0" strokeWidth={2} />}
+              {item.status === "cancelled" && <X className="w-4 h-4 text-[var(--color-text-tertiary)] flex-shrink-0" strokeWidth={2} />}
 
               {/* File info */}
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-medium truncate">{item.file.name}</p>
+                <p className="text-[12px] font-bold uppercase tracking-[0.02em] truncate" style={{ fontFamily: 'var(--font-body)' }}>{item.file.name}</p>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-[11px] text-[var(--color-text-tertiary)]">{formatSize(item.file.size)}</span>
+                  <span className="text-[10px] text-[var(--color-text-tertiary)] tabular-nums" style={{ fontFamily: 'var(--font-mono)' }}>{formatSize(item.file.size)}</span>
                   {item.status === "uploading" && (
-                    <span className="text-[11px] text-[var(--color-accent)] tabular-nums">{item.progress}%</span>
+                    <span className="text-[10px] text-[var(--color-green)] tabular-nums font-bold" style={{ fontFamily: 'var(--font-mono)' }}>{item.progress}%</span>
                   )}
                   {item.error && (
-                    <span className="text-[11px] text-red-500">{item.error}</span>
+                    <span className="text-[10px] text-[var(--color-error)] font-bold" style={{ fontFamily: 'var(--font-body)' }}>{item.error}</span>
                   )}
                 </div>
                 {item.status === "uploading" && (
-                  <div className="w-full h-1 bg-[var(--color-surface-2)] rounded-full overflow-hidden mt-1.5">
-                    <div className="h-full bg-[var(--color-accent)] rounded-full transition-[width] duration-300" style={{ width: `${item.progress}%` }} />
+                  <div className="w-full h-[6px] bg-[var(--color-surface-0)] overflow-hidden mt-1.5 border border-[var(--color-border-subtle)]" style={{ borderRadius: 0 }}>
+                    <div className="h-full bg-[var(--color-green)] transition-[width] duration-300" style={{ width: `${item.progress}%`, borderRadius: 0 }} />
                   </div>
                 )}
               </div>
 
               {/* Actions */}
               {(item.status === "uploading" || item.status === "queued") && (
-                <button onClick={() => cancelUpload(item.id)} className="p-1 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors" title="Abbrechen">
-                  <X className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
+                <button
+                  onClick={() => cancelUpload(item.id)}
+                  className="p-1 hover:bg-[var(--color-surface-2)] transition-colors border border-transparent hover:border-[var(--color-error)]"
+                  title="Abbrechen"
+                  style={{ borderRadius: 0 }}
+                >
+                  <X className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" strokeWidth={2} />
                 </button>
               )}
               {(item.status === "done" || item.status === "error" || item.status === "cancelled") && (
-                <button onClick={() => removeItem(item.id)} className="p-1 rounded-[var(--radius-sm)] hover:bg-[var(--color-surface-2)] transition-colors" title="Entfernen">
-                  <X className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
+                <button
+                  onClick={() => removeItem(item.id)}
+                  className="p-1 hover:bg-[var(--color-surface-2)] transition-colors border border-transparent hover:border-[var(--color-error)]"
+                  title="Entfernen"
+                  style={{ borderRadius: 0 }}
+                >
+                  <X className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" strokeWidth={2} />
                 </button>
               )}
             </div>

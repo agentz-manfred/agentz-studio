@@ -35,7 +35,7 @@ export function VideoPlayer({ src, embedSrc, poster, markers = [], onTimeClick, 
   // If embedSrc, use iframe
   if (embedSrc && !src) {
     return (
-      <div className="relative w-full aspect-video bg-black rounded-[var(--radius-lg)] overflow-hidden">
+      <div className="relative w-full aspect-video bg-black overflow-hidden border-2 border-[var(--color-border-strong)]" style={{ borderRadius: 0 }}>
         <iframe
           src={embedSrc + "?autoplay=false&preload=true"}
           className="w-full h-full border-0"
@@ -116,7 +116,7 @@ export function VideoPlayer({ src, embedSrc, poster, markers = [], onTimeClick, 
   const progress = duration ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="relative group w-full bg-black rounded-[var(--radius-lg)] overflow-hidden">
+    <div className="relative group w-full bg-black overflow-hidden border-2 border-[var(--color-border-strong)]" style={{ borderRadius: 0 }}>
       {/* Video */}
       <video
         ref={videoRef}
@@ -132,20 +132,23 @@ export function VideoPlayer({ src, embedSrc, poster, markers = [], onTimeClick, 
         preload="metadata"
       />
 
-      {/* Play overlay when paused */}
+      {/* Play overlay when paused — square green button */}
       {!playing && (
         <div
           className="absolute inset-0 flex items-center justify-center cursor-pointer"
           onClick={togglePlay}
         >
-          <div className="w-16 h-16 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
-            <Play className="w-7 h-7 text-[#0a0a0a] ml-1" />
+          <div
+            className="w-16 h-16 bg-[var(--color-green)] flex items-center justify-center border-2 border-[var(--color-green-dark)] transition-transform group-hover:scale-105"
+            style={{ borderRadius: 0, boxShadow: '3px 3px 0px #0A0A0A' }}
+          >
+            <Play className="w-7 h-7 text-[#0A0A0A] ml-1" strokeWidth={2.5} />
           </div>
         </div>
       )}
 
       {/* Controls bar */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pt-12 pb-0 px-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent pt-12 pb-0 px-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
         {/* Timeline / Progress */}
         <div
           ref={progressRef}
@@ -154,43 +157,46 @@ export function VideoPlayer({ src, embedSrc, poster, markers = [], onTimeClick, 
           onMouseMove={handleProgressHover}
           onMouseLeave={() => setHoverTime(null)}
         >
-          {/* Track background */}
-          <div className="w-full h-1 bg-white/20 rounded-full relative mb-3">
+          {/* Track background — square, no border-radius */}
+          <div className="w-full h-[6px] bg-white/20 relative mb-3" style={{ borderRadius: 0 }}>
             {/* Played */}
             <div
-              className="absolute left-0 top-0 h-full bg-white rounded-full transition-[width] duration-100"
-              style={{ width: `${progress}%` }}
+              className="absolute left-0 top-0 h-full bg-[var(--color-green)] transition-[width] duration-100"
+              style={{ width: `${progress}%`, borderRadius: 0 }}
             />
             {/* Hover preview */}
             {hoverTime !== null && (
               <div
-                className="absolute top-0 h-full bg-white/30 rounded-full"
-                style={{ width: `${(hoverTime / duration) * 100}%` }}
+                className="absolute top-0 h-full bg-white/20"
+                style={{ width: `${(hoverTime / duration) * 100}%`, borderRadius: 0 }}
               />
             )}
-            {/* Timeline markers */}
+            {/* Timeline markers — square dots */}
             {markers.map((m, i) => (
               <div
                 key={i}
-                className={`absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full cursor-pointer transition-transform hover:scale-150 z-10 ${
-                  m.resolved ? "bg-[var(--color-success)]" : "bg-amber-400"
-                }`}
-                style={{ left: `${(m.time / duration) * 100}%`, marginLeft: "-5px" }}
+                className="absolute top-1/2 -translate-y-1/2 w-[10px] h-[10px] cursor-pointer transition-transform hover:scale-150 z-10 border border-[#0A0A0A]"
+                style={{
+                  left: `${(m.time / duration) * 100}%`,
+                  marginLeft: "-5px",
+                  borderRadius: 0,
+                  background: m.resolved ? 'var(--color-success)' : '#f59e0b',
+                }}
                 title={formatTime(m.time)}
                 onClick={(e) => { e.stopPropagation(); onTimeClick?.(m.time); }}
               />
             ))}
-            {/* Playhead */}
+            {/* Playhead — square */}
             <div
-              className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-white rounded-full shadow-md border-2 border-white z-20 transition-[left] duration-100"
-              style={{ left: `${progress}%`, marginLeft: "-7px" }}
+              className="absolute top-1/2 -translate-y-1/2 w-[14px] h-[14px] bg-[var(--color-green)] z-20 transition-[left] duration-100 border-2 border-[var(--color-green-dark)]"
+              style={{ left: `${progress}%`, marginLeft: "-7px", borderRadius: 0, boxShadow: '1px 1px 0px #0A0A0A' }}
             />
           </div>
           {/* Hover timestamp tooltip */}
           {hoverTime !== null && (
             <div
-              className="absolute bottom-8 px-1.5 py-0.5 bg-black/80 text-white text-[11px] rounded pointer-events-none"
-              style={{ left: `${hoverX}px`, transform: "translateX(-50%)" }}
+              className="absolute bottom-8 px-1.5 py-0.5 bg-[#0A0A0A] text-[var(--color-green)] text-[11px] pointer-events-none border border-[var(--color-green)]"
+              style={{ left: `${hoverX}px`, transform: "translateX(-50%)", borderRadius: 0, fontFamily: 'var(--font-mono)' }}
             >
               {formatTime(hoverTime)}
             </div>
@@ -200,24 +206,24 @@ export function VideoPlayer({ src, embedSrc, poster, markers = [], onTimeClick, 
         {/* Button row */}
         <div className="flex items-center justify-between px-4 pb-3 pt-0">
           <div className="flex items-center gap-1">
-            <button onClick={() => skip(-10)} className="p-1.5 text-white/80 hover:text-white transition-colors">
-              <SkipBack className="w-4 h-4" />
+            <button onClick={() => skip(-10)} className="p-1.5 text-white/80 hover:text-[var(--color-green)] transition-colors">
+              <SkipBack className="w-4 h-4" strokeWidth={2} />
             </button>
-            <button onClick={togglePlay} className="p-1.5 text-white hover:text-white transition-colors">
-              {playing ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+            <button onClick={togglePlay} className="p-1.5 text-white hover:text-[var(--color-green)] transition-colors">
+              {playing ? <Pause className="w-5 h-5" strokeWidth={2} /> : <Play className="w-5 h-5" strokeWidth={2} />}
             </button>
-            <button onClick={() => skip(10)} className="p-1.5 text-white/80 hover:text-white transition-colors">
-              <SkipForward className="w-4 h-4" />
+            <button onClick={() => skip(10)} className="p-1.5 text-white/80 hover:text-[var(--color-green)] transition-colors">
+              <SkipForward className="w-4 h-4" strokeWidth={2} />
             </button>
-            <button onClick={() => setMuted(!muted)} className="p-1.5 text-white/80 hover:text-white transition-colors ml-1">
-              {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            <button onClick={() => setMuted(!muted)} className="p-1.5 text-white/80 hover:text-[var(--color-green)] transition-colors ml-1">
+              {muted ? <VolumeX className="w-4 h-4" strokeWidth={2} /> : <Volume2 className="w-4 h-4" strokeWidth={2} />}
             </button>
-            <span className="text-[12px] text-white/70 ml-2 tabular-nums">
+            <span className="text-[12px] text-white/70 ml-2 tabular-nums" style={{ fontFamily: 'var(--font-mono)' }}>
               {formatTime(currentTime)} / {formatTime(duration)}
             </span>
           </div>
-          <button onClick={toggleFullscreen} className="p-1.5 text-white/80 hover:text-white transition-colors">
-            <Maximize className="w-4 h-4" />
+          <button onClick={toggleFullscreen} className="p-1.5 text-white/80 hover:text-[var(--color-green)] transition-colors">
+            <Maximize className="w-4 h-4" strokeWidth={2} />
           </button>
         </div>
       </div>

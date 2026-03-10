@@ -96,8 +96,8 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, clientInfoMap,
       onDragEnd={(e) => { setIsDragging(false); handleDragEnd(); }}
       onDragCancel={() => setIsDragging(false)}
     >
-      <KanbanBoardPrimitive className="grid auto-cols-[240px] sm:auto-cols-[260px] grid-flow-col gap-2 sm:gap-3 overflow-x-auto pb-4 snap-x snap-mandatory sm:snap-none" style={{ touchAction: "auto" }}>
-        {STATUS_ORDER.map((status) => {
+      <KanbanBoardPrimitive className="grid auto-cols-[240px] sm:auto-cols-[260px] grid-flow-col gap-0 overflow-x-auto pb-4 snap-x snap-mandatory sm:snap-none" style={{ touchAction: "auto" }}>
+        {STATUS_ORDER.map((status, colIndex) => {
           const color = STATUS_COLORS[status] || "#a3a3a3";
           const statusIdeas = displayColumns[status] || [];
 
@@ -106,32 +106,42 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, clientInfoMap,
               key={status}
               value={status}
               className="!bg-transparent !border-0 !p-0 !rounded-none gap-0 snap-start"
+              style={{ marginLeft: colIndex > 0 ? '-2px' : 0 }}
             >
-              {/* Column Header */}
-              <div className="flex items-center justify-between px-2 py-2 mb-2">
+              {/* Column Header — brutal */}
+              <div
+                className="flex items-center justify-between px-3 py-2.5 mb-0 border-2 border-[var(--color-border-strong)]"
+                style={{ borderRadius: 0, borderBottom: '2px solid var(--color-border-strong)' }}
+              >
                 <div className="flex items-center gap-2">
                   <div
-                    className="w-2 h-2 rounded-full flex-shrink-0"
-                    style={{ background: color }}
+                    className="w-[10px] h-[10px] flex-shrink-0 border border-[#0A0A0A]"
+                    style={{ background: color, borderRadius: 0 }}
                   />
-                  <span className="text-[12px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)]">
+                  <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
                     {STATUS_LABELS[status] || status}
                   </span>
                 </div>
                 <span
-                  className="text-[11px] font-medium tabular-nums px-1.5 py-0.5 rounded-md"
-                  style={{ background: hexToRgba(color, 0.1), color }}
+                  className="text-[10px] font-bold tabular-nums px-1.5 py-0.5 border"
+                  style={{
+                    borderRadius: 0,
+                    background: hexToRgba(color, 0.12),
+                    color,
+                    borderColor: color,
+                    fontFamily: 'var(--font-mono)',
+                  }}
                 >
                   {statusIdeas.length}
                 </span>
               </div>
 
               {/* Cards */}
-              <div className="flex flex-col gap-2 min-h-[100px]">
-                {statusIdeas.map((idea) => {
+              <div className="flex flex-col gap-0 min-h-[100px]">
+                {statusIdeas.map((idea, cardIndex) => {
                   const clientName = clientNames?.[idea.clientId];
                   const clientInfo = clientInfoMap?.[idea.clientId];
-                  const avatarBg = clientInfo?.avatarColor || "#4F46E5";
+                  const avatarBg = clientInfo?.avatarColor || "#00DC82";
                   return (
                     <KanbanItem
                       key={idea._id}
@@ -141,34 +151,39 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, clientInfoMap,
                     >
                       <div
                         className={cn(
-                          "rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] p-3 shadow-sm",
-                          "transition-shadow hover:shadow-md",
-                          "active:shadow-lg active:scale-[1.02]",
+                          "border-2 border-[var(--color-border-strong)] bg-[var(--color-surface-1)] p-3",
+                          "transition-all duration-200",
+                          "hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[3px_3px_0px_var(--color-green-dark)] hover:border-[var(--color-green)]",
+                          "active:shadow-[4px_4px_0px_var(--color-green)] active:scale-[1.01]",
                         )}
+                        style={{
+                          borderRadius: 0,
+                          marginTop: '-2px',
+                        }}
                         onClick={onIdeaClick && !isDragging ? () => onIdeaClick(idea._id) : undefined}
                       >
                         {/* Accent bar top */}
                         <div
-                          className="h-0.5 -mx-3 -mt-3 mb-3 rounded-t-lg"
-                          style={{ background: color }}
+                          className="h-[3px] -mx-3 -mt-3 mb-3"
+                          style={{ background: color, borderRadius: 0 }}
                         />
-                        <p className="text-[13px] font-medium leading-snug line-clamp-2">
+                        <p className="text-[12px] font-bold leading-snug line-clamp-2 uppercase tracking-[0.02em] hover:text-[var(--color-green)] transition-colors" style={{ fontFamily: 'var(--font-body)' }}>
                           {idea.title}
                         </p>
                         {idea.description && (
-                          <p className="mt-1.5 text-[12px] text-[var(--color-text-tertiary)] line-clamp-2 leading-relaxed">
+                          <p className="mt-1.5 text-[11px] text-[var(--color-text-tertiary)] line-clamp-2 leading-relaxed" style={{ fontFamily: 'var(--font-body)' }}>
                             {idea.description}
                           </p>
                         )}
                         {clientName && (
-                          <div className="flex items-center gap-1.5 mt-2.5 pt-2 border-t border-[var(--color-border-subtle)]">
+                          <div className="flex items-center gap-1.5 mt-2.5 pt-2 border-t-2 border-[var(--color-border-subtle)]">
                             <div
-                              className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-[9px] font-bold text-white"
-                              style={{ background: avatarBg }}
+                              className="w-5 h-5 flex items-center justify-center flex-shrink-0 text-[9px] font-bold text-[#0A0A0A] border border-[#0A0A0A]"
+                              style={{ background: avatarBg, borderRadius: 0 }}
                             >
                               {clientName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
                             </div>
-                            <span className="text-[11px] text-[var(--color-text-tertiary)]">
+                            <span className="text-[10px] text-[var(--color-text-tertiary)] uppercase tracking-[0.04em] font-bold" style={{ fontFamily: 'var(--font-body)' }}>
                               {clientName}
                             </span>
                           </div>
@@ -178,7 +193,10 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, clientInfoMap,
                   );
                 })}
                 {statusIdeas.length === 0 && (
-                  <div className="flex items-center justify-center h-20 rounded-lg border border-dashed border-[var(--color-border)] text-[11px] text-[var(--color-text-tertiary)] opacity-30">
+                  <div
+                    className="flex items-center justify-center h-20 border-2 border-dashed border-[var(--color-border-strong)] text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-tertiary)] opacity-40"
+                    style={{ borderRadius: 0, marginTop: '-2px', fontFamily: 'var(--font-body)' }}
+                  >
                     Hierher ziehen
                   </div>
                 )}
@@ -191,29 +209,32 @@ export function KanbanBoard({ ideas, onStatusChange, clientNames, clientInfoMap,
       <KanbanOverlay>
         {({ value }) => {
           const idea = findIdea(value);
-          if (!idea) return <div className="size-full rounded-lg bg-[var(--color-accent)]/10" />;
+          if (!idea) return <div className="size-full bg-[var(--color-green-subtle)] border-2 border-[var(--color-green)]" style={{ borderRadius: 0 }} />;
           const clientName = clientNames?.[idea.clientId];
           const color = STATUS_COLORS[idea.status] || "#a3a3a3";
           const cInfo = clientInfoMap?.[idea.clientId];
-          const avatarBg = cInfo?.avatarColor || "#4F46E5";
+          const avatarBg = cInfo?.avatarColor || "#00DC82";
           return (
-            <div className="rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-1)] p-3 shadow-xl rotate-[2deg] w-[260px]">
+            <div
+              className="border-2 border-[var(--color-green)] bg-[var(--color-surface-1)] p-3 w-[260px]"
+              style={{ borderRadius: 0, boxShadow: '4px 4px 0px var(--color-green)', transform: 'rotate(2deg)' }}
+            >
               <div
-                className="h-0.5 -mx-3 -mt-3 mb-3 rounded-t-lg"
-                style={{ background: color }}
+                className="h-[3px] -mx-3 -mt-3 mb-3"
+                style={{ background: color, borderRadius: 0 }}
               />
-              <p className="text-[13px] font-medium leading-snug line-clamp-2">
+              <p className="text-[12px] font-bold leading-snug line-clamp-2 uppercase tracking-[0.02em]" style={{ fontFamily: 'var(--font-body)' }}>
                 {idea.title}
               </p>
               {clientName && (
                 <div className="flex items-center gap-1.5 mt-2">
                   <div
-                    className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-[9px] font-bold text-white"
-                    style={{ background: avatarBg }}
+                    className="w-5 h-5 flex items-center justify-center flex-shrink-0 text-[9px] font-bold text-[#0A0A0A] border border-[#0A0A0A]"
+                    style={{ background: avatarBg, borderRadius: 0 }}
                   >
                     {clientName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
                   </div>
-                  <span className="text-[11px] text-[var(--color-text-tertiary)]">
+                  <span className="text-[10px] text-[var(--color-text-tertiary)] uppercase tracking-[0.04em] font-bold" style={{ fontFamily: 'var(--font-body)' }}>
                     {clientName}
                   </span>
                 </div>
